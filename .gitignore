@@ -34,3 +34,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# InsightForge AI Backend
+backend/.env
+backend/tmp/
+*.db
+
+# Python pycache
+__pycache__/
+*.pyc
+

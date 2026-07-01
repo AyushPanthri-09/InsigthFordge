@@ -221,6 +221,7 @@ export interface StatisticalTest {
   interpretation: string;
   /** Business implication of the test result. */
   businessImplication: string;
+  passed?: boolean;
 }
 
 /** Time-series period summary (one bucket in a trend). */
@@ -264,7 +265,7 @@ export interface TimeSeriesAnalysis {
 /** Lightweight forecast result (no ML models — pure statistical). */
 export interface ForecastResult {
   /** Method used: moving_average | exponential_smoothing | holt_trend. */
-  method: "moving_average" | "exponential_smoothing" | "holt_trend";
+  method: "moving_average" | "exponential_smoothing" | "holt_trend" | "weighted_moving_average" | "linear_regression";
   /** Forecast values for the next periods. */
   nextPeriods: Array<{ period: string; predicted: number; lower: number; upper: number }>;
   /** 0–1 confidence in the forecast. */
@@ -682,6 +683,8 @@ export interface EDAReport {
 
   /** Phase 2.5: Autonomous investigation results per key finding. */
   investigations?: InvestigationResult[];
+  /** Phase 4: Dimension-based contribution segmentation. */
+  segmentation?: any;
 }
 
 export type InsightLevel = "descriptive" | "diagnostic" | "predictive" | "prescriptive";

@@ -37,6 +37,9 @@ import { computeAllExtendedStats, testNormality, testNormalityFromExtendedStats,
 import { analyseTimeSeries } from "./timeseries-engine";
 import { analyseRootCause } from "./root-cause-engine";
 import { runAutonomousInvestigation } from "./autonomous-investigator";
+import { detectAndComputeKPIs } from "./analytics/kpiEngine";
+import { computeCorrelationMatrix } from "./analytics/correlationEngine";
+import { runSegmentationAnalysis } from "./analytics/segmentation";
 
 // ---------------------------------------------------------------------------
 // Precomputed column cache — built once per buildEDA() call
@@ -644,11 +647,27 @@ export function buildEDA(
   const cache = buildColumnCache(rows, analyticsProfiles);
 
   // ── KPIs and charts use full profiles (visual, not analytical) ────────
-  const kpis = computeKPIs(rows, profiles, context);
+  const legacyKpis = computeKPIs(rows, profiles, context);
+  const computedKpis = detectAndComputeKPIs(rows, profiles.map(p => p.name), domain as any);
+  
+  // Merge lists by unique KPI ID to prevent duplicates
+  const kpiMap = new Map<string, KPI>();
+  for (const k of [...legacyKpis, ...computedKpis]) {
+    kpiMap.set(k.id, k);
+  }
+  const kpis = Array.from(kpiMap.values()).slice(0, 8);
+
   const charts = buildCharts(rows, profiles, context);
 
   // ── Correlations — use cached vectors, no row scan ────────────────────
-  const correlations = computeCorrelations(rows, analyticsProfiles, cache);
+  const numericCols = analyticsProfiles.filter(p => p.inferredRole === "measure").map(p => p.name);
+  const matrix = computeCorrelationMatrix(rows, numericCols);
+  const correlations = matrix.map(c => ({
+    a: c.a,
+    b: c.b,
+    r: c.r,
+    strength: c.strength.includes("strong") ? "strong" as const : c.strength.includes("moderate") ? "moderate" as const : "weak" as const
+  }));
   const topFindings = buildTopFindings(correlations, charts, context, analyticsProfiles);
 
   // ── Phase 2: Extended statistics — use cached numeric vectors ─────────
@@ -762,6 +781,19 @@ export function buildEDA(
     context,
   );
 
+  // ── Segmentation analysis (Phase 4 upgrade) ───────────────────────────
+  let segmentation = null;
+  const dimensionCols = analyticsProfiles
+    .filter((p) => p.inferredRole === "dimension" && p.uniqueCount >= 2 && p.uniqueCount <= 30)
+    .map((p) => p.name);
+  if (numericCols[0] && dimensionCols.length > 0) {
+    try {
+      segmentation = runSegmentationAnalysis(rows, profiles.map((p) => p.name), numericCols[0], dimensionCols);
+    } catch (e) {
+      console.warn("Segmentation analysis failed:", e);
+    }
+  }
+
   return {
     datasetId,
     kpis,
@@ -774,6 +806,7 @@ export function buildEDA(
     rootCauseAnalyses,
     statisticalTests,
     investigations,
+    segmentation,
   };
 }
 
@@ -781,7 +814,7 @@ export function buildEDA(
 // Utilities (internal helpers)
 // ---------------------------------------------------------------------------
 
-function prettify(name: string): string {
+export function prettify(name: string): string {
   return name.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 

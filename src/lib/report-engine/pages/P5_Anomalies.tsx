@@ -1,13 +1,11 @@
 import React from "react";
-import type { P5AnomaliesData, ReportSeverity } from "../types";
-import type { RootCauseNode } from "@/services/analytics/types";
+import type { P5AnomaliesData } from "../types";
 import { ReportPage } from "../primitives/ReportPage";
 import { ReportSection } from "../primitives/ReportSection";
 import { ReportBadge } from "../primitives/ReportBadge";
 import { ReportTable } from "../primitives/ReportTable";
 import { ReportCallout } from "../primitives/ReportCallout";
-
-const TOTAL_PAGES = 9;
+import { ReportChart } from "../primitives/ReportChart";
 
 interface Props {
   data: P5AnomaliesData;
@@ -18,308 +16,194 @@ interface Props {
 export function P5_Anomalies({ data, datasetName, generatedAt }: Props) {
   const totalAnomalies = data.anomalyColumns.reduce(
     (sum, c) => sum + c.anomalyCount,
-    0,
+    0
   );
   const significantTests = data.statisticalTests.filter(
-    (t) => t.isSignificant,
+    (t) => t.isSignificant
   ).length;
+
+  const barSpec = {
+    id: "anomaly_bar",
+    type: "bar" as const,
+    title: "Outlier Counts by Column",
+    description: "Frequency of flagged anomalous records",
+    xKey: "column",
+    yKeys: ["anomalyCount"],
+    data: data.anomalyColumns.map((col) => ({
+      column: col.column,
+      anomalyCount: col.anomalyCount,
+    })),
+  };
 
   return (
     <ReportPage
-      pageNumber={6}
-      totalPages={TOTAL_PAGES}
-      title="Risk, Anomalies & Root Cause"
-      subtitle="Outlier exposure, statistical evidence, root-cause segments, and autonomous investigations"
+      pageNumber={8}
+      totalPages={11}
+      title="Anomaly & Outlier Detection"
+      subtitle="Z-score outlier exposure, anomalous values, and automated risk reviews"
       datasetName={datasetName}
       generatedAt={generatedAt}
     >
-      <ReportSection title="Exception Overview">
-        <div className="rpt-grid rpt-grid-4" style={{ gap: 10 }}>
-          {[
-            {
-              label: "Anomaly Columns",
-              value: String(data.anomalyColumns.length),
-              variant: data.anomalyColumns.length ? "warning" : "success",
-            },
-            {
-              label: "Total Anomalies",
-              value: totalAnomalies.toLocaleString(),
-              variant: totalAnomalies ? "warning" : "success",
-            },
-            {
-              label: "Significant Tests",
-              value: String(significantTests),
-              variant: significantTests ? "critical" : "success",
-            },
-            {
-              label: "Investigations",
-              value: String(data.investigations.length),
-              variant: "brand",
-            },
-          ].map(
-            (item: {
-              label: string;
-              value: string | number;
-              variant: ReportSeverity | "brand";
-            }) => (
-              <div key={item.label} className="rpt-kpi">
-                <div className="rpt-kpi-label">{item.label}</div>
-                <div className="rpt-kpi-value">{item.value}</div>
-                <div style={{ marginTop: 8 }}>
-                  <ReportBadge
-                    label={
-                      item.variant === "brand"
-                        ? "AI reviewed"
-                        : item.variant === "success"
-                          ? "Clean"
-                          : "Review"
-                    }
-                    variant={item.variant}
-                    dot
-                  />
-                </div>
-              </div>
-            ),
-          )}
-        </div>
-      </ReportSection>
-
-      {data.anomalyColumns.length > 0 ? (
-        <ReportSection title="Anomaly Detection Matrix">
-          <ReportTable
-            columns={[
-              { key: "column", header: "Column", mono: true },
-              { key: "anomalyCount", header: "Anomalies", align: "right" },
-              { key: "distributionShape", header: "Distribution" },
-              {
-                key: "zScoreThreshold",
-                header: "Z-Threshold",
-                align: "right",
-                render: (r) => String(Number(r.zScoreThreshold).toFixed(1)),
-              },
-              {
-                key: "explanation",
-                header: "Executive Interpretation",
-                render: (r) => (
-                  <span
-                    style={{ fontSize: 10, color: "var(--rpt-text-muted)" }}
-                  >
-                    {String(r.explanation)}
-                  </span>
-                ),
-              },
-            ]}
-            rows={data.anomalyColumns}
-            maxRows={8}
-          />
-        </ReportSection>
-      ) : (
-        <ReportCallout
-          title="Anomaly Readiness Confirmed"
-          text="Numeric columns passed the configured distribution and outlier checks. Continue monitoring as new records arrive or business thresholds change."
-          severity="success"
-        />
-      )}
-
-      {data.rootCauseAnalyses.length > 0 && (
-        <ReportSection title="Root Cause Panels">
-          {data.rootCauseAnalyses.slice(0, 2).map((rca, i) => (
-            <div key={i} className="rpt-card" style={{ marginBottom: 12 }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  marginBottom: 12,
-                }}
-              >
-                <div>
-                  <div className="rpt-h3">{rca.targetMetric}</div>
-                  <div
-                    style={{
-                      marginTop: 4,
-                      fontSize: 10.5,
-                      color: "var(--rpt-text-muted)",
-                    }}
-                  >
-                    {rca.conclusion}
-                  </div>
-                </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        
+        {/* Exception Overview */}
+        <div style={{ display: "grid", gridTemplateColumns: "1.25fr 0.75fr", gap: 14 }}>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {[
+                { label: "Anomalous Attributes", value: String(data.anomalyColumns.length), variant: "warning" },
+                { label: "Total Exception Rows", value: totalAnomalies.toLocaleString(), variant: "critical" },
+              ].map((item, idx) => (
                 <div
+                  key={idx}
                   style={{
+                    background: "var(--rpt-surface2)",
+                    border: "1px solid var(--rpt-border)",
+                    borderRadius: 6,
+                    padding: "12px 10px",
                     display: "flex",
-                    gap: 6,
-                    flexWrap: "wrap",
-                    justifyContent: "flex-end",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: 64,
                   }}
                 >
-                  <ReportBadge
-                    label={`${rca.deviationPct >= 0 ? "+" : ""}${rca.deviationPct.toFixed(1)}% deviation`}
-                    variant={
-                      Math.abs(rca.deviationPct) > 10 ? "warning" : "info"
-                    }
-                  />
-                  <ReportBadge
-                    label={`${Math.round(rca.confidence * 100)}% confidence`}
-                    variant="brand"
-                  />
+                  <span style={{ fontSize: 8.5, fontWeight: 800, textTransform: "uppercase", color: "var(--rpt-text-muted)", letterSpacing: "0.08em" }}>
+                    {item.label}
+                  </span>
+                  <span style={{ fontSize: 18, fontWeight: 850, color: item.variant === "critical" ? "var(--rpt-critical)" : "var(--rpt-warning)", marginTop: 4 }}>
+                    {item.value}
+                  </span>
                 </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                background: "var(--rpt-surface2)",
+                border: "1px solid var(--rpt-border)",
+                borderRadius: 6,
+                padding: 12,
+              }}
+            >
+              <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--rpt-brand-dark)", marginBottom: 4 }}>
+                Anomaly Risk Assessment
               </div>
-              <div className="rpt-grid rpt-grid-2" style={{ gap: 12 }}>
-                {rca.rootCauses.slice(0, 2).map((node: RootCauseNode, ni) => (
-                  <div key={ni} className="rpt-stat-tile">
-                    <div className="rpt-label" style={{ marginBottom: 8 }}>
-                      {node.column}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 7,
-                      }}
-                    >
-                      {node.segments.slice(0, 3).map((seg, si) => (
-                        <div key={si}>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              gap: 8,
-                              fontSize: 9.5,
-                              marginBottom: 3,
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontFamily: "var(--rpt-font-mono)",
-                                color: "var(--rpt-text-muted)",
-                                overflowWrap: "anywhere",
-                              }}
-                            >
-                              {seg.value}
-                            </span>
-                            <strong>{seg.contribution.toFixed(1)}%</strong>
-                          </div>
-                          <div className="rpt-progress-track">
-                            <div
-                              className="rpt-progress-fill"
-                              style={{
-                                width: `${Math.min(100, Math.abs(seg.contribution))}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <p style={{ fontSize: 9.8, color: "var(--rpt-text-muted)", lineHeight: 1.45, margin: 0 }}>
+                Autonomous audits run multi-variant distribution profiles to verify record consistency. Outliers are filtered using a z-score cutoff threshold of 3.0.
+              </p>
+            </div>
+          </div>
+
+          {/* Anomaly Bar Chart */}
+          {data.anomalyColumns.length > 0 ? (
+            <div className="rpt-card" style={{ padding: 12 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--rpt-brand-dark)", marginBottom: 6 }}>
+                Outliers Count by Column
+              </div>
+              <div className="rpt-chart-panel" style={{ height: 110 }}>
+                <ReportChart spec={barSpec} height={110} />
               </div>
             </div>
-          ))}
-        </ReportSection>
-      )}
+          ) : (
+            <div
+              style={{
+                background: "var(--rpt-success-soft)",
+                border: "1px solid rgba(4, 120, 87, 0.15)",
+                borderRadius: 6,
+                padding: 12,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+              }}
+            >
+              <span style={{ fontSize: 10, color: "var(--rpt-success)", fontWeight: 700 }}>
+                No outlier records flagged in this verification run.
+              </span>
+            </div>
+          )}
 
-      {data.statisticalTests.length > 0 && (
-        <ReportSection title="Statistical Evidence">
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {data.statisticalTests.slice(0, 4).map((t, i) => (
-              <div
-                key={i}
-                className={t.isSignificant ? "rpt-risk-block" : "rpt-card-sm"}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr auto",
-                  gap: 12,
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 4,
-                    }}
-                  >
-                    <div className="rpt-h3">{t.testName}</div>
-                    <ReportBadge
-                      label={
-                        t.isSignificant ? "Significant" : "Not significant"
-                      }
-                      variant={t.isSignificant ? "critical" : "success"}
-                      dot
-                    />
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 10.5,
-                      color: "var(--rpt-text-muted)",
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    {t.interpretation}
-                  </div>
-                </div>
-                <div style={{ textAlign: "right", minWidth: 72 }}>
-                  <div className="rpt-label">p-value</div>
-                  <div
-                    style={{
-                      fontFamily: "var(--rpt-font-mono)",
-                      fontSize: 13,
-                      fontWeight: 850,
-                    }}
-                  >
-                    {t.pValue.toFixed(4)}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ReportSection>
-      )}
+        </div>
 
-      {data.investigations.length > 0 && (
-        <ReportSection title="Autonomous Investigation Notes">
-          <div className="rpt-grid rpt-grid-3" style={{ gap: 10 }}>
-            {data.investigations.slice(0, 3).map((inv, i) => {
-              const topHyp = inv.leadingHypotheses?.[0];
-              return (
-                <div key={i} className="rpt-ai-block">
-                  {topHyp && (
-                    <ReportBadge
-                      label={topHyp.verdict}
-                      variant={
-                        topHyp.verdict === "supported"
-                          ? "success"
-                          : topHyp.verdict === "rejected"
-                            ? "critical"
-                            : "warning"
-                      }
-                      dot
-                    />
-                  )}
-                  <div
-                    className="rpt-h3"
-                    style={{ marginTop: 9, marginBottom: 5 }}
-                  >
-                    {inv.finding}
+        {/* Anomaly Detection Matrix */}
+        {data.anomalyColumns.length > 0 ? (
+          <ReportSection title="Anomalous Fields Register">
+            <ReportTable
+              columns={[
+                { key: "column", header: "Column Label", mono: true },
+                { key: "anomalyCount", header: "Outliers Count", align: "right" },
+                { key: "distributionShape", header: "Distribution" },
+                {
+                  key: "zScoreThreshold",
+                  header: "Z-Cutoff",
+                  align: "right",
+                  render: (r) => String(Number(r.zScoreThreshold).toFixed(1)),
+                },
+                {
+                  key: "explanation",
+                  header: "Executive Impact Interpretation",
+                  render: (r) => (
+                    <span style={{ fontSize: 9.5, color: "var(--rpt-text-muted)" }}>
+                      {String(r.explanation)}
+                    </span>
+                  ),
+                },
+              ]}
+              rows={data.anomalyColumns}
+              maxRows={5}
+            />
+          </ReportSection>
+        ) : (
+          <ReportCallout
+            title="Clean Distribution Verified"
+            text="All numeric fields comply with governed normal distribution constraints. No extreme outlier values require staging or exclusion."
+            severity="success"
+          />
+        )}
+
+        {/* Statistical Evidence (Significant Hypothesis Tests) */}
+        {data.statisticalTests.length > 0 && (
+          <ReportSection title="Statistical Hypothesis Testing Results">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {data.statisticalTests.slice(0, 2).map((t, idx) => (
+                <div
+                  key={idx}
+                  className={t.isSignificant ? "rpt-risk-block" : "rpt-card-sm"}
+                  style={{
+                    padding: 12,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: 86,
+                  }}
+                >
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6, marginBottom: 4 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--rpt-brand-dark)" }}>
+                        {t.testName}
+                      </span>
+                      <ReportBadge
+                        label={t.isSignificant ? "Significant" : "Not Sig"}
+                        variant={t.isSignificant ? "critical" : "success"}
+                        dot
+                      />
+                    </div>
+                    <p style={{ fontSize: 9.2, color: "var(--rpt-text-muted)", lineHeight: 1.4, margin: 0 }}>
+                      {t.interpretation}
+                    </p>
                   </div>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      color: "var(--rpt-text-muted)",
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    {inv.conclusion}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--rpt-border-light)", paddingTop: 6, marginTop: 6 }}>
+                    <span style={{ fontSize: 8.5, color: "var(--rpt-text-muted)" }}>Test Statistic: <code style={{ fontFamily: "var(--rpt-font-mono)" }}>{t.statistic.toFixed(2)}</code></span>
+                    <span style={{ fontSize: 10, fontWeight: 800 }}>p: {t.pValue.toFixed(4)}</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </ReportSection>
-      )}
+              ))}
+            </div>
+          </ReportSection>
+        )}
+
+      </div>
     </ReportPage>
   );
 }

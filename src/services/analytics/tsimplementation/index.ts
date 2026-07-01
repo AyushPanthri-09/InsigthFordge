@@ -29,6 +29,7 @@ import type {
   ParsedDataset,
   ReasoningStep,
   AIInsight,
+  ColumnProfile,
 } from "../types";
 
 // Internal extension of the public AnalyticsService interface.
@@ -60,6 +61,16 @@ import {
   reasonAnalytics,
   reasonCleaningIssues,
 } from "@/lib/ai-reasoning.functions";
+
+import { detectAndComputeKPIs } from "./analytics/kpiEngine";
+import { computeCorrelationMatrix } from "./analytics/correlationEngine";
+import { detectAnomalies } from "./analytics/anomalyEngine";
+import { runSegmentationAnalysis } from "./analytics/segmentation";
+import { generateAdvancedForecast, type ExtendedForecastResult } from "./analytics/forecastingEngine";
+import { generateRecommendations } from "./analytics/recommendationEngine";
+import { calculateDataQuality } from "./analytics/qualityScore";
+import { generateStructuredInsights } from "./analytics/insightEngine";
+import { generateSCQANarrative, compileSCQANarrativeText } from "./analytics/narrativeEngine";
 
 // ---------------------------------------------------------------------------
 // In-process session store
@@ -235,6 +246,10 @@ export const tsAnalyticsService: AnalyticsService = {
     const dupCount =
       heuristicIssues.find((i) => i.id.startsWith("dup_"))?.affectedRows ?? 0;
 
+    const numericCols = profiles.filter(p => p.inferredRole === "measure").map(p => p.name);
+    const anomalies = detectAnomalies(ds.rows, ds.columns, numericCols, []);
+    const quality = calculateDataQuality(ds.rows, profiles, anomalies, dupCount);
+
     try {
       const ai = await reasonCleaningIssues({
         data: {
@@ -279,25 +294,30 @@ export const tsAnalyticsService: AnalyticsService = {
       const merged = [...aiIssues, ...heuristicIssues].map(
         enforceDAIEGovernance,
       );
-      return buildReport(
+      
+      const report = buildReport(
         datasetId,
         merged,
         ds.rowCount,
         ds.rowCount,
-        ai.overallNotes,
+        ai.overallNotes + "\n\n" + quality.recommendations.join("\n"),
       );
+      report.qualityScore = quality.overallScore;
+      return report;
     } catch (e) {
       console.warn(
         "AI cleaning reasoning failed; using Data Quality Intelligence issues only.",
         e,
       );
-      return buildReport(
+      const report = buildReport(
         datasetId,
         heuristicIssues,
         ds.rowCount,
         ds.rowCount,
-        "Heuristic + Data Quality Intelligence cleaning report with deterministic readiness evidence.",
+        "Heuristic + Data Quality Intelligence cleaning report with deterministic readiness evidence.\n\n" + quality.recommendations.join("\n"),
       );
+      report.qualityScore = quality.overallScore;
+      return report;
     }
   },
 
@@ -534,8 +554,11 @@ export const tsAnalyticsService: AnalyticsService = {
       );
       return buildFallbackAnalytics(
         datasetId,
-        eda.topFindings,
+        eda,
         enriched.domain.value,
+        ds.rows,
+        ds.columns,
+        enriched.profiles,
       );
     }
   },
@@ -666,213 +689,74 @@ export const tsAnalyticsService: AnalyticsService = {
 
 function buildFallbackAnalytics(
   datasetId: string,
-  topFindings: string[],
+  eda: EDAReport,
   domain: string,
+  rows: Record<string, unknown>[],
+  columns: string[],
+  profiles: ColumnProfile[],
 ): AnalyticsReport {
-  const findings =
-    topFindings.length > 0
-      ? topFindings
-      : [
-          `Dataset profiling completed for ${domain}; no dominant finding exceeded automated escalation thresholds.`,
-          "Data quality, KPI, and relationship checks remain available for executive review.",
-          "Stakeholder validation is recommended before strategic decisions are finalized.",
-        ];
+  const prettify = (name: string) => name.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const numericCols = profiles.filter(p => p.inferredRole === "measure").map(p => p.name);
+  
+  // 1. Correlation Matrix
+  const correlationMatrix = computeCorrelationMatrix(rows, numericCols);
+  
+  // 2. Anomaly Detection
+  const anomalies = detectAnomalies(rows, columns, numericCols, eda.timeSeriesAnalysis || []);
+  
+  // 3. Recommendation Engine
+  const recommendations = generateRecommendations(domain as any, eda.kpis, anomalies, correlationMatrix);
+  
+  // 4. Time Series Forecasts Extraction
+  const forecasts: ExtendedForecastResult[] = [];
+  if (eda.timeSeriesAnalysis) {
+    for (const ts of eda.timeSeriesAnalysis) {
+      if (ts.forecast) {
+        forecasts.push({
+          ...ts.forecast,
+          selectedMethod: ts.forecast.method as any,
+          explanation: `Forecasting projection for measure '${prettify(ts.measureColumn)}'.`,
+          mape: 1 - ts.forecast.confidence
+        });
+      }
+    }
+  }
 
-  const makeReadinessInsight = (
-    id: string,
-    level: AIInsight["level"],
-    title: string,
-    observation: string,
-    recommendation: string,
-    confidence: number,
-  ): AIInsight => ({
-    id,
-    level,
-    title,
-    observation,
-    summary: observation,
-    reasoning:
-      "Generated from deterministic profiling, data quality checks, EDA outputs, and statistical evidence available in this run.",
-    hypotheses: [
-      {
-        statement:
-          "The observed pattern reflects a genuine business signal in the dataset.",
-        supportingEvidence: [
-          { type: "dataset" as const, description: observation, weight: 0.7 },
-        ],
-        opposingEvidence: [
-          {
-            type: "inference" as const,
-            description:
-              "External business context was not available during deterministic assessment.",
-            weight: 0.3,
-          },
-        ],
-        verdict: "inconclusive" as const,
-        rationale:
-          "Dataset evidence supports executive review, while causal certainty requires stakeholder and source-system validation.",
-        confidence,
-      },
-      {
-        statement:
-          "The observed pattern may be influenced by data quality, sampling, or operational timing.",
-        supportingEvidence: [
-          {
-            type: "inference" as const,
-            description:
-              "Automated readiness mode cannot validate all upstream process conditions.",
-            weight: 0.4,
-          },
-        ],
-        opposingEvidence: [
-          { type: "dataset" as const, description: observation, weight: 0.4 },
-        ],
-        verdict: "inconclusive" as const,
-        rationale:
-          "The report should be treated as decision-support evidence until domain owners confirm process context.",
-        confidence: Math.max(0.35, confidence - 0.1),
-      },
-    ],
-    evidence: [
-      { type: "dataset" as const, description: observation, weight: 0.8 },
-    ],
-    confidence,
-    conclusion: observation,
-    recommendation,
-    limitations: [
-      "Deterministic assessment relies on available dataset evidence and automated profiling outputs.",
-      "Causality requires validation with process owners and source-system context.",
-    ],
-  });
+  // 5. Generate structured insights (Descriptive, Diagnostic, Predictive, Prescriptive)
+  const insights = generateStructuredInsights(
+    domain as any,
+    eda.kpis,
+    correlationMatrix,
+    anomalies,
+    eda.segmentation,
+    forecasts,
+    recommendations
+  );
+
+  // 6. Executive Narrative SCQA
+  const scqa = generateSCQANarrative(
+    domain as any,
+    rows.length,
+    eda.kpis,
+    anomalies,
+    correlationMatrix,
+    recommendations
+  );
+  const scqaText = compileSCQANarrativeText(scqa);
+
+  // 7. Quality Score calculation for business health reference
+  const totalCells = rows.length * profiles.length;
+  const nullCount = profiles.reduce((sum, p) => sum + p.nullCount, 0);
+  const completeness = totalCells > 0 ? (totalCells - nullCount) / totalCells : 1;
+  const healthScore = Math.round(completeness * 100);
 
   return {
     datasetId,
-    executiveSummary: `Overall Business Assessment: the ${domain} dataset has been evaluated through data quality controls, KPI profiling, exploratory analysis, and statistical evidence. The decision summary prioritizes validated dataset signals, confidence boundaries, and near-term governance actions for executive review.`,
-    businessHealthScore: 58,
-    descriptive: findings.slice(0, 3).map((f, i) => ({
-      id: `readiness_desc_${i}`,
-      level: "descriptive" as const,
-      title: f.split(":")[0] ?? `Finding ${i + 1}`,
-      observation: f,
-      summary: f,
-      reasoning:
-        "Generated from deterministic profiling, data quality, EDA, and statistical evidence available in this run.",
-      hypotheses: [
-        {
-          statement:
-            "The observed pattern reflects a genuine signal in the data.",
-          supportingEvidence: [
-            { type: "dataset" as const, description: f, weight: 0.7 },
-          ],
-          opposingEvidence: [],
-          verdict: "inconclusive" as const,
-          rationale:
-            "Dataset evidence is sufficient for readiness assessment, but not enough to confirm strategic causality without stakeholder validation.",
-          confidence: 0.5,
-        },
-        {
-          statement:
-            "The pattern may be a data-quality artifact (sampling, missing values, or unit inconsistency).",
-          supportingEvidence: [],
-          opposingEvidence: [
-            {
-              type: "inference" as const,
-              description: "No contradicting evidence collected.",
-              weight: 0.3,
-            },
-          ],
-          verdict: "inconclusive" as const,
-          rationale: "Cannot be tested without the reasoning engine.",
-          confidence: 0.3,
-        },
-      ],
-      evidence: [{ type: "dataset" as const, description: f, weight: 0.9 }],
-      confidence: 0.6,
-      conclusion: f,
-      recommendation:
-        "Use this finding as a validated starting point for stakeholder review and metric-owner confirmation.",
-      limitations: [
-        "Deterministic assessment relies on available dataset evidence and automated profiling outputs.",
-        "Causality requires validation with process owners and source-system context.",
-      ],
-    })),
-    diagnostic: [
-      makeReadinessInsight(
-        "readiness_diag_0",
-        "diagnostic",
-        "Root Cause Readiness",
-        findings[0],
-        "Confirm metric definitions, source-system lineage, and segment ownership before assigning operational root cause.",
-        0.58,
-      ),
-      makeReadinessInsight(
-        "readiness_diag_1",
-        "diagnostic",
-        "Correlation Readiness",
-        findings[1],
-        "Review the strongest computed relationships with metric owners and validate whether they represent causal drivers or shared inputs.",
-        0.55,
-      ),
-    ],
-    predictive: [
-      makeReadinessInsight(
-        "readiness_pred_0",
-        "predictive",
-        "Forecast Readiness",
-        "Predictive confidence depends on governed time fields, stable historical cadence, and enough repeated periods for interval estimation.",
-        "Add or validate date/period columns, preserve historical records, and rerun forecasting once the timeline is complete.",
-        0.52,
-      ),
-    ],
-    prescriptive: [
-      {
-        ...makeReadinessInsight(
-          "readiness_pres_0",
-          "prescriptive",
-          "Validate High-Impact Signals",
-          findings[0],
-          "Assign metric owners to validate the top deterministic findings and document source-system context before executive action.",
-          0.62,
-        ),
-        prescriptiveDetail: {
-          action:
-            "Run a metric-owner review of the top deterministic findings and document accepted definitions, exclusions, and source lineage.",
-          expectedImpact:
-            "Improves decision confidence and reduces the risk of acting on unvalidated or misinterpreted dataset signals.",
-          effort: "medium" as const,
-          priority: "high" as const,
-          riskOfInaction:
-            "Executives may act on analytically plausible signals before business context and data lineage are confirmed.",
-          successMetric:
-            "Top findings signed off by data owner, business owner, and analytics owner.",
-          timeHorizon: "short_term" as const,
-          confidence: 0.62,
-        },
-      },
-      {
-        ...makeReadinessInsight(
-          "readiness_pres_1",
-          "prescriptive",
-          "Strengthen Predictive Readiness",
-          "Forecasting and causal interpretation require stable time fields, sufficient history, and confirmed business events.",
-          "Add governed date fields and maintain enough historical periods to support reliable forecasts and seasonal analysis.",
-          0.56,
-        ),
-        prescriptiveDetail: {
-          action:
-            "Backfill or validate time columns, preserve period-level history, and label known business events that may affect trend interpretation.",
-          expectedImpact:
-            "Enables defensible trend, seasonality, and forecast exhibits in future executive reports.",
-          effort: "medium" as const,
-          priority: "medium" as const,
-          riskOfInaction:
-            "Forecast pages remain readiness-gated and leaders lose forward-looking planning support.",
-          successMetric:
-            "At least 6 stable historical periods available for priority forecast metrics.",
-          timeHorizon: "short_term" as const,
-          confidence: 0.56,
-        },
-      },
-    ],
+    executiveSummary: scqaText,
+    businessHealthScore: healthScore,
+    descriptive: insights.descriptive,
+    diagnostic: insights.diagnostic,
+    predictive: insights.predictive,
+    prescriptive: insights.prescriptive
   };
 }

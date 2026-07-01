@@ -285,6 +285,8 @@ function detectSeasonality(
 // Forecasting
 // ---------------------------------------------------------------------------
 
+import { generateAdvancedForecast } from "./analytics/forecastingEngine";
+
 /**
  * Automatically selects the best lightweight forecasting method based on
  * detected trend characteristics, then forecasts the next 3 periods.
@@ -294,21 +296,7 @@ function buildForecast(
   buckets: PeriodBucket[],
   granularity: string,
 ): ForecastResult {
-  const trend = classifyTrend(values);
-  const n = values.length;
-
-  // Holt's Linear Trend for growing/declining series
-  if (trend === "growing" || trend === "declining") {
-    return holtTrendForecast(values, buckets, granularity);
-  }
-
-  // Exponential Smoothing for flat/volatile series
-  if (trend === "flat" || trend === "volatile") {
-    return exponentialSmoothingForecast(values, buckets, granularity);
-  }
-
-  // Simple Moving Average as fallback
-  return movingAverageForecast(values, buckets, granularity);
+  return generateAdvancedForecast(values, buckets.map((b) => b.period), 3);
 }
 
 /** Simple N-period Moving Average forecast. */

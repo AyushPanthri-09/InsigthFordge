@@ -158,7 +158,7 @@ function extractTimeHorizon(insight: AIInsight): string {
     medium_term: "Medium-term (3-6 months)",
     long_term: "Long-term (6-12 months)",
   };
-  return map[detail?.timeHorizon] ?? "Short-term (1-3 months)";
+  return (detail?.timeHorizon ? map[detail.timeHorizon] : undefined) ?? "Short-term (1-3 months)";
 }
 
 /** Build a synthetic forecast chart spec from a TimeSeriesAnalysis */

@@ -1,31 +1,44 @@
 import React from "react";
 import type { ReportDocument } from "./types";
-import { P1_Executive } from "./pages/P1_Executive";
-import { P2_Performance } from "./pages/P2_Performance";
-import { P3_Trends } from "./pages/P3_Trends";
-import { P4_DataQuality } from "./pages/P4_DataQuality";
-import { P5_Anomalies } from "./pages/P5_Anomalies";
-import { P6_Forecast } from "./pages/P6_Forecast";
-import { P7_Recommendations } from "./pages/P7_Recommendations";
-import { Appendix } from "./pages/Appendix";
+import {
+  P1_Cover,
+  P2_ExecutiveSummary,
+  P3_TOC,
+  P4_KPIDashboard,
+  P5_DataQuality,
+  P6_Trends,
+  P7_Correlations,
+  P5_Anomalies,
+  P6_Forecast,
+  P7_Recommendations,
+  Appendix,
+} from "./pages";
 
 interface Props {
   doc: ReportDocument;
 }
 
 /**
- * Renders the complete report as a sequence of .rpt-page divs.
- * Used both for the live in-app preview and as the source for print HTML export.
+ * Renders the complete report as a sequence of exactly 11 A4 pages.
+ * Used both for the live in-app preview and as the source for print HTML/PDF export.
  */
 export function HtmlReportDocument({ doc }: Props) {
   const shared = { datasetName: doc.datasetName, generatedAt: doc.generatedAt };
 
   return (
     <div className="rpt-document">
-      <P1_Executive data={doc.p1} />
-      <P2_Performance data={doc.p2} {...shared} />
-      <P3_Trends data={doc.p3} {...shared} />
-      <P4_DataQuality data={doc.p4} {...shared} />
+      <P1_Cover data={doc.p1} {...shared} />
+      <P2_ExecutiveSummary data={doc.p1} {...shared} />
+      <P3_TOC {...shared} />
+      <P4_KPIDashboard
+        data={doc.p2}
+        {...shared}
+        businessHealthScore={doc.p1.businessHealthScore}
+        dataQualityScore={doc.p1.dataQualityScore}
+      />
+      <P5_DataQuality data={doc.p4} {...shared} />
+      <P6_Trends data={doc.p3} {...shared} />
+      <P7_Correlations data={doc.p2} {...shared} />
       <P5_Anomalies data={doc.p5} {...shared} />
       <P6_Forecast data={doc.p6} {...shared} />
       <P7_Recommendations data={doc.p7} {...shared} />
