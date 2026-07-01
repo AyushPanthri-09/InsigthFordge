@@ -16,7 +16,7 @@ interface ReportTableProps<T> {
   className?: string;
 }
 
-export function ReportTable<T extends Record<string, unknown>>({
+export function ReportTable<T extends object>({
   columns,
   rows,
   maxRows,
@@ -25,39 +25,43 @@ export function ReportTable<T extends Record<string, unknown>>({
   const visible = maxRows ? rows.slice(0, maxRows) : rows;
 
   return (
-    <table className={`rpt-table ${className}`}>
-      <thead>
-        <tr>
-          {columns.map((col) => (
-            <th
-              key={String(col.key)}
-              style={{
-                textAlign: col.align ?? "left",
-                width: col.width,
-              }}
-            >
-              {col.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {visible.map((row, ri) => (
-          <tr key={ri}>
+    <div className="rpt-table-wrap">
+      <table className={`rpt-table ${className}`}>
+        <thead>
+          <tr>
             {columns.map((col) => (
-              <td
+              <th
                 key={String(col.key)}
-                className={col.mono ? "rpt-table-mono" : ""}
-                style={{ textAlign: col.align ?? "left" }}
+                style={{
+                  textAlign: col.align ?? "left",
+                  width: col.width,
+                }}
               >
-                {col.render
-                  ? col.render(row)
-                  : String(row[col.key as keyof T] ?? "")}
-              </td>
+                {col.header}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {visible.map((row, ri) => (
+            <tr key={ri}>
+              {columns.map((col) => (
+                <td
+                  key={String(col.key)}
+                  className={col.mono ? "rpt-table-mono" : ""}
+                  style={{ textAlign: col.align ?? "left" }}
+                >
+                  {col.render
+                    ? col.render(row)
+                    : String(
+                        (row as Record<string, unknown>)[String(col.key)] ?? "",
+                      )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

@@ -2,10 +2,10 @@ import React from "react";
 import type { ReportSeverity } from "../types";
 
 const ICONS: Record<ReportSeverity, string> = {
-  critical: "🔴",
-  warning:  "⚠️",
-  info:     "ℹ️",
-  success:  "✅",
+  critical: "!",
+  warning: "!",
+  info: "i",
+  success: "+",
 };
 
 interface ReportCalloutProps {
@@ -15,7 +15,12 @@ interface ReportCalloutProps {
   icon?: string;
 }
 
-export function ReportCallout({ title, text, severity = "info", icon }: ReportCalloutProps) {
+export function ReportCallout({
+  title,
+  text,
+  severity = "info",
+  icon,
+}: ReportCalloutProps) {
   return (
     <div className={`rpt-callout rpt-callout-${severity}`}>
       <span className="rpt-callout-icon">{icon ?? ICONS[severity]}</span>

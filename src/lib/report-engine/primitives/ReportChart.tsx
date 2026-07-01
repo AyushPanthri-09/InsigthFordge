@@ -1,23 +1,46 @@
 import React from "react";
 import {
-  AreaChart, Area, BarChart, Bar, LineChart, Line,
-  PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from "recharts";
 import type { ChartSpec } from "@/services/analytics/types";
 
 const PALETTE = [
-  "var(--rpt-c1)", "var(--rpt-c2)", "var(--rpt-c3)", "var(--rpt-c4)",
-  "var(--rpt-c5)", "var(--rpt-c6)", "var(--rpt-c7)", "var(--rpt-c8)",
+  "var(--rpt-c1)",
+  "var(--rpt-c2)",
+  "var(--rpt-c3)",
+  "var(--rpt-c4)",
+  "var(--rpt-c5)",
+  "var(--rpt-c6)",
+  "var(--rpt-c7)",
+  "var(--rpt-c8)",
 ];
 
-const TICK_STYLE = { fill: "var(--rpt-text-muted)", fontSize: 9, fontFamily: "var(--rpt-font)" };
+const TICK_STYLE = {
+  fill: "var(--rpt-text-muted)",
+  fontSize: 9,
+  fontFamily: "var(--rpt-font)",
+};
 const TOOLTIP_STYLE = {
-  background: "var(--rpt-surface2)",
+  background: "#ffffff",
   border: "1px solid var(--rpt-border)",
   borderRadius: 8,
   fontSize: 11,
   color: "var(--rpt-text)",
+  boxShadow: "0 10px 24px rgba(16, 24, 40, 0.12)",
 };
 
 function fmt(v: unknown): string {
@@ -28,6 +51,10 @@ function fmt(v: unknown): string {
   return n % 1 === 0 ? String(n) : n.toFixed(2);
 }
 
+function safeChartId(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 interface ReportChartProps {
   spec: ChartSpec;
   height?: number;
@@ -35,7 +62,24 @@ interface ReportChartProps {
 
 export function ReportChart({ spec, height = 200 }: ReportChartProps) {
   const data = spec.data as Record<string, unknown>[];
-  if (!data?.length) return null;
+  if (!data?.length) {
+    return (
+      <div
+        className="rpt-stat-tile"
+        style={{
+          height,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "var(--rpt-text-muted)",
+          fontSize: 10,
+          textAlign: "center",
+        }}
+      >
+        Chart readiness gated until the source query returns plottable rows.
+      </div>
+    );
+  }
 
   const yKeys = spec.yKeys ?? [spec.yKeys?.[0] ?? "value"];
 
@@ -76,14 +120,35 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
           layout="horizontal"
           margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--rpt-border)" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--rpt-border-light)"
+            vertical={false}
+          />
           <>
-              <XAxis dataKey={spec.xKey} tick={TICK_STYLE} axisLine={false} tickLine={false} />
-              <YAxis tick={TICK_STYLE} tickFormatter={fmt} axisLine={false} tickLine={false} width={40} />
-            </>
+            <XAxis
+              dataKey={spec.xKey}
+              tick={TICK_STYLE}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tick={TICK_STYLE}
+              tickFormatter={fmt}
+              axisLine={false}
+              tickLine={false}
+              width={40}
+            />
+          </>
           <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => fmt(v)} />
           {yKeys.map((k, i) => (
-            <Bar key={k} dataKey={k} fill={PALETTE[i % PALETTE.length]} radius={[3, 3, 0, 0]} maxBarSize={32} />
+            <Bar
+              key={k}
+              dataKey={k}
+              fill={PALETTE[i % PALETTE.length]}
+              radius={[3, 3, 0, 0]}
+              maxBarSize={32}
+            />
           ))}
         </BarChart>
       </ResponsiveContainer>
@@ -93,18 +158,51 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
   if (spec.type === "area") {
     return (
       <ResponsiveContainer width="100%" height={height}>
-        <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
+        <AreaChart
+          data={data}
+          margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
+        >
           <defs>
             {yKeys.map((k, i) => (
-              <linearGradient key={k} id={`grad_${k}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0.3} />
-                <stop offset="95%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0} />
+              <linearGradient
+                key={k}
+                id={`grad_${safeChartId(`${spec.id}_${k}`)}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="5%"
+                  stopColor={PALETTE[i % PALETTE.length]}
+                  stopOpacity={0.3}
+                />
+                <stop
+                  offset="95%"
+                  stopColor={PALETTE[i % PALETTE.length]}
+                  stopOpacity={0}
+                />
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--rpt-border)" />
-          <XAxis dataKey={spec.xKey} tick={TICK_STYLE} axisLine={false} tickLine={false} />
-          <YAxis tick={TICK_STYLE} tickFormatter={fmt} axisLine={false} tickLine={false} width={40} />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--rpt-border-light)"
+            vertical={false}
+          />
+          <XAxis
+            dataKey={spec.xKey}
+            tick={TICK_STYLE}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={TICK_STYLE}
+            tickFormatter={fmt}
+            axisLine={false}
+            tickLine={false}
+            width={40}
+          />
           <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => fmt(v)} />
           {yKeys.map((k, i) => (
             <Area
@@ -113,7 +211,7 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
               dataKey={k}
               stroke={PALETTE[i % PALETTE.length]}
               strokeWidth={2}
-              fill={`url(#grad_${k})`}
+              fill={`url(#grad_${safeChartId(`${spec.id}_${k}`)})`}
               dot={false}
               connectNulls
             />
@@ -127,9 +225,24 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--rpt-border)" />
-        <XAxis dataKey={spec.xKey} tick={TICK_STYLE} axisLine={false} tickLine={false} />
-        <YAxis tick={TICK_STYLE} tickFormatter={fmt} axisLine={false} tickLine={false} width={40} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="var(--rpt-border-light)"
+          vertical={false}
+        />
+        <XAxis
+          dataKey={spec.xKey}
+          tick={TICK_STYLE}
+          axisLine={false}
+          tickLine={false}
+        />
+        <YAxis
+          tick={TICK_STYLE}
+          tickFormatter={fmt}
+          axisLine={false}
+          tickLine={false}
+          width={40}
+        />
         <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => fmt(v)} />
         {yKeys.map((k, i) => (
           <Line

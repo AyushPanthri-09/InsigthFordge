@@ -7,7 +7,11 @@
  * Every page component receives exactly the data it needs from this builder.
  */
 
-import type { FullAnalysis, AIInsight, ChartSpec } from "@/services/analytics/types";
+import type {
+  FullAnalysis,
+  AIInsight,
+  ChartSpec,
+} from "@/services/analytics/types";
 import type {
   ReportDocument,
   P1ExecutiveData,
@@ -22,11 +26,16 @@ import type {
   PriorityLevel,
   EffortLevel,
 } from "./types";
+import { sanitizeReportValue } from "./report-sanitizer";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function generateReportId(): string {
-  return `rpt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+function generateReportId(seed: string): string {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return `rpt_${hash.toString(36)}`;
 }
 
 function formatDateTime(date: Date): string {
@@ -58,6 +67,37 @@ function domainLabel(domain: string): string {
   return map[domain] ?? domain;
 }
 
+function uniqueStrings(values: string[], limit = values.length): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const value of values) {
+    const normalized = value.replace(/\s+/g, " ").trim();
+    const key = normalized.toLowerCase();
+    if (!normalized || seen.has(key)) continue;
+    seen.add(key);
+    out.push(normalized);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+function uniqueBy<T>(
+  values: T[],
+  keyFn: (value: T) => string,
+  limit = values.length,
+): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const value of values) {
+    const key = keyFn(value).replace(/\s+/g, " ").trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(value);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 function severityFromNullPct(nullPct: number): ReportSeverity {
   if (nullPct > 0.5) return "critical";
   if (nullPct > 0.25) return "warning";
@@ -65,48 +105,66 @@ function severityFromNullPct(nullPct: number): ReportSeverity {
   return "success";
 }
 
+type PrescriptiveDetail = {
+  priority?: PriorityLevel;
+  effort?: EffortLevel;
+  expectedImpact?: string;
+  riskOfInaction?: string;
+  successMetric?: string;
+  timeHorizon?: string;
+};
+
+function getPrescriptiveDetail(
+  insight: AIInsight,
+): PrescriptiveDetail | undefined {
+  return (insight as { prescriptiveDetail?: PrescriptiveDetail })
+    .prescriptiveDetail;
+}
+
 function extractPriority(insight: AIInsight): PriorityLevel {
-  const detail = (insight as any).prescriptiveDetail;
-  if (detail?.priority) return detail.priority as PriorityLevel;
+  const detail = getPrescriptiveDetail(insight);
+  if (detail?.priority) return detail.priority;
   if (insight.confidence >= 0.8) return "high";
   if (insight.confidence >= 0.6) return "medium";
   return "low";
 }
 
 function extractEffort(insight: AIInsight): EffortLevel {
-  const detail = (insight as any).prescriptiveDetail;
-  if (detail?.effort) return detail.effort as EffortLevel;
+  const detail = getPrescriptiveDetail(insight);
+  if (detail?.effort) return detail.effort;
   return "medium";
 }
 
 function extractExpectedImpact(insight: AIInsight): string {
-  const detail = (insight as any).prescriptiveDetail;
+  const detail = getPrescriptiveDetail(insight);
   return detail?.expectedImpact ?? insight.summary;
 }
 
 function extractRiskOfInaction(insight: AIInsight): string {
-  const detail = (insight as any).prescriptiveDetail;
+  const detail = getPrescriptiveDetail(insight);
   return detail?.riskOfInaction ?? "Risk not quantified.";
 }
 
 function extractSuccessMetric(insight: AIInsight): string {
-  const detail = (insight as any).prescriptiveDetail;
+  const detail = getPrescriptiveDetail(insight);
   return detail?.successMetric ?? "Track KPI improvement over 90 days.";
 }
 
 function extractTimeHorizon(insight: AIInsight): string {
-  const detail = (insight as any).prescriptiveDetail;
+  const detail = getPrescriptiveDetail(insight);
   const map: Record<string, string> = {
     immediate: "Immediate (< 2 weeks)",
-    short_term: "Short-term (1–3 months)",
-    medium_term: "Medium-term (3–6 months)",
-    long_term: "Long-term (6–12 months)",
+    short_term: "Short-term (1-3 months)",
+    medium_term: "Medium-term (3-6 months)",
+    long_term: "Long-term (6-12 months)",
   };
-  return map[detail?.timeHorizon] ?? "Short-term (1–3 months)";
+  return map[detail?.timeHorizon] ?? "Short-term (1-3 months)";
 }
 
 /** Build a synthetic forecast chart spec from a TimeSeriesAnalysis */
-function buildForecastChartSpec(ts: import("@/services/analytics/types").TimeSeriesAnalysis): ChartSpec {
+function buildForecastChartSpec(
+  ts: import("@/services/analytics/types").TimeSeriesAnalysis,
+): ChartSpec {
   const historicalData = ts.periods.map((p) => ({
     period: p.period,
     actual: p.value,
@@ -126,8 +184,8 @@ function buildForecastChartSpec(ts: import("@/services/analytics/types").TimeSer
   return {
     id: `forecast_${ts.measureColumn}`,
     type: "area",
-    title: `${ts.measureColumn} — Trend & Forecast`,
-    description: `${ts.overallTrend} trend · ${ts.totalGrowthPct >= 0 ? "+" : ""}${ts.totalGrowthPct.toFixed(1)}% total growth`,
+    title: `${ts.measureColumn} - Trend & Forecast`,
+    description: `${ts.overallTrend} trend / ${ts.totalGrowthPct >= 0 ? "+" : ""}${ts.totalGrowthPct.toFixed(1)}% total growth`,
     xKey: "period",
     yKeys: ["actual", "forecast"],
     data: [...historicalData, ...forecastData],
@@ -169,7 +227,11 @@ function buildP1(analysis: FullAnalysis, generatedAt: string): P1ExecutiveData {
         headline: analysis.analytics.executiveSummary.split(".")[0] + ".",
       };
 
-  const topRecommendations = analysis.analytics.prescriptive.slice(0, 4).map((i) => ({
+  const topRecommendations = uniqueBy(
+    analysis.analytics.prescriptive,
+    (i) => `${i.title}|${i.recommendation ?? i.summary}`,
+    4,
+  ).map((i) => ({
     title: i.title,
     summary: i.recommendation ?? i.summary,
     priority: extractPriority(i),
@@ -213,7 +275,7 @@ function buildP3(analysis: FullAnalysis): P3TrendsData {
     timeSeriesAnalysis: analysis.eda.timeSeriesAnalysis ?? [],
     trendCharts: trendCharts.slice(0, 3),
     diagnosticInsights: analysis.analytics.diagnostic,
-    topFindings: analysis.eda.topFindings,
+    topFindings: uniqueStrings(analysis.eda.topFindings, 6),
     hasTimeData: (analysis.eda.timeSeriesAnalysis?.length ?? 0) > 0,
   };
 }
@@ -302,7 +364,11 @@ function buildP6(analysis: FullAnalysis): P6ForecastData {
 }
 
 function buildP7(analysis: FullAnalysis): P7RecommendationsData {
-  const recommendations = analysis.analytics.prescriptive.map((i) => ({
+  const recommendations = uniqueBy(
+    analysis.analytics.prescriptive,
+    (i) => `${i.title}|${i.recommendation ?? i.summary}`,
+    6,
+  ).map((i) => ({
     id: i.id,
     title: i.title,
     observation: i.observation,
@@ -346,9 +412,11 @@ function buildAppendix(analysis: FullAnalysis): AppendixData {
 export function buildReportDocument(analysis: FullAnalysis): ReportDocument {
   const now = new Date();
   const generatedAt = formatDateTime(now);
-  const reportId = generateReportId();
+  const reportId = generateReportId(
+    `${analysis.dataset.datasetId}|${analysis.dataset.fileName}|${analysis.dataset.rowCount}|${analysis.dataset.columnCount}`,
+  );
 
-  return {
+  return sanitizeReportValue({
     reportId,
     generatedAt,
     datasetName: analysis.dataset.fileName.replace(/\.[^.]+$/, ""),
@@ -362,5 +430,5 @@ export function buildReportDocument(analysis: FullAnalysis): ReportDocument {
     p6: buildP6(analysis),
     p7: buildP7(analysis),
     appendix: buildAppendix(analysis),
-  };
+  });
 }
