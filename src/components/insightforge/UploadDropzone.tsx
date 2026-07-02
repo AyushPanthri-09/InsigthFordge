@@ -135,7 +135,7 @@ export function UploadDropzone({
       {/* Format badge */}
       <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-background/40 px-3 py-1.5 text-[11px] text-muted-foreground">
         <FileSpreadsheet className="h-3.5 w-3.5 opacity-70" />
-        <span className="font-mono">.csv .tsv .xlsx .xls</span>
+        <span className="font-mono">CSV · Excel · JSON · TSV</span>
       </div>
     </motion.label>
   );

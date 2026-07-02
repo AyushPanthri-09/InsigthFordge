@@ -13,7 +13,6 @@ import {
   Activity,
   FileText,
   Upload,
-  Zap,
   Database,
   TrendingUp,
   CheckCircle2,
@@ -35,12 +34,7 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.55, ease: EASE_OUT, delay },
 });
 
-const fadeIn = (delay = 0) => ({
-  initial: { opacity: 0 },
-  whileInView: { opacity: 1 },
-  viewport: { once: true },
-  transition: { duration: 0.5, ease: EASE_OUT, delay },
-});
+
 
 /* ── Nav link ───────────────────────────────────────────────── */
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -291,7 +285,7 @@ function Landing() {
               <span className="gradient-text">fully explained</span>
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-              Every insight is tagged with its evidence source and a confidence score.
+              Every insight tagged with source and confidence score.
             </p>
           </motion.div>
 
@@ -437,83 +431,85 @@ function Landing() {
 
         {/* ── Why InsightForge ─────────────────────────────────── */}
         <section id="why" className="mx-auto max-w-7xl px-6 pb-28">
-          <motion.div
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.6, ease: EASE_OUT }}
-            className="card-elevated relative overflow-hidden p-10 md:p-16"
-          >
-            {/* Ambient glow */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-accent/8" />
-            <div
-              className="pointer-events-none absolute -top-px inset-x-0 h-px"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent 0%, oklch(0.68 0.22 290 / 40%) 50%, transparent 100%)",
-              }}
-            />
-
-            <div className="relative mx-auto max-w-4xl text-center">
-              <p className="section-label mb-4">Why InsightForge</p>
-              <h2 className="font-display text-3xl font-bold tracking-[-0.025em] md:text-4xl">
-                Built on a single,{" "}
-                <span className="gradient-text">uncompromising philosophy</span>
-              </h2>
-              <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground">
-                Every feature is designed to ensure AI transparency, business relevance, and evidence-backed confidence.
-              </p>
-
-              {/* Feature grid */}
-              <div className="mt-12 grid gap-4 text-left md:grid-cols-2 lg:grid-cols-3">
-                {WHY_ITEMS.map((item, i) => (
-                  <motion.div
-                    key={item.title}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -3 }}
-                    transition={{ delay: 0.08 + i * 0.09, duration: 0.5, ease: EASE_OUT }}
-                    className="group flex items-start gap-4 rounded-xl border border-border/40 bg-white/[0.03] px-5 py-4.5 transition-all duration-250 hover:border-primary/25 hover:bg-white/[0.06] hover:shadow-[0_0_20px_oklch(0.68_0.22_290/12%)]"
-                  >
-                    <div
-                      className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg transition-transform duration-300 group-hover:scale-110 ${item.tone}`}
-                    >
-                      <item.Icon className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold tracking-[-0.01em]">{item.title}</div>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Philosophy list */}
-              <div className="mt-10 grid gap-3 text-sm md:grid-cols-2">
-                {PHILOSOPHY.map((p, i) => (
-                  <motion.div
-                    key={p}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.15 + i * 0.09, duration: 0.45, ease: EASE_OUT }}
-                    className="flex items-center gap-3 rounded-xl border border-border/40 bg-white/[0.025] px-4 py-3.5 text-left transition-colors hover:border-primary/20 hover:bg-white/[0.04]"
-                  >
-                    <span
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ background: "oklch(0.68 0.22 290)" }}
-                    />
-                    <span className="text-foreground/80">{p}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+          <motion.div className="mb-14 text-center" {...fadeUp()}>
+            <p className="section-label mb-3">Why InsightForge</p>
+            <h2 className="font-display text-3xl font-bold tracking-[-0.025em] md:text-4xl">
+              Built on a single,{" "}
+              <span className="gradient-text">uncompromising philosophy</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
+              Every feature is designed to ensure AI transparency, business relevance, and evidence-backed confidence.
+            </p>
           </motion.div>
+
+          {/* 4-column glassmorphism card grid */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {WHY_CARDS.map((card, i) => (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.12 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                transition={{ delay: i * 0.1, duration: 0.55, ease: EASE_OUT }}
+                className="group relative cursor-default overflow-hidden rounded-2xl p-7"
+                style={{
+                  background: "oklch(0.155 0.022 270 / 60%)",
+                  border: "1px solid oklch(1 0 0 / 8%)",
+                  backdropFilter: "blur(20px) saturate(150%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(150%)",
+                  boxShadow: "0 4px 24px oklch(0 0 0 / 30%), 0 1px 0 oklch(1 0 0 / 6%) inset",
+                  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                }}
+              >
+                {/* Hover glow overlay */}
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{
+                    background: `radial-gradient(ellipse 120px 80px at 50% 0%, ${card.glowColor} 0%, transparent 70%)`,
+                  }}
+                />
+                {/* Top gradient border line */}
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ background: card.borderGradient }}
+                />
+
+                {/* Gradient icon */}
+                <div
+                  className="relative mb-5 grid h-12 w-12 place-items-center rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
+                  style={{
+                    background: card.iconGradient,
+                    boxShadow: `0 0 0 1px oklch(1 0 0 / 10%), 0 8px 20px ${card.glowColor}`,
+                  }}
+                >
+                  <card.Icon className="h-5 w-5 text-white drop-shadow-sm" />
+                </div>
+
+                <h3 className="text-base font-bold tracking-[-0.02em] text-foreground">
+                  {card.title}
+                </h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                  {card.desc}
+                </p>
+
+                {/* Bottom premium shadow */}
+                <div
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-16 opacity-40"
+                  style={{
+                    background: `linear-gradient(to top, ${card.glowColor}, transparent)`,
+                  }}
+                />
+              </motion.div>
+            ))}
+          </div>
         </section>
 
+        {/* ── Never Principles Banner ───────────────────────────── */}
+        <NeverPrinciplesBanner />
+
         {/* ── CTA ──────────────────────────────────────────────── */}
-        <section id="pricing" className="mx-auto max-w-7xl px-6 pb-28">
+        <section id="pricing" className="mx-auto max-w-7xl px-6 pb-28 pt-20">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -561,8 +557,8 @@ function Landing() {
             <div className="relative">
               <p className="section-label mb-5">Get started for free</p>
               <h2 className="font-display text-3xl font-bold tracking-[-0.025em] md:text-5xl">
-                Start your first{" "}
-                <span className="gradient-text">AI Analysis</span>
+                Start your first AI Analysis —{" "}
+                <span className="gradient-text">It's Free</span>
               </h2>
               <p className="mx-auto mt-5 max-w-lg text-base text-muted-foreground">
                 Upload any dataset and let InsightForge AI transform raw data into
@@ -579,15 +575,30 @@ function Landing() {
                   className="btn-glow inline-flex items-center gap-3 rounded-2xl bg-primary px-8 py-4 text-base font-bold text-primary-foreground tracking-[-0.01em]"
                 >
                   <Upload className="h-5 w-5" />
-                  Upload Dataset — It's Free
-                  <ArrowRight className="h-5 w-5" />
+                  Upload Dataset →
                 </Link>
               </motion.div>
 
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground/60">
-                <span>✓ No account required</span>
-                <span>✓ Results in seconds</span>
-                <span>✓ Enterprise-grade security</span>
+              {/* Premium trust badges */}
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                {TRUST_BADGES.map((badge, i) => (
+                  <motion.span
+                    key={badge}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 + i * 0.07, duration: 0.4, ease: EASE_OUT }}
+                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium"
+                    style={{
+                      background: "oklch(0.68 0.22 290 / 8%)",
+                      border: "1px solid oklch(0.68 0.22 290 / 22%)",
+                      color: "oklch(0.82 0.10 290)",
+                    }}
+                  >
+                    <CheckCircle2 className="h-3 w-3" style={{ color: "oklch(0.80 0.15 155)" }} />
+                    {badge}
+                  </motion.span>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -601,12 +612,102 @@ function Landing() {
   );
 }
 
+/* ── Never Principles Banner ─────────────────────────────────── */
+function NeverPrinciplesBanner() {
+  const ref = useRef<HTMLElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.25 });
+
+  return (
+    <section
+      ref={ref}
+      aria-label="Core principles"
+      className="relative w-full overflow-hidden py-24"
+      style={{ background: "#0F172A" }}
+    >
+      {/* Ambient gradient overlays */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 800px 400px at 20% 50%, oklch(0.55 0.18 15 / 8%) 0%, transparent 60%), radial-gradient(ellipse 600px 400px at 80% 50%, oklch(0.45 0.12 0 / 6%) 0%, transparent 60%)",
+        }}
+      />
+      {/* Top/bottom border lines */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 15 / 35%) 30%, oklch(0.60 0.18 0 / 30%) 70%, transparent 100%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 15 / 25%) 30%, oklch(0.60 0.18 0 / 20%) 70%, transparent 100%)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-5xl px-6">
+        {/* Section label */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, ease: EASE_OUT }}
+          className="mb-10 text-center text-[10px] font-bold uppercase tracking-[0.18em]"
+          style={{ color: "oklch(0.60 0.18 15)" }}
+        >
+          Core Philosophy
+        </motion.p>
+
+        <div className="space-y-5">
+          {NEVER_PRINCIPLES.map((principle, i) => (
+            <motion.div
+              key={principle}
+              initial={{ opacity: 0, x: -24 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.55, ease: EASE_OUT, delay: 0.12 + i * 0.12 }}
+              className="group flex items-center gap-5 rounded-2xl px-7 py-5 transition-all duration-300"
+              style={{
+                background: "oklch(1 0 0 / 2.5%)",
+                border: "1px solid oklch(1 0 0 / 5%)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              {/* Cross icon */}
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-lg font-black transition-all duration-300 group-hover:scale-110"
+                style={{
+                  background: "oklch(0.60 0.22 15 / 15%)",
+                  border: "1px solid oklch(0.60 0.22 15 / 30%)",
+                  color: "oklch(0.72 0.22 15)",
+                  lineHeight: 1,
+                }}
+                aria-hidden="true"
+              >
+                ✕
+              </span>
+
+              <p
+                className="font-display text-xl font-semibold tracking-[-0.02em] transition-colors duration-300 sm:text-2xl md:text-3xl"
+                style={{ color: "oklch(0.88 0.005 250)" }}
+              >
+                {principle}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ── Data ─────────────────────────────────────────────────────── */
 
 const PIPELINE = [
   {
     title: "Upload",
-    desc: "Drop CSV, Excel or JSON. Firebase stores it securely.",
+    desc: "Drag & drop CSV, Excel, or JSON. Firebase stores it securely.",
     Icon: Upload,
   },
   {
@@ -658,7 +759,7 @@ const CAPABILITIES = [
   },
   {
     title: "Analyst Notes",
-    desc: "Optional human guidance: focus on retention, ignore cancelled orders. Never mandatory.",
+    desc: "Human-in-the-loop guidance: focus on retention, ignore cancelled orders. Never mandatory.",
     Icon: Sparkles,
     tone: "bg-accent/15 text-accent",
   },
@@ -670,42 +771,56 @@ const CAPABILITIES = [
   },
 ];
 
-const WHY_ITEMS = [
+/* ── Why InsightForge — 4-column glassmorphism cards ─────────── */
+const WHY_CARDS = [
   {
     Icon: Brain,
     title: "Explainable AI",
-    desc: "Every decision is reasoned and transparent — no black boxes.",
-    tone: "bg-primary/15 text-primary",
+    desc: "Every decision is reasoned and transparent—no black boxes.",
+    iconGradient: "linear-gradient(135deg, oklch(0.68 0.22 290), oklch(0.65 0.20 240))",
+    glowColor: "oklch(0.68 0.22 290 / 18%)",
+    borderGradient:
+      "linear-gradient(90deg, transparent 0%, oklch(0.68 0.22 290 / 60%) 50%, transparent 100%)",
   },
   {
     Icon: TrendingUp,
     title: "Business Intelligence",
     desc: "Understands your domain and speaks the language of your business.",
-    tone: "bg-info/15 text-info",
+    iconGradient: "linear-gradient(135deg, oklch(0.65 0.20 195), oklch(0.60 0.18 220))",
+    glowColor: "oklch(0.65 0.20 195 / 15%)",
+    borderGradient:
+      "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 195 / 60%) 50%, transparent 100%)",
   },
   {
     Icon: Target,
-    title: "Evidence-backed Recommendations",
+    title: "Evidence-backed",
     desc: "Actions are prioritized by evidence strength and business impact.",
-    tone: "bg-warning/15 text-warning",
+    iconGradient: "linear-gradient(135deg, oklch(0.85 0.19 95), oklch(0.80 0.22 70))",
+    glowColor: "oklch(0.85 0.19 95 / 15%)",
+    borderGradient:
+      "linear-gradient(90deg, transparent 0%, oklch(0.85 0.19 95 / 60%) 50%, transparent 100%)",
   },
   {
     Icon: ShieldCheck,
-    title: "Enterprise Security",
-    desc: "Firebase-powered encrypted storage with enterprise-grade protection.",
-    tone: "bg-success/15 text-success",
-  },
-  {
-    Icon: Zap,
-    title: "High Performance",
-    desc: "Results in seconds — not hours. Optimized AI pipeline end-to-end.",
-    tone: "bg-accent/15 text-accent",
+    title: "Enterprise-grade & Fast",
+    desc: "Firebase encrypted storage with enterprise protection. Results in seconds, not hours.",
+    iconGradient: "linear-gradient(135deg, oklch(0.75 0.18 155), oklch(0.70 0.16 170))",
+    glowColor: "oklch(0.75 0.18 155 / 15%)",
+    borderGradient:
+      "linear-gradient(90deg, transparent 0%, oklch(0.75 0.18 155 / 60%) 50%, transparent 100%)",
   },
 ];
 
-const PHILOSOPHY = [
+const NEVER_PRINCIPLES = [
   "Never analyze before understanding.",
   "Never conclude without evidence.",
   "Never predict without assumptions.",
   "Never recommend without justification.",
+];
+
+const TRUST_BADGES = [
+  "No account required",
+  "Results in seconds",
+  "Enterprise-grade security",
+  "Evidence-driven AI",
 ];
