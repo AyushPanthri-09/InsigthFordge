@@ -29,8 +29,17 @@ import type {
   NumericStats,
   TimeIntelligence,
 } from "../types";
-import { analyseAllColumns, buildFactDimensionMap, extractMeasuresAndDimensions } from "./column-intelligence";
-import { inferBusinessDomain, inferBusinessProcesses, extractPrimaryEntities, suggestKPICandidates } from "./business-context";
+import {
+  analyseAllColumns,
+  buildFactDimensionMap,
+  extractMeasuresAndDimensions,
+} from "./column-intelligence";
+import {
+  inferBusinessDomain,
+  inferBusinessProcesses,
+  extractPrimaryEntities,
+  suggestKPICandidates,
+} from "./business-context";
 import { discoverAllRelationships } from "./relationship-discovery";
 
 // ---------------------------------------------------------------------------
@@ -43,7 +52,9 @@ const URL_RE = /^https?:\/\//i;
 const ID_HINT = /(^id$|_id$|^uuid$|guid|code|sku|order(_)?number)/i;
 
 export function inferType(values: unknown[]): ColumnSemanticType {
-  const nonNull = values.filter((v) => v !== null && v !== undefined && v !== "");
+  const nonNull = values.filter(
+    (v) => v !== null && v !== undefined && v !== "",
+  );
   return inferTypeFromNonNull(nonNull);
 }
 
@@ -104,12 +115,15 @@ export function profileColumn(
   values: unknown[],
   totalRows: number,
 ): ColumnProfile {
-  const nonNull = values.filter((v) => v !== null && v !== undefined && v !== "");
+  const nonNull = values.filter(
+    (v) => v !== null && v !== undefined && v !== "",
+  );
   const unique = new Set(nonNull.map((v) => String(v)));
   // Reuse the already-computed nonNull array — avoids a second O(n) filter inside inferType().
   const inferredType = inferTypeFromNonNull(nonNull);
   const isLikelyId =
-    ID_HINT.test(name) || (unique.size === nonNull.length && nonNull.length > 5);
+    ID_HINT.test(name) ||
+    (unique.size === nonNull.length && nonNull.length > 5);
 
   let role: ColumnProfile["inferredRole"] = "dimension";
   if (inferredType === "datetime" || inferredType === "date") role = "date";
@@ -169,7 +183,11 @@ export function profileAll(
   columns: string[],
 ): ColumnProfile[] {
   return columns.map((col) =>
-    profileColumn(col, rows.map((r) => r[col]), rows.length),
+    profileColumn(
+      col,
+      rows.map((r) => r[col]),
+      rows.length,
+    ),
   );
 }
 
@@ -296,13 +314,19 @@ export function profileDataset(
   const factDimensionMap = buildFactDimensionMap(profiles, intelligence);
 
   // Step 6 — Measures and dimensions extraction
-  const { measures, dimensions } = extractMeasuresAndDimensions(profiles, intelligence);
+  const { measures, dimensions } = extractMeasuresAndDimensions(
+    profiles,
+    intelligence,
+  );
 
   // Step 7 — KPI candidate suggestions (computed once here; callers read enriched.suggestedKPIs)
   const suggestedKPIs = suggestKPICandidates(columns, domainResult.domain);
 
   // Step 8 — Business processes and primary entities (computed once here; callers read enriched fields)
-  const businessProcesses = inferBusinessProcesses(columns, domainResult.domain);
+  const businessProcesses = inferBusinessProcesses(
+    columns,
+    domainResult.domain,
+  );
   const primaryEntities = extractPrimaryEntities(columns, domainResult.domain);
 
   return {
@@ -329,4 +353,9 @@ export function profileDataset(
 }
 
 // Re-export helpers used by other modules (avoids import path changes)
-export { inferBusinessDomain, inferBusinessProcesses, extractPrimaryEntities, suggestKPICandidates };
+export {
+  inferBusinessDomain,
+  inferBusinessProcesses,
+  extractPrimaryEntities,
+  suggestKPICandidates,
+};

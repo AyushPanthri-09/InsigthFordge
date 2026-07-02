@@ -52,7 +52,11 @@ export function generateHypotheses(
 ): Array<{ id: string; statement: string; relatedColumns: string[] }> {
   const isPositive = deviationPct > 0;
   const direction = isPositive ? "increase" : "decrease";
-  const hypotheses: Array<{ id: string; statement: string; relatedColumns: string[] }> = [];
+  const hypotheses: Array<{
+    id: string;
+    statement: string;
+    relatedColumns: string[];
+  }> = [];
   const colNames = profiles.map((p) => p.name.toLowerCase());
 
   // ── Universal hypotheses (always included) ──────────────────────────────
@@ -71,7 +75,9 @@ export function generateHypotheses(
   hypotheses.push({
     id: "h_concentration",
     statement: `The ${direction} is driven by a single large transaction, customer, or event (concentration effect) rather than broad-based organic change.`,
-    relatedColumns: profiles.filter((p) => p.inferredRole === "measure").map((p) => p.name),
+    relatedColumns: profiles
+      .filter((p) => p.inferredRole === "measure")
+      .map((p) => p.name),
   });
 
   hypotheses.push({
@@ -84,7 +90,9 @@ export function generateHypotheses(
   // These are generated ONLY when the relevant column actually exists
 
   if (colNames.some((c) => /discount|rebate|promo|coupon|markdown/i.test(c))) {
-    const discountCol = profiles.find((p) => /discount|rebate|promo|coupon|markdown/i.test(p.name))!.name;
+    const discountCol = profiles.find((p) =>
+      /discount|rebate|promo|coupon|markdown/i.test(p.name),
+    )!.name;
     hypotheses.push({
       id: "h_discount",
       statement: `The ${direction} in "${metricCol}" was driven by ${isPositive ? "promotional discounts or price reductions attracting more volume" : "reduced discounting leading to lower conversion"}.`,
@@ -93,7 +101,9 @@ export function generateHypotheses(
   }
 
   if (colNames.some((c) => /quantity|qty|units|volume|count/i.test(c))) {
-    const qtyCol = profiles.find((p) => /quantity|qty|units|volume|count/i.test(p.name))!.name;
+    const qtyCol = profiles.find((p) =>
+      /quantity|qty|units|volume|count/i.test(p.name),
+    )!.name;
     hypotheses.push({
       id: "h_volume",
       statement: `The ${direction} was driven primarily by ${isPositive ? "higher transaction volume / more units sold" : "lower volume"} rather than a change in average transaction size.`,
@@ -101,7 +111,9 @@ export function generateHypotheses(
     });
   }
 
-  if (colNames.some((c) => /price|rate|aov|average.*order|order.*value/i.test(c))) {
+  if (
+    colNames.some((c) => /price|rate|aov|average.*order|order.*value/i.test(c))
+  ) {
     const priceCol = profiles.find((p) => /price|rate|aov/i.test(p.name))!.name;
     hypotheses.push({
       id: "h_price",
@@ -110,8 +122,12 @@ export function generateHypotheses(
     });
   }
 
-  if (colNames.some((c) => /region|territory|zone|state|country|city/i.test(c))) {
-    const geoCol = profiles.find((p) => /region|territory|zone|state|country|city/i.test(p.name))!.name;
+  if (
+    colNames.some((c) => /region|territory|zone|state|country|city/i.test(c))
+  ) {
+    const geoCol = profiles.find((p) =>
+      /region|territory|zone|state|country|city/i.test(p.name),
+    )!.name;
     hypotheses.push({
       id: "h_geographic",
       statement: `The ${direction} is concentrated in one or two geographic markets, suggesting a localised event (infrastructure change, campaign, competition, local economic factor) rather than nationwide demand shift.`,
@@ -119,8 +135,12 @@ export function generateHypotheses(
     });
   }
 
-  if (colNames.some((c) => /product|category|item|sku|segment|class/i.test(c))) {
-    const prodCol = profiles.find((p) => /product|category|item|sku|segment/i.test(p.name))!.name;
+  if (
+    colNames.some((c) => /product|category|item|sku|segment|class/i.test(c))
+  ) {
+    const prodCol = profiles.find((p) =>
+      /product|category|item|sku|segment/i.test(p.name),
+    )!.name;
     hypotheses.push({
       id: "h_product_mix",
       statement: `The ${direction} reflects a product mix shift — ${isPositive ? "premium or high-margin products captured a larger share" : "lower-value products or SKUs dominated the period"}.`,
@@ -128,8 +148,12 @@ export function generateHypotheses(
     });
   }
 
-  if (colNames.some((c) => /customer|client|segment|tier|type|channel/i.test(c))) {
-    const custCol = profiles.find((p) => /customer|client|segment|tier/i.test(p.name))!.name;
+  if (
+    colNames.some((c) => /customer|client|segment|tier|type|channel/i.test(c))
+  ) {
+    const custCol = profiles.find((p) =>
+      /customer|client|segment|tier/i.test(p.name),
+    )!.name;
     hypotheses.push({
       id: "h_customer_mix",
       statement: `The ${direction} reflects a customer composition change — ${isPositive ? "higher-value or enterprise customers drove this period" : "lower-value or churn-prone customers dominated"}.`,
@@ -142,7 +166,9 @@ export function generateHypotheses(
     hypotheses.push({
       id: "h_campaign",
       statement: `A marketing campaign, flash sale, or promotional event drove the ${direction} — evidenced by co-movement with discount or quantity columns.`,
-      relatedColumns: profiles.filter((p) => /discount|promo|camp/i.test(p.name)).map((p) => p.name),
+      relatedColumns: profiles
+        .filter((p) => /discount|promo|camp/i.test(p.name))
+        .map((p) => p.name),
     });
   }
 
@@ -150,7 +176,9 @@ export function generateHypotheses(
     hypotheses.push({
       id: "h_attrition_wave",
       statement: `The ${direction} reflects a wave of attrition or hiring, not steady-state behaviour.`,
-      relatedColumns: profiles.filter((p) => /hire|resign|exit|attrition/i.test(p.name)).map((p) => p.name),
+      relatedColumns: profiles
+        .filter((p) => /hire|resign|exit|attrition/i.test(p.name))
+        .map((p) => p.name),
     });
   }
 
@@ -158,7 +186,9 @@ export function generateHypotheses(
     hypotheses.push({
       id: "h_expansion",
       statement: `The ${direction} reflects net expansion MRR (upgrades, seat additions) rather than new customer acquisition.`,
-      relatedColumns: profiles.filter((p) => /plan|tier|upgrade|mrr/i.test(p.name)).map((p) => p.name),
+      relatedColumns: profiles
+        .filter((p) => /plan|tier|upgrade|mrr/i.test(p.name))
+        .map((p) => p.name),
     });
   }
 
@@ -216,10 +246,13 @@ export function evaluateHypothesis(
     if (!isRelated && q.analysisType !== "distribution_shift") continue;
 
     const strengthScore =
-      q.evidenceStrength === "strong" ? 0.85
-      : q.evidenceStrength === "moderate" ? 0.65
-      : q.evidenceStrength === "weak" ? 0.4
-      : 0.1;
+      q.evidenceStrength === "strong"
+        ? 0.85
+        : q.evidenceStrength === "moderate"
+          ? 0.65
+          : q.evidenceStrength === "weak"
+            ? 0.4
+            : 0.1;
 
     if (q.supportsMainFinding && q.evidenceStrength !== "none") {
       supporting.push({
@@ -248,18 +281,30 @@ function evaluateDataQualityHypothesis(
   // Heuristic: extreme deviations (>200%) with no column-level support
   // are more likely data quality than real business events
   const isExtreme = Math.abs(deviationPct) > 200;
-  const verdict: TestedHypothesis["verdict"] = isExtreme ? "inconclusive" : "rejected";
+  const verdict: TestedHypothesis["verdict"] = isExtreme
+    ? "inconclusive"
+    : "rejected";
 
   return {
     id: hyp.id,
     statement: hyp.statement,
     questions: [],
     supportingEvidence: isExtreme
-      ? [{ description: `Deviation of ${deviationPct.toFixed(1)}% is extreme and warrants data quality investigation.`, strength: 0.5 }]
+      ? [
+          {
+            description: `Deviation of ${deviationPct.toFixed(1)}% is extreme and warrants data quality investigation.`,
+            strength: 0.5,
+          },
+        ]
       : [],
     opposingEvidence: isExtreme
       ? []
-      : [{ description: `Deviation of ${deviationPct.toFixed(1)}% is within plausible business range. Data quality issues typically produce >200% deviations.`, strength: 0.7 }],
+      : [
+          {
+            description: `Deviation of ${deviationPct.toFixed(1)}% is within plausible business range. Data quality issues typically produce >200% deviations.`,
+            strength: 0.7,
+          },
+        ],
     verdict,
     rationale: isExtreme
       ? "Cannot rule out a data quality issue — the magnitude is unusually large. Verify source data."
@@ -273,9 +318,18 @@ function evaluateSeasonalityHypothesis(
   hyp: { id: string; statement: string; relatedColumns: string[] },
   questions: InvestigativeQuestion[],
 ): TestedHypothesis {
-  const seasonalQ = questions.find((q) => q.analysisType === "temporal_pattern" && q.question.includes("seasonal"));
-  const trendQ = questions.find((q) => q.analysisType === "temporal_pattern" && q.question.includes("trend"));
-  const anomalyFreqQ = questions.find((q) => q.analysisType === "temporal_pattern" && q.question.includes("recur"));
+  const seasonalQ = questions.find(
+    (q) =>
+      q.analysisType === "temporal_pattern" && q.question.includes("seasonal"),
+  );
+  const trendQ = questions.find(
+    (q) =>
+      q.analysisType === "temporal_pattern" && q.question.includes("trend"),
+  );
+  const anomalyFreqQ = questions.find(
+    (q) =>
+      q.analysisType === "temporal_pattern" && q.question.includes("recur"),
+  );
 
   const supporting: TestedHypothesis["supportingEvidence"] = [];
   const opposing: TestedHypothesis["opposingEvidence"] = [];
@@ -295,17 +349,29 @@ function evaluateSeasonalityHypothesis(
   }
 
   if (trendQ?.supportsMainFinding) {
-    opposing.push({ description: `Sustained trend detected — suggests structural change, not pure seasonality.`, strength: 0.5 });
+    opposing.push({
+      description: `Sustained trend detected — suggests structural change, not pure seasonality.`,
+      strength: 0.5,
+    });
   }
 
-  return buildVerdict(hyp, supporting, opposing, [seasonalQ, trendQ, anomalyFreqQ].filter(Boolean) as InvestigativeQuestion[]);
+  return buildVerdict(
+    hyp,
+    supporting,
+    opposing,
+    [seasonalQ, trendQ, anomalyFreqQ].filter(
+      Boolean,
+    ) as InvestigativeQuestion[],
+  );
 }
 
 function evaluateConcentrationHypothesis(
   hyp: { id: string; statement: string; relatedColumns: string[] },
   questions: InvestigativeQuestion[],
 ): TestedHypothesis {
-  const segmentQuestions = questions.filter((q) => q.analysisType === "segment_comparison");
+  const segmentQuestions = questions.filter(
+    (q) => q.analysisType === "segment_comparison",
+  );
   const distQ = questions.find((q) => q.analysisType === "distribution_shift");
 
   const supporting: TestedHypothesis["supportingEvidence"] = [];
@@ -313,7 +379,9 @@ function evaluateConcentrationHypothesis(
 
   // High contribution from a single segment supports concentration
   const topSegmentQ = segmentQuestions
-    .filter((q) => q.supportsMainFinding && q.evidenceValue && q.evidenceValue > 30)
+    .filter(
+      (q) => q.supportsMainFinding && q.evidenceValue && q.evidenceValue > 30,
+    )
     .sort((a, b) => (b.evidenceValue ?? 0) - (a.evidenceValue ?? 0))[0];
 
   if (topSegmentQ) {
@@ -324,7 +392,9 @@ function evaluateConcentrationHypothesis(
   }
 
   // Many moderate segments opposing concentration
-  const spreadSegments = segmentQuestions.filter((q) => q.evidenceValue && q.evidenceValue < 15 && q.evidenceValue > 3);
+  const spreadSegments = segmentQuestions.filter(
+    (q) => q.evidenceValue && q.evidenceValue < 15 && q.evidenceValue > 3,
+  );
   if (spreadSegments.length >= 3 && !topSegmentQ) {
     opposing.push({
       description: `Effect is spread across ${spreadSegments.length} segments (no single dominant driver), suggesting broad-based change rather than concentration.`,
@@ -333,7 +403,10 @@ function evaluateConcentrationHypothesis(
   }
 
   if (distQ && distQ.evidenceValue && Math.abs(distQ.evidenceValue) > 3) {
-    supporting.push({ description: `Extreme z-score (${(distQ.evidenceValue ?? 0).toFixed(2)}) confirms this is an outlier event, consistent with concentration.`, strength: 0.65 });
+    supporting.push({
+      description: `Extreme z-score (${(distQ.evidenceValue ?? 0).toFixed(2)}) confirms this is an outlier event, consistent with concentration.`,
+      strength: 0.65,
+    });
   }
 
   return buildVerdict(hyp, supporting, opposing, segmentQuestions);
@@ -349,8 +422,10 @@ function buildVerdict(
   opposing: TestedHypothesis["opposingEvidence"],
   questions: InvestigativeQuestion[],
 ): TestedHypothesis {
-  const maxSupport = supporting.length > 0 ? Math.max(...supporting.map((e) => e.strength)) : 0;
-  const maxOppose = opposing.length > 0 ? Math.max(...opposing.map((e) => e.strength)) : 0;
+  const maxSupport =
+    supporting.length > 0 ? Math.max(...supporting.map((e) => e.strength)) : 0;
+  const maxOppose =
+    opposing.length > 0 ? Math.max(...opposing.map((e) => e.strength)) : 0;
 
   let verdict: TestedHypothesis["verdict"];
   let rationale: string;
@@ -366,7 +441,8 @@ function buildVerdict(
     confidence = Math.min(0.85, 0.5 + maxOppose * 0.35);
   } else if (supporting.length === 0 && opposing.length === 0) {
     verdict = "inconclusive";
-    rationale = "No relevant columns available in this dataset to test this hypothesis. Cannot confirm or rule out.";
+    rationale =
+      "No relevant columns available in this dataset to test this hypothesis. Cannot confirm or rule out.";
     confidence = 0.3;
   } else if (maxSupport >= 0.5 && maxOppose >= 0.5) {
     verdict = "inconclusive";
@@ -378,7 +454,8 @@ function buildVerdict(
     confidence = 0.55;
   } else {
     verdict = "inconclusive";
-    rationale = "Insufficient evidence to confirm or reject this hypothesis from the available dataset columns.";
+    rationale =
+      "Insufficient evidence to confirm or reject this hypothesis from the available dataset columns.";
     confidence = 0.35;
   }
 
@@ -435,13 +512,16 @@ export function buildDriverImportance(
   const seen = new Set<string>();
 
   // Segment-based drivers (from dimension questions)
-  for (const q of questions.filter((q) => q.analysisType === "segment_comparison")) {
+  for (const q of questions.filter(
+    (q) => q.analysisType === "segment_comparison",
+  )) {
     if (seen.has(q.targetColumn)) continue;
     seen.add(q.targetColumn);
 
     const profile = profiles.find((p) => p.name === q.targetColumn);
     const contribution = q.evidenceValue ?? 0;
-    const isSignificant = q.evidenceStrength === "strong" || q.evidenceStrength === "moderate";
+    const isSignificant =
+      q.evidenceStrength === "strong" || q.evidenceStrength === "moderate";
 
     drivers.push({
       column: q.targetColumn,

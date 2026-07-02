@@ -2,17 +2,25 @@ import { motion, AnimatePresence } from "motion/react";
 import { Loader2 } from "lucide-react";
 import type { ReasoningStep } from "@/services/analytics/types";
 
-const PHASE_CONFIG: Record<ReasoningStep["phase"], { dot: string; label: string }> = {
-  understanding: { dot: "bg-info",    label: "Understanding" },
-  profiling:     { dot: "bg-accent",  label: "Profiling" },
-  cleaning:      { dot: "bg-warning", label: "Cleaning" },
-  eda:           { dot: "bg-accent",  label: "EDA" },
-  analytics:     { dot: "bg-primary", label: "Analytics" },
-  reporting:     { dot: "bg-success", label: "Reporting" },
+const PHASE_CONFIG: Record<
+  ReasoningStep["phase"],
+  { dot: string; label: string }
+> = {
+  understanding: { dot: "bg-info", label: "Understanding" },
+  profiling: { dot: "bg-accent", label: "Profiling" },
+  cleaning: { dot: "bg-warning", label: "Cleaning" },
+  eda: { dot: "bg-accent", label: "EDA" },
+  analytics: { dot: "bg-primary", label: "Analytics" },
+  reporting: { dot: "bg-success", label: "Reporting" },
 };
 
 const PHASE_ORDER: ReasoningStep["phase"][] = [
-  "understanding", "profiling", "cleaning", "eda", "analytics", "reporting",
+  "understanding",
+  "profiling",
+  "cleaning",
+  "eda",
+  "analytics",
+  "reporting",
 ];
 const TOTAL_PHASES = PHASE_ORDER.length;
 
@@ -29,7 +37,8 @@ export function ProgressOverlay({
   const latestPhase = steps.length > 0 ? steps[steps.length - 1].phase : null;
   const latestIdx = latestPhase ? PHASE_ORDER.indexOf(latestPhase) : -1;
   const progress = Math.min(
-    Math.round(((latestIdx + 1) / TOTAL_PHASES) * 90) + (steps.length > 0 ? 5 : 0),
+    Math.round(((latestIdx + 1) / TOTAL_PHASES) * 90) +
+      (steps.length > 0 ? 5 : 0),
     95,
   );
 
@@ -68,13 +77,19 @@ export function ProgressOverlay({
               <div className="flex items-center gap-3">
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 1.5,
+                    ease: "linear",
+                  }}
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10"
                 >
                   <Loader2 className="h-5 w-5 text-primary" />
                 </motion.div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold">Analyzing your dataset</div>
+                  <div className="text-sm font-semibold">
+                    Analyzing your dataset
+                  </div>
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={current}
@@ -111,8 +126,8 @@ export function ProgressOverlay({
                         active
                           ? "bg-primary/15 text-primary"
                           : done
-                          ? "bg-muted/60 text-muted-foreground line-through"
-                          : "bg-muted/30 text-muted-foreground/50"
+                            ? "bg-muted/60 text-muted-foreground line-through"
+                            : "bg-muted/30 text-muted-foreground/50"
                       }`}
                     >
                       {active && (
@@ -141,8 +156,12 @@ export function ProgressOverlay({
                         transition={{ duration: 0.2 }}
                         className="flex items-center gap-2 text-xs"
                       >
-                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${cfg.dot}`} />
-                        <span className="truncate text-foreground/70">{s.message}</span>
+                        <span
+                          className={`h-1.5 w-1.5 shrink-0 rounded-full ${cfg.dot}`}
+                        />
+                        <span className="truncate text-foreground/70">
+                          {s.message}
+                        </span>
                       </motion.div>
                     );
                   })}

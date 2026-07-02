@@ -4,7 +4,7 @@ const TIERS = [
   { min: 80, cls: "text-success border-success/30 bg-success/8" },
   { min: 60, cls: "text-info border-info/30 bg-info/8" },
   { min: 40, cls: "text-warning border-warning/30 bg-warning/8" },
-  { min: 0,  cls: "text-destructive border-destructive/30 bg-destructive/8" },
+  { min: 0, cls: "text-destructive border-destructive/30 bg-destructive/8" },
 ] as const;
 
 function getTier(pct: number) {

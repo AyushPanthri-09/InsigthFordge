@@ -25,19 +25,19 @@ export function runSegmentationAnalysis(
   rows: Record<string, unknown>[],
   columns: string[],
   targetMetric: string,
-  dimensionColumns: string[]
+  dimensionColumns: string[],
 ): SegmentationResult {
   const contributions: SegmentContribution[] = [];
 
   const metricValues = rows
-    .map(r => Number(r[targetMetric]))
-    .filter(v => Number.isFinite(v));
+    .map((r) => Number(r[targetMetric]))
+    .filter((v) => Number.isFinite(v));
 
   if (metricValues.length === 0 || rows.length === 0) {
     return {
       targetMetric,
       contributions: [],
-      explanation: `No numeric data found for metric ${prettify(targetMetric)}.`
+      explanation: `No numeric data found for metric ${prettify(targetMetric)}.`,
     };
   }
 
@@ -54,7 +54,14 @@ export function runSegmentationAnalysis(
 
     for (const r of rows) {
       const val = r[targetMetric];
-      const numVal = typeof val === "number" ? val : Number(String(val).replace(/[$£€¥₹%,]/g, "").trim());
+      const numVal =
+        typeof val === "number"
+          ? val
+          : Number(
+              String(val)
+                .replace(/[$£€¥₹%,]/g, "")
+                .trim(),
+            );
       if (!Number.isFinite(numVal)) continue;
 
       const segName = String(r[dim] ?? "Unknown").trim();
@@ -67,8 +74,10 @@ export function runSegmentationAnalysis(
     for (const [segVal, sumVal] of segmentSums.entries()) {
       const count = segmentCounts.get(segVal) ?? 1;
       const meanVal = sumVal / count;
-      const contributionPct = overallSum !== 0 ? (sumVal / overallSum) * 100 : 0;
-      const deviationPct = overallMean !== 0 ? ((meanVal - overallMean) / overallMean) * 100 : 0;
+      const contributionPct =
+        overallSum !== 0 ? (sumVal / overallSum) * 100 : 0;
+      const deviationPct =
+        overallMean !== 0 ? ((meanVal - overallMean) / overallMean) * 100 : 0;
 
       contributions.push({
         dimension: dim,
@@ -78,7 +87,7 @@ export function runSegmentationAnalysis(
         contributionPct,
         meanValue: meanVal,
         overallMean,
-        deviationPct
+        deviationPct,
       });
     }
   }
@@ -102,7 +111,7 @@ export function runSegmentationAnalysis(
   return {
     targetMetric,
     contributions: sortedContributions,
-    explanation
+    explanation,
   };
 }
 

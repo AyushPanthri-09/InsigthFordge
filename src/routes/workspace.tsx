@@ -2,7 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Download, Sparkles, RefreshCw, BarChart3 } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  Sparkles,
+  RefreshCw,
+  BarChart3,
+} from "lucide-react";
 import { Brand } from "@/components/insightforge/Brand";
 import { Footer } from "@/components/insightforge/Footer";
 import { UploadDropzone } from "@/components/insightforge/UploadDropzone";
@@ -41,11 +47,11 @@ export const Route = createFileRoute("/workspace")({
 });
 
 type Tab =
-  | "overview" 
-  | "understanding" 
-  | "cleaning" 
-  | "eda" 
-  | "analytics" 
+  | "overview"
+  | "understanding"
+  | "cleaning"
+  | "eda"
+  | "analytics"
   | "sandbox"
   | "data"
   | "report";
@@ -139,7 +145,12 @@ function Workspace() {
       {/* ── Main ───────────────────────────────────────────── */}
       <main className="mx-auto max-w-[1400px] px-6 py-10">
         {!analysis ? (
-          <UploadState notes={notes} setNotes={setNotes} run={run} busy={busy} />
+          <UploadState
+            notes={notes}
+            setNotes={setNotes}
+            run={run}
+            busy={busy}
+          />
         ) : (
           <Dashboard
             analysis={analysis}
@@ -151,7 +162,10 @@ function Workspace() {
         )}
       </main>
       {analysis && (
-        <AiCopilot dataset={analysis.dataset} understanding={analysis.understanding} />
+        <AiCopilot
+          dataset={analysis.dataset}
+          understanding={analysis.understanding}
+        />
       )}
       <Footer />
     </div>
@@ -192,8 +206,8 @@ function UploadState({
         <div className="flex items-start gap-2 rounded-xl border border-border/60 bg-background/30 p-3.5 text-xs text-muted-foreground">
           <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
           <span>
-            Your file is processed entirely in your session. Sensitive data never
-            leaves the analysis context.
+            Your file is processed entirely in your session. Sensitive data
+            never leaves the analysis context.
           </span>
         </div>
       </div>
@@ -251,10 +265,12 @@ function Dashboard({
             {analysis.dataset.fileName}
           </h1>
           <p className="mt-1 text-xs text-muted-foreground">
-            <span className="tabular-nums">{analysis.dataset.rowCount.toLocaleString()}</span> rows
-            {" "}×{" "}
-            <span className="tabular-nums">{analysis.dataset.columnCount}</span> columns
-            {" "}·{" "}Domain:{" "}
+            <span className="tabular-nums">
+              {analysis.dataset.rowCount.toLocaleString()}
+            </span>{" "}
+            rows ×{" "}
+            <span className="tabular-nums">{analysis.dataset.columnCount}</span>{" "}
+            columns · Domain:{" "}
             <span className="font-medium text-foreground/90">
               {analysis.understanding.domain}
             </span>
@@ -280,7 +296,9 @@ function Dashboard({
               <span
                 className={cn(
                   "ml-2 inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1 text-[10px] tabular-nums font-semibold",
-                  tab === t.id ? "bg-primary/20 text-primary" : "bg-muted/70 text-muted-foreground",
+                  tab === t.id
+                    ? "bg-primary/20 text-primary"
+                    : "bg-muted/70 text-muted-foreground",
                 )}
               >
                 {t.count}
@@ -314,8 +332,15 @@ function Dashboard({
           )}
           {tab === "eda" && <EDATab analysis={analysis} />}
           {tab === "analytics" && <AnalyticsTab analysis={analysis} />}
-          {tab === "sandbox" && <PredictiveSandbox dataset={analysis.dataset} />}
-          {tab === "data" && <DataWorkspace dataset={analysis.dataset} understanding={analysis.understanding} />}
+          {tab === "sandbox" && (
+            <PredictiveSandbox dataset={analysis.dataset} />
+          )}
+          {tab === "data" && (
+            <DataWorkspace
+              dataset={analysis.dataset}
+              understanding={analysis.understanding}
+            />
+          )}
           {tab === "report" && <ReportTab analysis={analysis} />}
         </motion.div>
       </AnimatePresence>
@@ -401,7 +426,10 @@ function EDATab({ analysis }: { analysis: FullAnalysis }) {
       {/* Charts */}
       {analysis.eda.charts.length > 0 && (
         <div>
-          <SectionHeader title="Visualizations" count={analysis.eda.charts.length} />
+          <SectionHeader
+            title="Visualizations"
+            count={analysis.eda.charts.length}
+          />
           <div className="mt-3 grid gap-4 lg:grid-cols-2">
             {analysis.eda.charts.map((c) => (
               <ChartCard key={c.id} spec={c} />
@@ -413,7 +441,10 @@ function EDATab({ analysis }: { analysis: FullAnalysis }) {
       {/* Correlations */}
       {analysis.eda.correlations.length > 0 && (
         <div className="card-elevated p-5">
-          <SectionHeader title="Top Correlations" subtitle="Pearson correlations between numeric measures." />
+          <SectionHeader
+            title="Top Correlations"
+            subtitle="Pearson correlations between numeric measures."
+          />
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {analysis.eda.correlations.map((c, i) => (
               <div
@@ -421,9 +452,13 @@ function EDATab({ analysis }: { analysis: FullAnalysis }) {
                 className="flex items-center justify-between rounded-lg border border-border/60 bg-background/40 px-3 py-2.5 transition-colors hover:bg-muted/20"
               >
                 <div className="flex min-w-0 items-center gap-1.5 text-xs">
-                  <code className="truncate font-mono text-[11px] text-muted-foreground">{c.a}</code>
+                  <code className="truncate font-mono text-[11px] text-muted-foreground">
+                    {c.a}
+                  </code>
                   <span className="shrink-0 text-muted-foreground">↔</span>
-                  <code className="truncate font-mono text-[11px] text-muted-foreground">{c.b}</code>
+                  <code className="truncate font-mono text-[11px] text-muted-foreground">
+                    {c.b}
+                  </code>
                 </div>
                 <div className="ml-3 flex shrink-0 items-center gap-2">
                   <span
@@ -431,8 +466,8 @@ function EDATab({ analysis }: { analysis: FullAnalysis }) {
                       c.strength === "strong"
                         ? "bg-success/15 text-success"
                         : c.strength === "moderate"
-                        ? "bg-info/15 text-info"
-                        : "bg-muted text-muted-foreground"
+                          ? "bg-info/15 text-info"
+                          : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {c.strength}
@@ -511,7 +546,9 @@ function AnalyticsTab({ analysis }: { analysis: FullAnalysis }) {
           {s.items.length === 0 ? (
             <div className="card-elevated empty-state">
               <BarChart3 className="h-8 w-8 opacity-30" />
-              <p className="text-sm">No {s.title.toLowerCase()} insights generated for this dataset.</p>
+              <p className="text-sm">
+                No {s.title.toLowerCase()} insights generated for this dataset.
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -551,7 +588,7 @@ function ReportTab({ analysis }: { analysis: FullAnalysis }) {
         <div>
           <h2 className="text-base font-semibold">Enterprise Report Preview</h2>
           <p className="text-xs text-muted-foreground">
-            Live preview of the full 9-page PDF report
+            Live preview of the full 13-page PDF report
           </p>
         </div>
         <button
@@ -598,10 +635,14 @@ function SectionHeader({
     <div className="flex items-baseline justify-between gap-3">
       <div>
         <h2 className="text-sm font-semibold">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>}
+        {subtitle && (
+          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+        )}
       </div>
       {count !== undefined && (
-        <span className="text-xs tabular-nums text-muted-foreground">{count}</span>
+        <span className="text-xs tabular-nums text-muted-foreground">
+          {count}
+        </span>
       )}
     </div>
   );

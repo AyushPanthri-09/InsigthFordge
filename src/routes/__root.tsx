@@ -8,7 +8,12 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { FileQuestion, RefreshCw, ArrowLeft, AlertTriangle } from "lucide-react";
+import {
+  FileQuestion,
+  RefreshCw,
+  ArrowLeft,
+  AlertTriangle,
+} from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -21,7 +26,9 @@ function NotFoundComponent() {
           <FileQuestion className="h-7 w-7 text-muted-foreground" />
         </div>
         <p className="section-label">Error 404</p>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight">Page not found</h1>
+        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight">
+          Page not found
+        </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           This page doesn't exist or has been moved.
         </p>
@@ -58,7 +65,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Try again
@@ -75,33 +85,49 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "InsightForge AI — Autonomous AI Data Scientist & Business Consultant" },
-      { name: "description", content: "Upload any CSV or XLSX. InsightForge AI understands your dataset's business context, cleans with reasoning, and delivers descriptive, diagnostic, predictive, and prescriptive insights." },
-      { name: "author", content: "InsightForge AI" },
-      { property: "og:title", content: "InsightForge AI — Autonomous AI Data Scientist" },
-      { property: "og:description", content: "Premium AI analytics platform. Understand, clean, analyze, predict, and recommend — all with evidence and confidence." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-    links: [
-      { rel: "preconnect", href: "https://rsms.me/" },
-      { rel: "stylesheet", href: "https://rsms.me/inter/inter.css" },
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    head: () => ({
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          title:
+            "InsightForge AI — Autonomous AI Data Scientist & Business Consultant",
+        },
+        {
+          name: "description",
+          content:
+            "Upload any CSV or XLSX. InsightForge AI understands your dataset's business context, cleans with reasoning, and delivers descriptive, diagnostic, predictive, and prescriptive insights.",
+        },
+        { name: "author", content: "InsightForge AI" },
+        {
+          property: "og:title",
+          content: "InsightForge AI — Autonomous AI Data Scientist",
+        },
+        {
+          property: "og:description",
+          content:
+            "Premium AI analytics platform. Understand, clean, analyze, predict, and recommend — all with evidence and confidence.",
+        },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+      ],
+      links: [
+        { rel: "preconnect", href: "https://rsms.me/" },
+        { rel: "stylesheet", href: "https://rsms.me/inter/inter.css" },
+        {
+          rel: "stylesheet",
+          href: appCss,
+        },
+      ],
+    }),
+    shellComponent: RootShell,
+    component: RootComponent,
+    notFoundComponent: NotFoundComponent,
+    errorComponent: ErrorComponent,
+  },
+);
 
 function RootShell({ children }: { children: ReactNode }) {
   return (

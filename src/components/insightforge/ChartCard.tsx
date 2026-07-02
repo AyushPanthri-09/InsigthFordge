@@ -1,8 +1,19 @@
 import type { ChartSpec } from "@/services/analytics/types";
 import { Sparkles } from "lucide-react";
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell,
-  Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Legend,
 } from "recharts";
 
 const COLORS = ["#a78bfa", "#60a5fa", "#34d399", "#fbbf24", "#f472b6"];
@@ -23,7 +34,9 @@ export function ChartCard({ spec }: { spec: ChartSpec }) {
       <div className="border-b border-border/60 px-5 py-4">
         <h3 className="text-sm font-semibold">{spec.title}</h3>
         {spec.description && (
-          <p className="mt-0.5 text-xs text-muted-foreground">{spec.description}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {spec.description}
+          </p>
         )}
       </div>
 
@@ -74,16 +87,38 @@ function renderChart(spec: ChartSpec) {
 
   if (spec.type === "area" || spec.type === "line") {
     return (
-      <AreaChart data={spec.data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
+      <AreaChart
+        data={spec.data}
+        margin={{ top: 10, right: 16, bottom: 0, left: 0 }}
+      >
         <defs>
           {spec.yKeys.map((k, i) => (
-            <linearGradient key={k} id={`grad-${spec.id}-${i}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={COLORS[i % COLORS.length]} stopOpacity={0.45} />
-              <stop offset="100%" stopColor={COLORS[i % COLORS.length]} stopOpacity={0.02} />
+            <linearGradient
+              key={k}
+              id={`grad-${spec.id}-${i}`}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop
+                offset="0%"
+                stopColor={COLORS[i % COLORS.length]}
+                stopOpacity={0.45}
+              />
+              <stop
+                offset="100%"
+                stopColor={COLORS[i % COLORS.length]}
+                stopOpacity={0.02}
+              />
             </linearGradient>
           ))}
         </defs>
-        <CartesianGrid stroke="oklch(1 0 0 / 6%)" vertical={false} strokeDasharray="3 3" />
+        <CartesianGrid
+          stroke="oklch(1 0 0 / 6%)"
+          vertical={false}
+          strokeDasharray="3 3"
+        />
         <XAxis
           dataKey={spec.xKey}
           tick={{ fill: "oklch(0.68 0.025 270)", fontSize: 11 }}
@@ -96,7 +131,10 @@ function renderChart(spec: ChartSpec) {
           tickLine={false}
           axisLine={false}
         />
-        <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "oklch(1 0 0 / 10%)", strokeWidth: 1 }} />
+        <Tooltip
+          contentStyle={tooltipStyle}
+          cursor={{ stroke: "oklch(1 0 0 / 10%)", strokeWidth: 1 }}
+        />
         {spec.yKeys.map((k, i) => (
           <Area
             key={k}
@@ -115,8 +153,15 @@ function renderChart(spec: ChartSpec) {
 
   // Default: bar
   return (
-    <BarChart data={spec.data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
-      <CartesianGrid stroke="oklch(1 0 0 / 6%)" vertical={false} strokeDasharray="3 3" />
+    <BarChart
+      data={spec.data}
+      margin={{ top: 10, right: 16, bottom: 0, left: 0 }}
+    >
+      <CartesianGrid
+        stroke="oklch(1 0 0 / 6%)"
+        vertical={false}
+        strokeDasharray="3 3"
+      />
       <XAxis
         dataKey={spec.xKey}
         tick={{ fill: "oklch(0.68 0.025 270)", fontSize: 11 }}
@@ -133,7 +178,10 @@ function renderChart(spec: ChartSpec) {
         tickLine={false}
         axisLine={false}
       />
-      <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "oklch(1 0 0 / 4%)", radius: 4 }} />
+      <Tooltip
+        contentStyle={tooltipStyle}
+        cursor={{ fill: "oklch(1 0 0 / 4%)", radius: 4 }}
+      />
       {spec.yKeys.map((k, i) => (
         <Bar
           key={k}

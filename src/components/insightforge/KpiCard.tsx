@@ -15,14 +15,18 @@ export function KpiCard({ kpi, index = 0 }: KpiCardProps) {
   const trendColor = isUp
     ? "text-success bg-success/10"
     : isDown
-    ? "text-destructive bg-destructive/10"
-    : "text-muted-foreground bg-muted/40";
+      ? "text-destructive bg-destructive/10"
+      : "text-muted-foreground bg-muted/40";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: index * 0.05 }}
+      transition={{
+        duration: 0.4,
+        ease: [0.16, 1, 0.3, 1],
+        delay: index * 0.05,
+      }}
       whileHover={{ y: -2, transition: { duration: 0.18 } }}
       className="card-elevated group relative cursor-default p-5 transition-[box-shadow,border-color] duration-250 hover:border-primary/20 hover:shadow-[var(--shadow-card-hover)]"
     >

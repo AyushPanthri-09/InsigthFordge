@@ -1,31 +1,52 @@
 import type { DatasetUnderstanding } from "@/services/analytics/types";
 import { ConfidenceBadge } from "./ConfidenceBadge";
-import { Database, Tag, KeyRound, Calendar, Hash, Type, AlertTriangle } from "lucide-react";
+import {
+  Database,
+  Tag,
+  KeyRound,
+  Calendar,
+  Hash,
+  Type,
+  AlertTriangle,
+} from "lucide-react";
 
 const DOMAIN_LABELS: Record<string, string> = {
-  ecommerce: "E-commerce", retail: "Retail", finance: "Finance",
-  banking: "Banking", healthcare: "Healthcare", education: "Education",
-  manufacturing: "Manufacturing", logistics: "Logistics", hr: "HR",
-  marketing: "Marketing", saas: "SaaS", operations: "Operations", generic: "General",
+  ecommerce: "E-commerce",
+  retail: "Retail",
+  finance: "Finance",
+  banking: "Banking",
+  healthcare: "Healthcare",
+  education: "Education",
+  manufacturing: "Manufacturing",
+  logistics: "Logistics",
+  hr: "HR",
+  marketing: "Marketing",
+  saas: "SaaS",
+  operations: "Operations",
+  generic: "General",
 };
 
 const ROLE_ICON = {
-  measure:  Hash,
+  measure: Hash,
   dimension: Tag,
-  key:      KeyRound,
-  date:     Calendar,
+  key: KeyRound,
+  date: Calendar,
   metadata: Type,
 };
 
 const ROLE_COLOR: Record<string, string> = {
-  measure:   "bg-info/10 text-info border-info/20",
+  measure: "bg-info/10 text-info border-info/20",
   dimension: "bg-accent/10 text-accent border-accent/20",
-  key:       "bg-primary/10 text-primary border-primary/20",
-  date:      "bg-warning/10 text-warning border-warning/20",
-  metadata:  "bg-muted/40 text-muted-foreground border-border/60",
+  key: "bg-primary/10 text-primary border-primary/20",
+  date: "bg-warning/10 text-warning border-warning/20",
+  metadata: "bg-muted/40 text-muted-foreground border-border/60",
 };
 
-export function DatasetUnderstandingView({ data }: { data: DatasetUnderstanding }) {
+export function DatasetUnderstandingView({
+  data,
+}: {
+  data: DatasetUnderstanding;
+}) {
   return (
     <div className="space-y-6">
       {/* ── Domain overview ─────────────────────────────── */}
@@ -60,7 +81,9 @@ export function DatasetUnderstandingView({ data }: { data: DatasetUnderstanding 
           )}
         </div>
 
-        <p className="mt-5 text-sm leading-relaxed text-foreground/85">{data.summary}</p>
+        <p className="mt-5 text-sm leading-relaxed text-foreground/85">
+          {data.summary}
+        </p>
 
         {data.purpose && (
           <div className="mt-4 rounded-xl border border-border/60 bg-background/40 px-4 py-3">
@@ -75,7 +98,9 @@ export function DatasetUnderstandingView({ data }: { data: DatasetUnderstanding 
             <div>
               <div className="field-label text-warning mb-1">Warnings</div>
               <ul className="list-disc space-y-1 pl-4 text-xs text-foreground/80">
-                {data.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                {data.warnings.map((w, i) => (
+                  <li key={i}>{w}</li>
+                ))}
               </ul>
             </div>
           </div>
@@ -95,8 +120,12 @@ export function DatasetUnderstandingView({ data }: { data: DatasetUnderstanding 
                 key={i}
                 className="rounded-xl border border-border/60 bg-background/40 p-3.5 transition-colors hover:bg-muted/20"
               >
-                <div className="text-sm font-semibold gradient-text">{k.name}</div>
-                <p className="mt-1.5 text-xs leading-relaxed text-foreground/80">{k.rationale}</p>
+                <div className="text-sm font-semibold gradient-text">
+                  {k.name}
+                </div>
+                <p className="mt-1.5 text-xs leading-relaxed text-foreground/80">
+                  {k.rationale}
+                </p>
                 <div className="mt-2.5 flex flex-wrap gap-1">
                   {k.columns.map((c) => (
                     <code
@@ -145,7 +174,8 @@ export function DatasetUnderstandingView({ data }: { data: DatasetUnderstanding 
             <tbody>
               {data.columnProfiles.map((p, idx) => {
                 const RoleIcon = ROLE_ICON[p.inferredRole] ?? Tag;
-                const roleColor = ROLE_COLOR[p.inferredRole] ?? ROLE_COLOR.metadata;
+                const roleColor =
+                  ROLE_COLOR[p.inferredRole] ?? ROLE_COLOR.metadata;
                 return (
                   <tr
                     key={p.name}
@@ -173,7 +203,9 @@ export function DatasetUnderstandingView({ data }: { data: DatasetUnderstanding 
                       {p.nullCount.toLocaleString()}
                     </td>
                     <td className="px-5 py-3 text-xs text-foreground/80">
-                      {p.businessMeaning ?? <span className="text-muted-foreground">—</span>}
+                      {p.businessMeaning ?? (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </td>
                   </tr>
                 );

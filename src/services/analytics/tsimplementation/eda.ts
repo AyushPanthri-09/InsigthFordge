@@ -33,7 +33,12 @@ import type {
   TimeIntelligence,
   TimeSeriesAnalysis,
 } from "../types";
-import { computeAllExtendedStats, testNormality, testNormalityFromExtendedStats, testGroupDifference } from "./statistical-engine";
+import {
+  computeAllExtendedStats,
+  testNormality,
+  testNormalityFromExtendedStats,
+  testGroupDifference,
+} from "./statistical-engine";
 import { analyseTimeSeries } from "./timeseries-engine";
 import { analyseRootCause } from "./root-cause-engine";
 import { runAutonomousInvestigation } from "./autonomous-investigator";
@@ -268,9 +273,7 @@ export function computeKPIs(
   // Standard measures KPIs
   for (const m of measures.slice(0, 4)) {
     const intel = intelligence?.[m.name];
-    const aggregation = intel
-      ? resolveAggregation(intel, m)
-      : "sum";
+    const aggregation = intel ? resolveAggregation(intel, m) : "sum";
 
     const displayName = intel?.businessMeaning
       ? extractShortName(intel.businessMeaning)
@@ -313,14 +316,15 @@ export function computeKPIs(
   // Completeness KPI — valuable data quality signal
   const totalCells = rows.length * profiles.length;
   const nullCells = profiles.reduce((sum, p) => sum + p.nullCount, 0);
-  const completeness = totalCells > 0 ? ((totalCells - nullCells) / totalCells) * 100 : 100;
+  const completeness =
+    totalCells > 0 ? ((totalCells - nullCells) / totalCells) * 100 : 100;
   kpis.push({
     id: "completeness",
     label: "Data Completeness",
     value: completeness,
     formattedValue: `${completeness.toFixed(1)}%`,
     confidence: 1,
-    rationale: `${(nullCells).toLocaleString()} missing cells out of ${totalCells.toLocaleString()} total cells.`,
+    rationale: `${nullCells.toLocaleString()} missing cells out of ${totalCells.toLocaleString()} total cells.`,
   });
 
   return kpis.slice(0, 8);
@@ -356,10 +360,17 @@ export function computeCorrelations(
         for (const row of rows) {
           const x = Number(row[a]);
           const y = Number(row[b]);
-          if (Number.isFinite(x) && Number.isFinite(y)) { xs.push(x); ys.push(y); }
+          if (Number.isFinite(x) && Number.isFinite(y)) {
+            xs.push(x);
+            ys.push(y);
+          }
         }
         if (xs.length < 8) continue;
-        try { r = ss.sampleCorrelation(xs, ys); } catch { continue; }
+        try {
+          r = ss.sampleCorrelation(xs, ys);
+        } catch {
+          continue;
+        }
         if (!Number.isFinite(r)) continue;
       }
 
@@ -393,7 +404,9 @@ export function buildCharts(
 
   // Determine columns by role
   const measures = profiles.filter((p) =>
-    factDimMap ? factDimMap[p.name] === "fact" && p.stats : p.inferredRole === "measure",
+    factDimMap
+      ? factDimMap[p.name] === "fact" && p.stats
+      : p.inferredRole === "measure",
   );
 
   const dimensions = profiles.filter((p) =>
@@ -403,7 +416,9 @@ export function buildCharts(
         p.inferredType !== "date" &&
         p.uniqueCount > 1 &&
         p.uniqueCount <= 30
-      : p.inferredRole === "dimension" && p.uniqueCount > 1 && p.uniqueCount <= 30,
+      : p.inferredRole === "dimension" &&
+        p.uniqueCount > 1 &&
+        p.uniqueCount <= 30,
   );
 
   // Use intelligence-detected primary date column; fall back to first date profile
@@ -415,14 +430,15 @@ export function buildCharts(
       p.inferredType === "date",
   );
   const primaryDate = primaryDateColName
-    ? profiles.find((p) => p.name === primaryDateColName) ?? dates[0]
+    ? (profiles.find((p) => p.name === primaryDateColName) ?? dates[0])
     : dates[0];
 
   // ── Chart 1: Time-series for the primary measure ──────────────────────
   if (primaryDate && measures.length > 0) {
     // Prefer the first KPI-candidate measure; fall back to first measure
     const primaryMeasure =
-      measures.find((m) => intelligence?.[m.name]?.isKpiCandidate) ?? measures[0];
+      measures.find((m) => intelligence?.[m.name]?.isKpiCandidate) ??
+      measures[0];
 
     const granularity = timeIntel?.granularity ?? "month";
     const buckets = new Map<string, number>();
@@ -431,7 +447,10 @@ export function buildCharts(
       const d = parseDate(r[primaryDate.name]);
       if (!d) continue;
       const key = formatDateBucket(d, granularity);
-      buckets.set(key, (buckets.get(key) ?? 0) + (Number(r[primaryMeasure.name]) || 0));
+      buckets.set(
+        key,
+        (buckets.get(key) ?? 0) + (Number(r[primaryMeasure.name]) || 0),
+      );
     }
 
     const data = Array.from(buckets.entries())
@@ -451,7 +470,10 @@ export function buildCharts(
         xKey: "period",
         yKeys: [primaryMeasure.name],
         data,
-        insight: trendInsight(data.map((d) => d[primaryMeasure.name] as number), measureLabel),
+        insight: trendInsight(
+          data.map((d) => d[primaryMeasure.name] as number),
+          measureLabel,
+        ),
       });
     }
   }
@@ -465,12 +487,16 @@ export function buildCharts(
       dimensions[0];
 
     const primaryMeasure =
-      measures.find((m) => intelligence?.[m.name]?.isKpiCandidate) ?? measures[0];
+      measures.find((m) => intelligence?.[m.name]?.isKpiCandidate) ??
+      measures[0];
 
     const buckets = new Map<string, number>();
     for (const r of rows) {
       const k = String(r[targetDim.name] ?? "Unknown");
-      buckets.set(k, (buckets.get(k) ?? 0) + (Number(r[primaryMeasure.name]) || 0));
+      buckets.set(
+        k,
+        (buckets.get(k) ?? 0) + (Number(r[primaryMeasure.name]) || 0),
+      );
     }
 
     const data = Array.from(buckets.entries())
@@ -504,7 +530,8 @@ export function buildCharts(
 
   // ── Chart 3: Second measure vs second dimension (categorical breakdown) ─
   if (dimensions.length > 1 && measures.length > 1) {
-    const dim = dimensions.find((d, i) => i > 0 && d.uniqueCount <= 10) ?? dimensions[1];
+    const dim =
+      dimensions.find((d, i) => i > 0 && d.uniqueCount <= 10) ?? dimensions[1];
     const measure = measures[1];
 
     const buckets = new Map<string, number>();
@@ -611,7 +638,10 @@ function buildTopFindings(
 
     if (context.suggestedKPIs.length > 0) {
       findings.push(
-        `Domain "${context.domain}": recommended KPIs include ${context.suggestedKPIs.map((k) => k.name).slice(0, 3).join(", ")}. ` +
+        `Domain "${context.domain}": recommended KPIs include ${context.suggestedKPIs
+          .map((k) => k.name)
+          .slice(0, 3)
+          .join(", ")}. ` +
           `These have been pre-computed where source columns were available.`,
       );
     }
@@ -648,8 +678,12 @@ export function buildEDA(
 
   // ── KPIs and charts use full profiles (visual, not analytical) ────────
   const legacyKpis = computeKPIs(rows, profiles, context);
-  const computedKpis = detectAndComputeKPIs(rows, profiles.map(p => p.name), domain as any);
-  
+  const computedKpis = detectAndComputeKPIs(
+    rows,
+    profiles.map((p) => p.name),
+    domain as any,
+  );
+
   // Merge lists by unique KPI ID to prevent duplicates
   const kpiMap = new Map<string, KPI>();
   for (const k of [...legacyKpis, ...computedKpis]) {
@@ -660,22 +694,40 @@ export function buildEDA(
   const charts = buildCharts(rows, profiles, context);
 
   // ── Correlations — use cached vectors, no row scan ────────────────────
-  const numericCols = analyticsProfiles.filter(p => p.inferredRole === "measure").map(p => p.name);
+  const numericCols = analyticsProfiles
+    .filter((p) => p.inferredRole === "measure")
+    .map((p) => p.name);
   const matrix = computeCorrelationMatrix(rows, numericCols);
-  const correlations = matrix.map(c => ({
+  const correlations = matrix.map((c) => ({
     a: c.a,
     b: c.b,
     r: c.r,
-    strength: c.strength.includes("strong") ? "strong" as const : c.strength.includes("moderate") ? "moderate" as const : "weak" as const
+    strength: c.strength.includes("strong")
+      ? ("strong" as const)
+      : c.strength.includes("moderate")
+        ? ("moderate" as const)
+        : ("weak" as const),
   }));
-  const topFindings = buildTopFindings(correlations, charts, context, analyticsProfiles);
+  const topFindings = buildTopFindings(
+    correlations,
+    charts,
+    context,
+    analyticsProfiles,
+  );
 
   // ── Phase 2: Extended statistics — use cached numeric vectors ─────────
-  const extendedStats = computeAllExtendedStats(rows, analyticsProfiles, domain, cache);
+  const extendedStats = computeAllExtendedStats(
+    rows,
+    analyticsProfiles,
+    domain,
+    cache,
+  );
 
   // ── Phase 2: Statistical tests ────────────────────────────────────────
   const statisticalTests: StatisticalTest[] = [];
-  for (const p of analyticsProfiles.filter((p) => p.inferredRole === "measure").slice(0, 4)) {
+  for (const p of analyticsProfiles
+    .filter((p) => p.inferredRole === "measure")
+    .slice(0, 4)) {
     const ext = extendedStats[p.name];
     if (ext) {
       statisticalTests.push(testNormalityFromExtendedStats(ext, p.name));
@@ -688,9 +740,14 @@ export function buildEDA(
 
   // Group difference test — reuse cached vectors for group partitioning
   const categoricals = analyticsProfiles.filter(
-    (p) => p.inferredRole === "dimension" && p.uniqueCount >= 2 && p.uniqueCount <= 6,
+    (p) =>
+      p.inferredRole === "dimension" &&
+      p.uniqueCount >= 2 &&
+      p.uniqueCount <= 6,
   );
-  const measures = analyticsProfiles.filter((p) => p.inferredRole === "measure" && p.stats);
+  const measures = analyticsProfiles.filter(
+    (p) => p.inferredRole === "measure" && p.stats,
+  );
   if (categoricals.length > 0 && measures.length > 0) {
     const dim = categoricals[0];
     const metric = measures[0];
@@ -708,9 +765,13 @@ export function buildEDA(
       }
     }
     if (groupMap.size === 2) {
-      const [[labelA, groupA], [labelB, groupB]] = Array.from(groupMap.entries());
+      const [[labelA, groupA], [labelB, groupB]] = Array.from(
+        groupMap.entries(),
+      );
       if (groupA.length >= 4 && groupB.length >= 4) {
-        statisticalTests.push(testGroupDifference(groupA, groupB, labelA, labelB, metric.name));
+        statisticalTests.push(
+          testGroupDifference(groupA, groupB, labelA, labelB, metric.name),
+        );
       }
     }
   }
@@ -720,7 +781,11 @@ export function buildEDA(
   const timeIntel = context?.timeIntelligence;
   if (timeIntel) {
     const tsTargets = analyticsProfiles
-      .filter((p) => context?.intelligence?.[p.name]?.isKpiCandidate || p.inferredRole === "measure")
+      .filter(
+        (p) =>
+          context?.intelligence?.[p.name]?.isKpiCandidate ||
+          p.inferredRole === "measure",
+      )
       .slice(0, 2);
     // Pre-parse dates once — reused across all measure columns to avoid
     // repeated parseDate() calls on every row for every target measure.
@@ -734,7 +799,14 @@ export function buildEDA(
       return null;
     });
     for (const m of tsTargets) {
-      const ts = analyseTimeSeries(rows, timeIntel.primaryDateColumn, m.name, timeIntel.granularity, domain, parsedDates);
+      const ts = analyseTimeSeries(
+        rows,
+        timeIntel.primaryDateColumn,
+        m.name,
+        timeIntel.granularity,
+        domain,
+        parsedDates,
+      );
       if (ts) timeSeriesAnalysis.push(ts);
     }
   }
@@ -743,16 +815,34 @@ export function buildEDA(
   const rootCauseAnalyses: RootCauseAnalysis[] = [];
   if (timeSeriesAnalysis.length > 0) {
     const primaryTs = timeSeriesAnalysis[0];
-    const peakPeriodData = primaryTs.periods.find((p) => p.period === primaryTs.peakPeriod);
+    const peakPeriodData = primaryTs.periods.find(
+      (p) => p.period === primaryTs.peakPeriod,
+    );
     if (peakPeriodData && Math.abs(primaryTs.totalGrowthPct) >= 20) {
-      const rca = analyseRootCause(rows, primaryTs.measureColumn, peakPeriodData.value, analyticsProfiles, domain, 2, extendedStats);
+      const rca = analyseRootCause(
+        rows,
+        primaryTs.measureColumn,
+        peakPeriodData.value,
+        analyticsProfiles,
+        domain,
+        2,
+        extendedStats,
+      );
       if (rca) rootCauseAnalyses.push(rca);
     }
   } else if (measures.length > 0 && extendedStats[measures[0].name]) {
     const topMeasure = measures[0];
     const ext = extendedStats[topMeasure.name];
     if (ext && Math.abs((ext.max - ext.mean) / (ext.mean || 1)) > 0.5) {
-      const rca = analyseRootCause(rows, topMeasure.name, ext.percentiles["p90"] ?? ext.max, analyticsProfiles, domain, 2, extendedStats);
+      const rca = analyseRootCause(
+        rows,
+        topMeasure.name,
+        ext.percentiles["p90"] ?? ext.max,
+        analyticsProfiles,
+        domain,
+        2,
+        extendedStats,
+      );
       if (rca) rootCauseAnalyses.push(rca);
     }
   }
@@ -784,11 +874,21 @@ export function buildEDA(
   // ── Segmentation analysis (Phase 4 upgrade) ───────────────────────────
   let segmentation = null;
   const dimensionCols = analyticsProfiles
-    .filter((p) => p.inferredRole === "dimension" && p.uniqueCount >= 2 && p.uniqueCount <= 30)
+    .filter(
+      (p) =>
+        p.inferredRole === "dimension" &&
+        p.uniqueCount >= 2 &&
+        p.uniqueCount <= 30,
+    )
     .map((p) => p.name);
   if (numericCols[0] && dimensionCols.length > 0) {
     try {
-      segmentation = runSegmentationAnalysis(rows, profiles.map((p) => p.name), numericCols[0], dimensionCols);
+      segmentation = runSegmentationAnalysis(
+        rows,
+        profiles.map((p) => p.name),
+        numericCols[0],
+        dimensionCols,
+      );
     } catch (e) {
       console.warn("Segmentation analysis failed:", e);
     }
@@ -859,11 +959,16 @@ function formatDateBucket(d: Date, granularity: string): string {
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const w = getISOWeek(d);
   switch (granularity) {
-    case "year": return `${y}`;
-    case "quarter": return `${y}-Q${Math.ceil(d.getMonth() / 3 + 1)}`;
-    case "week": return `${y}-W${String(w).padStart(2, "0")}`;
-    case "day": return `${y}-${m}-${String(d.getDate()).padStart(2, "0")}`;
-    default: return `${y}-${m}`; // month (default)
+    case "year":
+      return `${y}`;
+    case "quarter":
+      return `${y}-Q${Math.ceil(d.getMonth() / 3 + 1)}`;
+    case "week":
+      return `${y}-W${String(w).padStart(2, "0")}`;
+    case "day":
+      return `${y}-${m}-${String(d.getDate()).padStart(2, "0")}`;
+    default:
+      return `${y}-${m}`; // month (default)
   }
 }
 
@@ -871,7 +976,9 @@ function getISOWeek(d: Date): number {
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  return Math.ceil(((date.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
+  return Math.ceil(
+    ((date.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7,
+  );
 }
 
 function trendInsight(values: number[], label: string): string {
@@ -918,7 +1025,10 @@ function buildEnhancedFindings(
 
   // Add distribution insights from extended stats
   for (const [col, ext] of Object.entries(extendedStats).slice(0, 2)) {
-    if (ext.distributionShape !== "normal" && ext.distributionShape !== "unknown") {
+    if (
+      ext.distributionShape !== "normal" &&
+      ext.distributionShape !== "unknown"
+    ) {
       findings.push(ext.distributionExplanation);
     }
     if (ext.anomalyCount > 0) {
@@ -937,8 +1047,12 @@ function buildEnhancedFindings(
   }
 
   // Add significant statistical test results
-  for (const test of statisticalTests.filter((t) => t.isSignificant).slice(0, 2)) {
-    findings.push(`${test.testName}: ${test.interpretation} ${test.businessImplication}`);
+  for (const test of statisticalTests
+    .filter((t) => t.isSignificant)
+    .slice(0, 2)) {
+    findings.push(
+      `${test.testName}: ${test.interpretation} ${test.businessImplication}`,
+    );
   }
 
   return findings.slice(0, 12); // cap at 12 findings

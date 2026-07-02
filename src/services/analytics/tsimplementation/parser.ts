@@ -25,7 +25,9 @@ export async function parseFile(file: File): Promise<InternalDataset> {
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, { type: "array", cellDates: true });
     const sheet = wb.Sheets[wb.SheetNames[0]];
-    rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: null });
+    rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+      defval: null,
+    });
     columns = rows.length ? Object.keys(rows[0]) : [];
   } else {
     throw new Error(`Unsupported file type: .${ext}. Use CSV or XLSX.`);

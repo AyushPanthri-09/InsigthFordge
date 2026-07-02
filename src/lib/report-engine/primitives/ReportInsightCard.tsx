@@ -6,7 +6,11 @@ interface ReportInsightCardProps {
   badge?: string;
 }
 
-export function ReportInsightCard({ title, children, badge }: ReportInsightCardProps) {
+export function ReportInsightCard({
+  title,
+  children,
+  badge,
+}: ReportInsightCardProps) {
   return (
     <div className="rpt-insight-card">
       <div className="rpt-insight-card-accent" />

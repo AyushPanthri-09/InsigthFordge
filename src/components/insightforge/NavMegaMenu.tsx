@@ -95,7 +95,15 @@ const RIGHT_ITEMS = [
 type FeatureItem = (typeof LEFT_ITEMS)[number] | (typeof RIGHT_ITEMS)[number];
 
 /* ── Feature card ─────────────────────────────────────────────── */
-function FeatureCard({ emoji, Icon, title, desc, color, glow, activeBorder }: FeatureItem) {
+function FeatureCard({
+  emoji,
+  Icon,
+  title,
+  desc,
+  color,
+  glow,
+  activeBorder,
+}: FeatureItem) {
   return (
     <motion.div
       whileHover={{ y: -3, scale: 1.015 }}
@@ -118,8 +126,12 @@ function FeatureCard({ emoji, Icon, title, desc, color, glow, activeBorder }: Fe
       </div>
       {/* Text */}
       <div className="min-w-0">
-        <div className="text-sm font-semibold leading-snug tracking-[-0.01em]">{title}</div>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{desc}</p>
+        <div className="text-sm font-semibold leading-snug tracking-[-0.01em]">
+          {title}
+        </div>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          {desc}
+        </p>
       </div>
     </motion.div>
   );
@@ -140,11 +152,7 @@ export function NavMegaMenu() {
   };
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={show}
-      onMouseLeave={hide}
-    >
+    <div className="relative" onMouseEnter={show} onMouseLeave={hide}>
       {/* ── Trigger ──────────────────────────────────────────── */}
       <button
         aria-expanded={open}

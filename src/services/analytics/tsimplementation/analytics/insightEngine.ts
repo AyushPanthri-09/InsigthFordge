@@ -1,4 +1,10 @@
-import type { BusinessDomain, KPI, AIInsight, Evidence, Hypothesis } from "../../types";
+import type {
+  BusinessDomain,
+  KPI,
+  AIInsight,
+  Evidence,
+  Hypothesis,
+} from "../../types";
 import { CorrelationResult } from "./correlationEngine";
 import { AnomalyResult } from "./anomalyEngine";
 import { SegmentationResult } from "./segmentation";
@@ -16,7 +22,7 @@ export function generateStructuredInsights(
   anomalies: AnomalyResult[],
   segmentation: SegmentationResult | null,
   forecasts: ExtendedForecastResult[],
-  recommendations: ActionableRecommendation[]
+  recommendations: ActionableRecommendation[],
 ): {
   descriptive: AIInsight[];
   diagnostic: AIInsight[];
@@ -35,16 +41,16 @@ export function generateStructuredInsights(
   const datasetEvidence = (desc: string, weight = 0.8): Evidence => ({
     type: "dataset",
     description: desc,
-    weight
+    weight,
   });
 
   // --- 1. DESCRIPTIVE INSIGHTS ---
   // What happened? Based on high-level KPIs
-  const mainKpis = kpis.filter(k => k.id !== "kpi_total_records");
+  const mainKpis = kpis.filter((k) => k.id !== "kpi_total_records");
   if (mainKpis.length > 0) {
     const primary = mainKpis[0];
     const secondary = mainKpis[1] || mainKpis[0];
-    
+
     descriptive.push({
       id: nextId("desc"),
       level: "descriptive",
@@ -54,31 +60,47 @@ export function generateStructuredInsights(
       reasoning: `Extracted from deterministic column profiling. ${primary.rationale}`,
       confidence: primary.confidence,
       conclusion: `${primary.label} metrics stand at ${primary.formattedValue}, driving overall performance for the ${domain} domain.`,
-      recommendation: "Ensure key metrics are integrated into regular team alignment cycles.",
+      recommendation:
+        "Ensure key metrics are integrated into regular team alignment cycles.",
       evidence: [
-        datasetEvidence(`${primary.label}: ${primary.formattedValue} (${primary.rationale})`),
-        datasetEvidence(`${secondary.label}: ${secondary.formattedValue} (${secondary.rationale})`, 0.6)
+        datasetEvidence(
+          `${primary.label}: ${primary.formattedValue} (${primary.rationale})`,
+        ),
+        datasetEvidence(
+          `${secondary.label}: ${secondary.formattedValue} (${secondary.rationale})`,
+          0.6,
+        ),
       ],
       hypotheses: [
         {
           statement: `The calculated ${primary.label} reflects standard seasonal business performance.`,
-          supportingEvidence: [datasetEvidence(`${primary.label} is in line with baseline expectations.`)],
+          supportingEvidence: [
+            datasetEvidence(
+              `${primary.label} is in line with baseline expectations.`,
+            ),
+          ],
           opposingEvidence: [],
           verdict: "supported",
           rationale: "Data aligns with baseline KPI metrics.",
           confidence: 0.8,
-          rank: 1
+          rank: 1,
         },
         {
           statement: `The calculated ${primary.label} is biased by data outliers.`,
           supportingEvidence: [],
-          opposingEvidence: [datasetEvidence("Outlier scans indicate regular spread counts.", 0.5)],
+          opposingEvidence: [
+            datasetEvidence(
+              "Outlier scans indicate regular spread counts.",
+              0.5,
+            ),
+          ],
           verdict: "rejected",
-          rationale: "Z-score scans confirmed that metric outliers do not skew the aggregate total.",
+          rationale:
+            "Z-score scans confirmed that metric outliers do not skew the aggregate total.",
           confidence: 0.2,
-          rank: 2
-        }
-      ]
+          rank: 2,
+        },
+      ],
     });
   }
 
@@ -97,29 +119,44 @@ export function generateStructuredInsights(
       conclusion: `Changes in ${prettify(topCorr.a)} are statistically associated with changes in ${prettify(topCorr.b)}.`,
       recommendation: `Run a regression analysis or causal test to confirm if changes in ${prettify(topCorr.a)} can directly control outcomes in ${prettify(topCorr.b)}.`,
       evidence: [
-        datasetEvidence(`Pearson r = ${topCorr.r.toFixed(2)} between ${topCorr.a} and ${topCorr.b}`),
-        { type: "inference", description: `Business models support relation between these categories.`, weight: 0.5 }
+        datasetEvidence(
+          `Pearson r = ${topCorr.r.toFixed(2)} between ${topCorr.a} and ${topCorr.b}`,
+        ),
+        {
+          type: "inference",
+          description: `Business models support relation between these categories.`,
+          weight: 0.5,
+        },
       ],
       hypotheses: [
         {
           statement: `Changes in ${prettify(topCorr.a)} directly influence ${prettify(topCorr.b)}.`,
-          supportingEvidence: [datasetEvidence("High correlation coefficient suggests linear alignment.")],
+          supportingEvidence: [
+            datasetEvidence(
+              "High correlation coefficient suggests linear alignment.",
+            ),
+          ],
           opposingEvidence: [],
           verdict: "supported",
           rationale: "Highly correlated variables in clean dataset.",
           confidence: 0.75,
-          rank: 1
+          rank: 1,
         },
         {
-          statement: "The correlation is a statistical artifact (spurious correlation).",
+          statement:
+            "The correlation is a statistical artifact (spurious correlation).",
           supportingEvidence: [],
-          opposingEvidence: [datasetEvidence("Sufficient row volume prevents spurious calculation.")],
+          opposingEvidence: [
+            datasetEvidence(
+              "Sufficient row volume prevents spurious calculation.",
+            ),
+          ],
           verdict: "rejected",
           rationale: "Sample size is large enough to rule out random variance.",
           confidence: 0.15,
-          rank: 2
-        }
-      ]
+          rank: 2,
+        },
+      ],
     });
   }
 
@@ -136,29 +173,37 @@ export function generateStructuredInsights(
       conclusion: `The '${topSeg.segmentValue}' segment dictates performance for the metric '${prettify(segmentation.targetMetric)}'.`,
       recommendation: `Target this segment for growth or audit its operational practices to duplicate success.`,
       evidence: [
-        datasetEvidence(`Contribution: ${topSeg.contributionPct.toFixed(1)}% of sum ($${topSeg.metricSum.toLocaleString()})`),
-        datasetEvidence(`Mean deviation: ${topSeg.deviationPct.toFixed(1)}% vs baseline average.`)
+        datasetEvidence(
+          `Contribution: ${topSeg.contributionPct.toFixed(1)}% of sum ($${topSeg.metricSum.toLocaleString()})`,
+        ),
+        datasetEvidence(
+          `Mean deviation: ${topSeg.deviationPct.toFixed(1)}% vs baseline average.`,
+        ),
       ],
       hypotheses: [
         {
           statement: `The '${topSeg.segmentValue}' segment is organically higher-performing.`,
-          supportingEvidence: [datasetEvidence("Higher mean and contribution percentage.")],
+          supportingEvidence: [
+            datasetEvidence("Higher mean and contribution percentage."),
+          ],
           opposingEvidence: [],
           verdict: "supported",
           rationale: "Data demonstrates high performance in this segment.",
           confidence: 0.8,
-          rank: 1
+          rank: 1,
         },
         {
           statement: "The segment difference is statistically insignificant.",
           supportingEvidence: [],
-          opposingEvidence: [datasetEvidence("Significant deviation percentage above average.")],
+          opposingEvidence: [
+            datasetEvidence("Significant deviation percentage above average."),
+          ],
           verdict: "rejected",
           rationale: "Deviation is too high to be attributed to random noise.",
           confidence: 0.1,
-          rank: 2
-        }
-      ]
+          rank: 2,
+        },
+      ],
     });
   }
 
@@ -167,7 +212,7 @@ export function generateStructuredInsights(
   for (const fc of forecasts.slice(0, 2)) {
     const firstPeriod = fc.nextPeriods[0];
     const lastPeriod = fc.nextPeriods[fc.nextPeriods.length - 1];
-    
+
     predictive.push({
       id: nextId("pred"),
       level: "predictive",
@@ -177,33 +222,44 @@ export function generateStructuredInsights(
       reasoning: `Advanced forecasting engine selected model: '${fc.selectedMethod}' based on lowest backtesting error (MAPE: ${(fc.mape * 100).toFixed(1)}%).`,
       confidence: fc.confidence,
       conclusion: `If current trend persists, performance will align with the project value of ${lastPeriod.predicted.toFixed(1)} (${fc.explanation}).`,
-      recommendation: "Use these confidence bounds to guide sales targets and supply chain inventory plans.",
+      recommendation:
+        "Use these confidence bounds to guide sales targets and supply chain inventory plans.",
       evidence: [
-        datasetEvidence(`Selected forecast method: ${fc.selectedMethod} (MAPE: ${(fc.mape * 100).toFixed(1)}%)`),
-        datasetEvidence(`Predicted value in ${lastPeriod.period}: ${lastPeriod.predicted.toFixed(1)} (range: ${lastPeriod.lower.toFixed(1)} - ${lastPeriod.upper.toFixed(1)})`)
+        datasetEvidence(
+          `Selected forecast method: ${fc.selectedMethod} (MAPE: ${(fc.mape * 100).toFixed(1)}%)`,
+        ),
+        datasetEvidence(
+          `Predicted value in ${lastPeriod.period}: ${lastPeriod.predicted.toFixed(1)} (range: ${lastPeriod.lower.toFixed(1)} - ${lastPeriod.upper.toFixed(1)})`,
+        ),
       ],
       hypotheses: [
         {
           statement: "Historical trends will stay linear and predictive.",
-          supportingEvidence: [datasetEvidence("Historical backtesting error is low.")],
+          supportingEvidence: [
+            datasetEvidence("Historical backtesting error is low."),
+          ],
           opposingEvidence: [],
           verdict: "supported",
           rationale: "Backtest error indicates reliable predictability.",
           confidence: 0.8,
-          rank: 1
+          rank: 1,
         },
         {
-          statement: "Significant trend shift will occur in the forecast period.",
+          statement:
+            "Significant trend shift will occur in the forecast period.",
           supportingEvidence: [],
-          opposingEvidence: [datasetEvidence("Stability coefficients in timeseries are high.")],
+          opposingEvidence: [
+            datasetEvidence("Stability coefficients in timeseries are high."),
+          ],
           verdict: "inconclusive",
-          rationale: "External factors may disrupt the forecast; monitor real-time data against bounds.",
+          rationale:
+            "External factors may disrupt the forecast; monitor real-time data against bounds.",
           confidence: 0.4,
-          rank: 2
-        }
+          rank: 2,
+        },
       ],
       assumptions: fc.assumptions,
-      limitations: fc.risks
+      limitations: fc.risks,
     });
   }
 
@@ -222,27 +278,41 @@ export function generateStructuredInsights(
       recommendation: rec.action,
       evidence: [
         datasetEvidence(`Expected Impact: ${rec.expectedImpact}`),
-        { type: "external", description: `Risk of inaction: ${rec.riskOfInaction}`, weight: 0.7 }
+        {
+          type: "external",
+          description: `Risk of inaction: ${rec.riskOfInaction}`,
+          weight: 0.7,
+        },
       ],
       hypotheses: [
         {
           statement: `Implementing the action will generate the expected impact: "${rec.expectedImpact}"`,
-          supportingEvidence: [datasetEvidence("Business metrics and statistics align with this solution.")],
+          supportingEvidence: [
+            datasetEvidence(
+              "Business metrics and statistics align with this solution.",
+            ),
+          ],
           opposingEvidence: [],
           verdict: "supported",
-          rationale: "Recommendation targets resolved root cause variables directly.",
+          rationale:
+            "Recommendation targets resolved root cause variables directly.",
           confidence: 0.85,
-          rank: 1
+          rank: 1,
         },
         {
           statement: "The proposed action will fail to resolve the core issue.",
           supportingEvidence: [],
-          opposingEvidence: [datasetEvidence("High correlation and driver alignment support success.")],
+          opposingEvidence: [
+            datasetEvidence(
+              "High correlation and driver alignment support success.",
+            ),
+          ],
           verdict: "rejected",
-          rationale: "Evidence demonstrates high correlation between actionable levers and the target metric.",
+          rationale:
+            "Evidence demonstrates high correlation between actionable levers and the target metric.",
           confidence: 0.15,
-          rank: 2
-        }
+          rank: 2,
+        },
       ],
       prescriptiveDetail: {
         action: rec.action,
@@ -252,8 +322,8 @@ export function generateStructuredInsights(
         riskOfInaction: rec.riskOfInaction,
         successMetric: rec.successMetric,
         timeHorizon: rec.timeHorizon,
-        confidence: rec.confidence
-      }
+        confidence: rec.confidence,
+      },
     });
   }
 

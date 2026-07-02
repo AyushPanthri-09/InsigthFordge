@@ -16,7 +16,12 @@ function kpiIcon(index: number): string {
   return ["UP", "OR", "CU", "$", "GR", "%"][index % 6];
 }
 
-export function P3_TOC({ datasetName, generatedAt, executiveData, performanceData }: Props) {
+export function P3_TOC({
+  datasetName,
+  generatedAt,
+  executiveData,
+  performanceData,
+}: Props) {
   const topKpis = executiveData?.topKpis?.slice(0, 6) ?? [];
   const recommendations = executiveData?.topRecommendations?.slice(0, 4) ?? [];
   const primaryChart = performanceData?.primaryCharts?.[0];
@@ -31,7 +36,9 @@ export function P3_TOC({ datasetName, generatedAt, executiveData, performanceDat
       generatedAt={generatedAt}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}
+        >
           <ReportSection title="Top KPIs">
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topKpis.map((kpi, index) => (
@@ -64,17 +71,35 @@ export function P3_TOC({ datasetName, generatedAt, executiveData, performanceDat
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <div className="rpt-mini-metric-label">{kpi.label}</div>
-                    <div style={{ fontSize: 8.5, color: "var(--rpt-text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div
+                      style={{
+                        fontSize: 8.5,
+                        color: "var(--rpt-text-muted)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {kpi.rationale}
                     </div>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: "var(--rpt-brand-dark)", fontVariantNumeric: "tabular-nums" }}>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 900,
+                      color: "var(--rpt-brand-dark)",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
                     {kpi.formattedValue}
                   </div>
                 </div>
               ))}
               {topKpis.length === 0 && (
-                <div className="rpt-card-sm" style={{ color: "var(--rpt-text-muted)", fontSize: 10 }}>
+                <div
+                  className="rpt-card-sm"
+                  style={{ color: "var(--rpt-text-muted)", fontSize: 10 }}
+                >
                   No KPI records were available for this dataset.
                 </div>
               )}
@@ -84,24 +109,50 @@ export function P3_TOC({ datasetName, generatedAt, executiveData, performanceDat
           <ReportSection title="Top Recommendations">
             <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
               {recommendations.map((rec, index) => (
-                <div key={`${rec.title}-${index}`} className="rpt-numbered-action">
+                <div
+                  key={`${rec.title}-${index}`}
+                  className="rpt-numbered-action"
+                >
                   <div className="rpt-numbered-action-index">{index + 1}</div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 850, color: "var(--rpt-brand-dark)", marginBottom: 3 }}>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 850,
+                        color: "var(--rpt-brand-dark)",
+                        marginBottom: 3,
+                      }}
+                    >
                       {rec.title}
                     </div>
-                    <p style={{ margin: 0, fontSize: 8.8, lineHeight: 1.42, color: "var(--rpt-text-muted)" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: 8.8,
+                        lineHeight: 1.42,
+                        color: "var(--rpt-text-muted)",
+                      }}
+                    >
                       {rec.summary}
                     </p>
                     <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                      <ReportBadge label={`${rec.priority} impact`} variant={rec.priority} />
-                      <ReportBadge label={`${rec.effort} effort`} variant="neutral" />
+                      <ReportBadge
+                        label={`${rec.priority} impact`}
+                        variant={rec.priority}
+                      />
+                      <ReportBadge
+                        label={`${rec.effort} effort`}
+                        variant="neutral"
+                      />
                     </div>
                   </div>
                 </div>
               ))}
               {recommendations.length === 0 && (
-                <div className="rpt-card-sm" style={{ color: "var(--rpt-text-muted)", fontSize: 10 }}>
+                <div
+                  className="rpt-card-sm"
+                  style={{ color: "var(--rpt-text-muted)", fontSize: 10 }}
+                >
                   Recommendation generation did not return prioritized actions.
                 </div>
               )}
@@ -116,7 +167,13 @@ export function P3_TOC({ datasetName, generatedAt, executiveData, performanceDat
                 <ReportChart spec={primaryChart} height={260} />
               </div>
               {primaryChart.description && (
-                <div style={{ marginTop: 7, fontSize: 8.8, color: "var(--rpt-text-muted)" }}>
+                <div
+                  style={{
+                    marginTop: 7,
+                    fontSize: 8.8,
+                    color: "var(--rpt-text-muted)",
+                  }}
+                >
                   Source: {primaryChart.description}
                 </div>
               )}
@@ -127,7 +184,10 @@ export function P3_TOC({ datasetName, generatedAt, executiveData, performanceDat
         {executiveData && (
           <div className="rpt-exec-insight">
             <div className="rpt-exec-insight-label">Key takeaway</div>
-            <p>{executiveData.scqa.recommendedAction || executiveData.executiveSummary}</p>
+            <p>
+              {executiveData.scqa.recommendedAction ||
+                executiveData.executiveSummary}
+            </p>
           </div>
         )}
       </div>

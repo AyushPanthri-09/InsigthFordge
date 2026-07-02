@@ -34,10 +34,14 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.55, ease: EASE_OUT, delay },
 });
 
-
-
 /* ── Nav link ───────────────────────────────────────────────── */
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   return (
     <a
       href={href}
@@ -53,34 +57,37 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 }
 
 /* ── Route ──────────────────────────────────────────────────── */
-export const Route = createFileRoute("/")(
-  {
-    head: () => ({
-      meta: [
-        { title: "InsightForge AI — Autonomous AI Data Scientist & Business Consultant" },
-        {
-          name: "description",
-          content:
-            "Drop any CSV or XLSX. InsightForge AI understands the business context, cleans with reasoning, and delivers four levels of evidence-backed insights.",
-        },
-        { property: "og:title", content: "InsightForge AI — Premium AI Analytics" },
-        {
-          property: "og:description",
-          content:
-            "Understand. Clean. Analyze. Predict. Recommend. Every step transparent and evidence-backed.",
-        },
-      ],
-    }),
-    component: Landing,
-  },
-);
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      {
+        title:
+          "InsightForge AI — Autonomous AI Data Scientist & Business Consultant",
+      },
+      {
+        name: "description",
+        content:
+          "Drop any CSV or XLSX. InsightForge AI understands the business context, cleans with reasoning, and delivers four levels of evidence-backed insights.",
+      },
+      {
+        property: "og:title",
+        content: "InsightForge AI — Premium AI Analytics",
+      },
+      {
+        property: "og:description",
+        content:
+          "Understand. Clean. Analyze. Predict. Recommend. Every step transparent and evidence-backed.",
+      },
+    ],
+  }),
+  component: Landing,
+});
 
 function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen">
-
       {/* ── Header ────────────────────────────────────────────── */}
       <header
         className="glass sticky top-0 z-40"
@@ -132,7 +139,11 @@ function Landing() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            {mobileMenuOpen ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <Menu className="h-4 w-4" />
+            )}
           </button>
         </div>
 
@@ -146,10 +157,34 @@ function Landing() {
             className="border-t border-border/40 px-6 pb-4 md:hidden"
           >
             <nav className="flex flex-col gap-4 pt-4">
-              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Features</a>
-              <a href="#workflow" className="text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Workflow</a>
-              <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
-              <a href="#why" className="text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Live Demo</a>
+              <a
+                href="#features"
+                className="text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Features
+              </a>
+              <a
+                href="#workflow"
+                className="text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Workflow
+              </a>
+              <a
+                href="#pricing"
+                className="text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Pricing
+              </a>
+              <a
+                href="#why"
+                className="text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Live Demo
+              </a>
               <Link
                 to="/dashboard"
                 className="inline-flex w-fit items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
@@ -163,7 +198,6 @@ function Landing() {
       </header>
 
       <main>
-
         {/* ── Hero ─────────────────────────────────────────────── */}
         <section
           className="relative flex min-h-[92vh] flex-col items-center justify-center overflow-hidden px-6 pt-12 pb-20 text-center"
@@ -179,7 +213,6 @@ function Landing() {
 
           {/* Content */}
           <div className="relative z-10 mx-auto max-w-5xl">
-
             {/* Glowing badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 10 }}
@@ -211,10 +244,10 @@ function Landing() {
               transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.18 }}
               className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg sm:leading-relaxed"
             >
-              InsightForge AI reads your dataset the way a senior data scientist would.
-              It identifies the business context, justifies every cleaning decision, runs
-              four levels of analytics, and delivers evidence-backed recommendations —
-              not just statistics.
+              InsightForge AI reads your dataset the way a senior data scientist
+              would. It identifies the business context, justifies every
+              cleaning decision, runs four levels of analytics, and delivers
+              evidence-backed recommendations — not just statistics.
             </motion.p>
 
             {/* CTAs */}
@@ -224,7 +257,10 @@ function Landing() {
               transition={{ duration: 0.55, ease: EASE_OUT, delay: 0.28 }}
               className="mt-10 flex flex-wrap items-center justify-center gap-4"
             >
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }}>
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.96 }}
+              >
                 <Link
                   to="/dashboard"
                   className="btn-glow inline-flex items-center gap-2.5 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground"
@@ -305,8 +341,12 @@ function Landing() {
                 >
                   <c.Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-6 text-base font-semibold tracking-[-0.015em]">{c.title}</h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
+                <h3 className="mt-6 text-base font-semibold tracking-[-0.015em]">
+                  {c.title}
+                </h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                  {c.desc}
+                </p>
                 <div className="mt-5 flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                   Learn more <ChevronRight className="h-3 w-3" />
                 </div>
@@ -334,7 +374,8 @@ function Landing() {
                 <span className="gradient-text">trusted decision</span>
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-                Five stages. Every decision logged. Every conclusion backed by evidence.
+                Five stages. Every decision logged. Every conclusion backed by
+                evidence.
               </p>
             </motion.div>
 
@@ -346,7 +387,11 @@ function Landing() {
                   initial={{ scaleX: 0 }}
                   whileInView={{ scaleX: 1 }}
                   viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                  transition={{
+                    duration: 1.2,
+                    ease: [0.16, 1, 0.3, 1],
+                    delay: 0.2,
+                  }}
                   className="absolute top-7 left-[calc(10%+2rem)] right-[calc(10%+2rem)] h-px origin-left"
                   style={{
                     background:
@@ -362,7 +407,11 @@ function Landing() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, amount: 0.15 }}
                       whileHover={{ y: -5 }}
-                      transition={{ delay: i * 0.12, duration: 0.55, ease: EASE_OUT }}
+                      transition={{
+                        delay: i * 0.12,
+                        duration: 0.55,
+                        ease: EASE_OUT,
+                      }}
                       className="gradient-border-card group flex cursor-default flex-col items-center p-6 text-center"
                     >
                       {/* Step number circle */}
@@ -380,8 +429,12 @@ function Landing() {
                       <span className="mt-1 text-[10px] font-bold uppercase tracking-widest text-primary/60">
                         Step {i + 1}
                       </span>
-                      <h3 className="mt-3 text-sm font-semibold tracking-[-0.01em]">{s.title}</h3>
-                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{s.desc}</p>
+                      <h3 className="mt-3 text-sm font-semibold tracking-[-0.01em]">
+                        {s.title}
+                      </h3>
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                        {s.desc}
+                      </p>
                     </motion.div>
                   ))}
                 </div>
@@ -406,7 +459,11 @@ function Landing() {
                     initial={{ opacity: 0, x: -16 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
-                    transition={{ delay: i * 0.1, duration: 0.5, ease: EASE_OUT }}
+                    transition={{
+                      delay: i * 0.1,
+                      duration: 0.5,
+                      ease: EASE_OUT,
+                    }}
                     className="gradient-border-card relative p-5"
                   >
                     {/* Circle on line */}
@@ -421,7 +478,9 @@ function Landing() {
                     </div>
                     <span className="section-label">Step {i + 1}</span>
                     <h3 className="mt-1.5 text-sm font-semibold">{s.title}</h3>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{s.desc}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {s.desc}
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -438,7 +497,8 @@ function Landing() {
               <span className="gradient-text">uncompromising philosophy</span>
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-              Every feature is designed to ensure AI transparency, business relevance, and evidence-backed confidence.
+              Every feature is designed to ensure AI transparency, business
+              relevance, and evidence-backed confidence.
             </p>
           </motion.div>
 
@@ -458,7 +518,8 @@ function Landing() {
                   border: "1px solid oklch(1 0 0 / 8%)",
                   backdropFilter: "blur(20px) saturate(150%)",
                   WebkitBackdropFilter: "blur(20px) saturate(150%)",
-                  boxShadow: "0 4px 24px oklch(0 0 0 / 30%), 0 1px 0 oklch(1 0 0 / 6%) inset",
+                  boxShadow:
+                    "0 4px 24px oklch(0 0 0 / 30%), 0 1px 0 oklch(1 0 0 / 6%) inset",
                   transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
               >
@@ -534,14 +595,16 @@ function Landing() {
             <div
               className="pointer-events-none absolute -top-32 -left-32 h-64 w-64 rounded-full opacity-60"
               style={{
-                background: "radial-gradient(circle, oklch(0.68 0.22 290 / 20%) 0%, transparent 70%)",
+                background:
+                  "radial-gradient(circle, oklch(0.68 0.22 290 / 20%) 0%, transparent 70%)",
                 filter: "blur(40px)",
               }}
             />
             <div
               className="pointer-events-none absolute -bottom-32 -right-32 h-64 w-64 rounded-full opacity-60"
               style={{
-                background: "radial-gradient(circle, oklch(0.65 0.20 240 / 18%) 0%, transparent 70%)",
+                background:
+                  "radial-gradient(circle, oklch(0.65 0.20 240 / 18%) 0%, transparent 70%)",
                 filter: "blur(40px)",
               }}
             />
@@ -561,8 +624,8 @@ function Landing() {
                 <span className="gradient-text">It's Free</span>
               </h2>
               <p className="mx-auto mt-5 max-w-lg text-base text-muted-foreground">
-                Upload any dataset and let InsightForge AI transform raw data into
-                evidence-backed business intelligence in minutes.
+                Upload any dataset and let InsightForge AI transform raw data
+                into evidence-backed business intelligence in minutes.
               </p>
 
               <motion.div
@@ -587,7 +650,11 @@ function Landing() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.1 + i * 0.07, duration: 0.4, ease: EASE_OUT }}
+                    transition={{
+                      delay: 0.1 + i * 0.07,
+                      duration: 0.4,
+                      ease: EASE_OUT,
+                    }}
                     className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium"
                     style={{
                       background: "oklch(0.68 0.22 290 / 8%)",
@@ -595,7 +662,10 @@ function Landing() {
                       color: "oklch(0.82 0.10 290)",
                     }}
                   >
-                    <CheckCircle2 className="h-3 w-3" style={{ color: "oklch(0.80 0.15 155)" }} />
+                    <CheckCircle2
+                      className="h-3 w-3"
+                      style={{ color: "oklch(0.80 0.15 155)" }}
+                    />
                     {badge}
                   </motion.span>
                 ))}
@@ -603,7 +673,6 @@ function Landing() {
             </div>
           </motion.div>
         </section>
-
       </main>
 
       {/* ── Footer ───────────────────────────────────────────── */}
@@ -666,7 +735,6 @@ function NeverPrinciplesBanner() {
       />
 
       <div className="relative mx-auto max-w-4xl px-6">
-
         {/* ── Section header ── */}
         <div className="mb-12 text-center">
           <motion.p
@@ -715,7 +783,11 @@ function NeverPrinciplesBanner() {
               key={principle}
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.52, ease: EASE_OUT, delay: 0.22 + i * 0.12 }}
+              transition={{
+                duration: 0.52,
+                ease: EASE_OUT,
+                delay: 0.22 + i * 0.12,
+              }}
               whileHover={{ y: -6 }}
               className="group relative flex items-center gap-5 overflow-hidden rounded-2xl px-6 py-5 transition-shadow duration-300"
               style={{
@@ -792,7 +864,6 @@ function NeverPrinciplesBanner() {
             </motion.div>
           ))}
         </div>
-
       </div>
     </section>
   );
@@ -873,7 +944,8 @@ const WHY_CARDS = [
     Icon: Brain,
     title: "Explainable AI",
     desc: "Every decision is reasoned and transparent—no black boxes.",
-    iconGradient: "linear-gradient(135deg, oklch(0.68 0.22 290), oklch(0.65 0.20 240))",
+    iconGradient:
+      "linear-gradient(135deg, oklch(0.68 0.22 290), oklch(0.65 0.20 240))",
     glowColor: "oklch(0.68 0.22 290 / 18%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.68 0.22 290 / 60%) 50%, transparent 100%)",
@@ -882,7 +954,8 @@ const WHY_CARDS = [
     Icon: TrendingUp,
     title: "Business Intelligence",
     desc: "Understands your domain and speaks the language of your business.",
-    iconGradient: "linear-gradient(135deg, oklch(0.65 0.20 195), oklch(0.60 0.18 220))",
+    iconGradient:
+      "linear-gradient(135deg, oklch(0.65 0.20 195), oklch(0.60 0.18 220))",
     glowColor: "oklch(0.65 0.20 195 / 15%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 195 / 60%) 50%, transparent 100%)",
@@ -891,7 +964,8 @@ const WHY_CARDS = [
     Icon: Target,
     title: "Evidence-backed",
     desc: "Actions are prioritized by evidence strength and business impact.",
-    iconGradient: "linear-gradient(135deg, oklch(0.85 0.19 95), oklch(0.80 0.22 70))",
+    iconGradient:
+      "linear-gradient(135deg, oklch(0.85 0.19 95), oklch(0.80 0.22 70))",
     glowColor: "oklch(0.85 0.19 95 / 15%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.85 0.19 95 / 60%) 50%, transparent 100%)",
@@ -900,7 +974,8 @@ const WHY_CARDS = [
     Icon: ShieldCheck,
     title: "Enterprise-grade & Fast",
     desc: "Firebase encrypted storage with enterprise protection. Results in seconds, not hours.",
-    iconGradient: "linear-gradient(135deg, oklch(0.75 0.18 155), oklch(0.70 0.16 170))",
+    iconGradient:
+      "linear-gradient(135deg, oklch(0.75 0.18 155), oklch(0.70 0.16 170))",
     glowColor: "oklch(0.75 0.18 155 / 15%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.75 0.18 155 / 60%) 50%, transparent 100%)",

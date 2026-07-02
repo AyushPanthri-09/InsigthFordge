@@ -6,12 +6,12 @@ const PHASE_CONFIG: Record<
   ReasoningStep["phase"],
   { dot: string; badge: string }
 > = {
-  understanding: { dot: "bg-info",    badge: "bg-info/10 text-info" },
-  profiling:     { dot: "bg-accent",  badge: "bg-accent/10 text-accent" },
-  cleaning:      { dot: "bg-warning", badge: "bg-warning/10 text-warning" },
-  eda:           { dot: "bg-accent",  badge: "bg-accent/10 text-accent" },
-  analytics:     { dot: "bg-primary", badge: "bg-primary/10 text-primary" },
-  reporting:     { dot: "bg-success", badge: "bg-success/10 text-success" },
+  understanding: { dot: "bg-info", badge: "bg-info/10 text-info" },
+  profiling: { dot: "bg-accent", badge: "bg-accent/10 text-accent" },
+  cleaning: { dot: "bg-warning", badge: "bg-warning/10 text-warning" },
+  eda: { dot: "bg-accent", badge: "bg-accent/10 text-accent" },
+  analytics: { dot: "bg-primary", badge: "bg-primary/10 text-primary" },
+  reporting: { dot: "bg-success", badge: "bg-success/10 text-success" },
 };
 
 export function ReasoningLog({ steps }: { steps: ReasoningStep[] }) {
@@ -24,7 +24,9 @@ export function ReasoningLog({ steps }: { steps: ReasoningStep[] }) {
         </div>
         <div>
           <h3 className="text-sm font-semibold">Reasoning Log</h3>
-          <p className="text-[11px] text-muted-foreground">Every decision, in order.</p>
+          <p className="text-[11px] text-muted-foreground">
+            Every decision, in order.
+          </p>
         </div>
         {steps.length > 0 && (
           <span className="ml-auto rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
@@ -38,7 +40,9 @@ export function ReasoningLog({ steps }: { steps: ReasoningStep[] }) {
         {steps.length === 0 ? (
           <div className="empty-state py-10">
             <Cpu className="h-8 w-8 opacity-25" />
-            <p className="text-sm">Reasoning steps will appear here during analysis.</p>
+            <p className="text-sm">
+              Reasoning steps will appear here during analysis.
+            </p>
           </div>
         ) : (
           <ol className="px-5 py-4">
@@ -69,9 +73,13 @@ export function ReasoningLog({ steps }: { steps: ReasoningStep[] }) {
                         {s.phase}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm leading-snug text-foreground/90">{s.message}</p>
+                    <p className="mt-1 text-sm leading-snug text-foreground/90">
+                      {s.message}
+                    </p>
                     {s.detail && (
-                      <p className="mt-0.5 text-xs text-muted-foreground">{s.detail}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {s.detail}
+                      </p>
                     )}
                   </div>
                 </motion.li>

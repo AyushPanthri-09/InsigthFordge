@@ -28,7 +28,9 @@ export function ReportExecutiveInsight({
         <p className="rpt-executive-insight-impact">{impact}</p>
       </div>
       <div className="rpt-executive-confidence">
-        <div className="rpt-executive-confidence-value">{Math.round(normalized)}%</div>
+        <div className="rpt-executive-confidence-value">
+          {Math.round(normalized)}%
+        </div>
         <div className="rpt-executive-confidence-label">Confidence</div>
       </div>
     </div>

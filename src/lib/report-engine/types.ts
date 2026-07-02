@@ -171,7 +171,12 @@ export interface AppendixData {
   columnProfiles: ColumnProfile[];
   statisticalTests: StatisticalTest[];
   extendedStats: Record<string, ExtendedNumericStats>;
-  relationships: Array<{ from: string; to: string; type: string; confidence: number }>;
+  relationships: Array<{
+    from: string;
+    to: string;
+    type: string;
+    confidence: number;
+  }>;
   domain: string;
   datasetName: string;
   rowCount: number;

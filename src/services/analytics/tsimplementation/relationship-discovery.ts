@@ -18,7 +18,12 @@
  *  - Integrates with ColumnIntelligence output for richer inference.
  */
 
-import type { ColumnIntelligence, ColumnProfile, ColumnRelationship, TimeIntelligence } from "../types";
+import type {
+  ColumnIntelligence,
+  ColumnProfile,
+  ColumnRelationship,
+  TimeIntelligence,
+} from "../types";
 
 // ---------------------------------------------------------------------------
 // Primary Key Detection
@@ -31,7 +36,9 @@ import type { ColumnIntelligence, ColumnProfile, ColumnRelationship, TimeIntelli
  *   2. Null rate < 5%
  *   3. Column name matches ID patterns (preferred but not required)
  */
-export function detectPrimaryKeys(profiles: ColumnProfile[]): ColumnRelationship[] {
+export function detectPrimaryKeys(
+  profiles: ColumnProfile[],
+): ColumnRelationship[] {
   const relationships: ColumnRelationship[] = [];
 
   for (const p of profiles) {
@@ -98,7 +105,10 @@ export function detectForeignKeys(
 
     // Self-reference detection: e.g., manager_id in a table that also has employee_id
     const isSelfRef = allColLower.some(
-      (c) => c !== p.name.toLowerCase() && c.includes(entityName) && c.endsWith("id"),
+      (c) =>
+        c !== p.name.toLowerCase() &&
+        c.includes(entityName) &&
+        c.endsWith("id"),
     );
 
     if (siblingCols.length > 0) {
@@ -142,14 +152,21 @@ export function detectForeignKeys(
 export function detectDateHierarchies(
   profiles: ColumnProfile[],
   rows: Record<string, unknown>[],
-): { relationships: ColumnRelationship[]; timeIntelligence: TimeIntelligence | null } {
+): {
+  relationships: ColumnRelationship[];
+  timeIntelligence: TimeIntelligence | null;
+} {
   const relationships: ColumnRelationship[] = [];
 
   const dateProfiles = profiles.filter(
-    (p) => p.inferredRole === "date" || p.inferredType === "datetime" || p.inferredType === "date",
+    (p) =>
+      p.inferredRole === "date" ||
+      p.inferredType === "datetime" ||
+      p.inferredType === "date",
   );
 
-  if (dateProfiles.length === 0) return { relationships, timeIntelligence: null };
+  if (dateProfiles.length === 0)
+    return { relationships, timeIntelligence: null };
 
   // Identify the primary date column (highest non-null rate among date cols)
   const primary = dateProfiles.reduce((best, cur) =>
@@ -166,10 +183,15 @@ export function detectDateHierarchies(
 
   rawDates.sort((a, b) => a.getTime() - b.getTime());
   const dateRangeStart = rawDates[0]?.toISOString().split("T")[0];
-  const dateRangeEnd = rawDates[rawDates.length - 1]?.toISOString().split("T")[0];
+  const dateRangeEnd = rawDates[rawDates.length - 1]
+    ?.toISOString()
+    .split("T")[0];
   const spanDays =
     rawDates.length >= 2
-      ? Math.round((rawDates[rawDates.length - 1].getTime() - rawDates[0].getTime()) / 86_400_000)
+      ? Math.round(
+          (rawDates[rawDates.length - 1].getTime() - rawDates[0].getTime()) /
+            86_400_000,
+        )
       : undefined;
 
   // Detect granularity by looking at unique dates per period
@@ -184,8 +206,12 @@ export function detectDateHierarchies(
   for (let i = 0; i < dateProfiles.length - 1; i++) {
     const a = dateProfiles[i];
     const b = dateProfiles[i + 1];
-    const aLevel = DATE_HIERARCHY.findIndex((l) => a.name.toLowerCase().includes(l));
-    const bLevel = DATE_HIERARCHY.findIndex((l) => b.name.toLowerCase().includes(l));
+    const aLevel = DATE_HIERARCHY.findIndex((l) =>
+      a.name.toLowerCase().includes(l),
+    );
+    const bLevel = DATE_HIERARCHY.findIndex((l) =>
+      b.name.toLowerCase().includes(l),
+    );
 
     if (aLevel !== -1 && bLevel !== -1 && aLevel < bLevel) {
       relationships.push({
@@ -236,7 +262,9 @@ const GEO_LEVELS = [
   { level: "zip", pattern: /zip|postal|pincode|postcode/i },
 ];
 
-export function detectGeoHierarchies(profiles: ColumnProfile[]): ColumnRelationship[] {
+export function detectGeoHierarchies(
+  profiles: ColumnProfile[],
+): ColumnRelationship[] {
   const relationships: ColumnRelationship[] = [];
 
   const geoProfiles: Array<{ profile: ColumnProfile; level: number }> = [];
@@ -277,7 +305,9 @@ export function detectMeasureDimensionLinks(
 ): ColumnRelationship[] {
   const relationships: ColumnRelationship[] = [];
 
-  const measures = profiles.filter((p) => intelligence[p.name]?.schemaRole === "fact_measure");
+  const measures = profiles.filter(
+    (p) => intelligence[p.name]?.schemaRole === "fact_measure",
+  );
   const dimensions = profiles.filter(
     (p) =>
       intelligence[p.name]?.schemaRole === "dimension_attribute" ||
@@ -309,7 +339,9 @@ export function detectMeasureDimensionLinks(
  * and another is a descriptive label for the same entity.
  * Example: "product_code" → "product_name"
  */
-export function detectLookupRelationships(profiles: ColumnProfile[]): ColumnRelationship[] {
+export function detectLookupRelationships(
+  profiles: ColumnProfile[],
+): ColumnRelationship[] {
   const relationships: ColumnRelationship[] = [];
   const CODE_RE = /\b(code|id|key|num|no|ref|sku)\b/i;
   const LABEL_RE = /\b(name|label|title|description|desc|text)\b/i;
@@ -363,13 +395,23 @@ export function discoverAllRelationships(
 } {
   const pks = detectPrimaryKeys(profiles);
   const fks = detectForeignKeys(profiles, pks);
-  const { relationships: dateRels, timeIntelligence } = detectDateHierarchies(profiles, rows);
+  const { relationships: dateRels, timeIntelligence } = detectDateHierarchies(
+    profiles,
+    rows,
+  );
   const geoRels = detectGeoHierarchies(profiles);
   const mdRels = detectMeasureDimensionLinks(profiles, intelligence);
   const lookupRels = detectLookupRelationships(profiles);
 
   // Merge and deduplicate (same fromColumn + toColumn + type → keep highest confidence)
-  const all = [...pks, ...fks, ...dateRels, ...geoRels, ...mdRels, ...lookupRels];
+  const all = [
+    ...pks,
+    ...fks,
+    ...dateRels,
+    ...geoRels,
+    ...mdRels,
+    ...lookupRels,
+  ];
   const seen = new Map<string, ColumnRelationship>();
   for (const r of all) {
     const key = `${r.fromColumn}|${r.toColumn}|${r.relationshipType}`;
@@ -379,7 +421,9 @@ export function discoverAllRelationships(
     }
   }
 
-  const relationships = Array.from(seen.values()).sort((a, b) => b.confidence - a.confidence);
+  const relationships = Array.from(seen.values()).sort(
+    (a, b) => b.confidence - a.confidence,
+  );
 
   return { relationships, timeIntelligence };
 }

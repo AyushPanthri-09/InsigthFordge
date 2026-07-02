@@ -67,7 +67,9 @@ export function computeExtendedStats(
   const iqr = q3 - q1;
   const min = sorted[0];
   const max = sorted[sorted.length - 1];
-  const outlierCount = nums.filter((n) => n < q1 - 1.5 * iqr || n > q3 + 1.5 * iqr).length;
+  const outlierCount = nums.filter(
+    (n) => n < q1 - 1.5 * iqr || n > q3 + 1.5 * iqr,
+  ).length;
 
   // ── Distribution shape ─────────────────────────────────────────────────
   const skewness = computeSkewness(nums, mean, stdev);
@@ -111,7 +113,14 @@ export function computeExtendedStats(
   };
 
   return {
-    min, max, mean, median, stdev, q1, q3, outlierCount,
+    min,
+    max,
+    mean,
+    median,
+    stdev,
+    q1,
+    q3,
+    outlierCount,
     skewness,
     kurtosis,
     coefficientOfVariation,
@@ -142,8 +151,9 @@ export function computeAllExtendedStats(
   for (const p of profiles) {
     if (p.inferredRole !== "measure") continue;
     // Use cached vector when available; fall back to row scan only if not cached.
-    const nums = cache?.numericVectors.get(p.name)
-      ?? rows.map((r) => Number(r[p.name])).filter((n) => Number.isFinite(n));
+    const nums =
+      cache?.numericVectors.get(p.name) ??
+      rows.map((r) => Number(r[p.name])).filter((n) => Number.isFinite(n));
     const ext = computeExtendedStats(nums, p.name, domain);
     if (ext) result[p.name] = ext;
   }
@@ -170,7 +180,8 @@ export function testNormality(
       statistic: 0,
       pValue: 1,
       isSignificant: false,
-      interpretation: "Insufficient data for normality test (minimum 8 observations required).",
+      interpretation:
+        "Insufficient data for normality test (minimum 8 observations required).",
       businessImplication: "Cannot determine distribution shape reliably.",
     };
   }
@@ -253,7 +264,8 @@ export function testGroupDifference(
       pValue: 1,
       isSignificant: false,
       interpretation: "Insufficient data for group comparison.",
-      businessImplication: "Cannot determine if group difference is real or due to chance.",
+      businessImplication:
+        "Cannot determine if group difference is real or due to chance.",
     };
   }
 
@@ -298,15 +310,20 @@ export function testGroupDifference(
 
 export function computeCorrelationCached(
   rows: Record<string, unknown>[],
-  cache: {
-    numericVectors: Map<string, number[]>;
-    correlationCache: Map<string, number>;
-  } | undefined,
+  cache:
+    | {
+        numericVectors: Map<string, number[]>;
+        correlationCache: Map<string, number>;
+      }
+    | undefined,
   metricCol: string,
   otherCol: string,
 ): number | null {
   if (cache) {
-    const key = metricCol < otherCol ? `${metricCol}|${otherCol}` : `${otherCol}|${metricCol}`;
+    const key =
+      metricCol < otherCol
+        ? `${metricCol}|${otherCol}`
+        : `${otherCol}|${metricCol}`;
     if (cache.correlationCache.has(key)) {
       const cached = cache.correlationCache.get(key)!;
       return Number.isFinite(cached) ? cached : null;
@@ -314,7 +331,8 @@ export function computeCorrelationCached(
 
     const xs = cache.numericVectors.get(metricCol);
     const ys = cache.numericVectors.get(otherCol);
-    if (!xs || !ys || xs.length < 8 || ys.length < 8 || xs.length !== ys.length) return null;
+    if (!xs || !ys || xs.length < 8 || ys.length < 8 || xs.length !== ys.length)
+      return null;
 
     try {
       const r = ss.sampleCorrelation(xs, ys);
@@ -359,15 +377,17 @@ export function computeDistributionShiftCached(
   percentile: number;
   valueCount: number;
 } | null {
-  const values = cache?.numericVectors.get(metricCol)
-    ?? rows.map((r) => Number(r[metricCol])).filter((n) => Number.isFinite(n));
+  const values =
+    cache?.numericVectors.get(metricCol) ??
+    rows.map((r) => Number(r[metricCol])).filter((n) => Number.isFinite(n));
 
   if (values.length < 10) return null;
 
   const mean = ss.mean(values);
   const stdev = values.length > 1 ? ss.standardDeviation(values) : 0;
   const zScore = stdev > 0 ? (anomalyValue - mean) / stdev : 0;
-  const percentile = values.filter((v) => v <= anomalyValue).length / values.length * 100;
+  const percentile =
+    (values.filter((v) => v <= anomalyValue).length / values.length) * 100;
 
   return {
     zScore,
@@ -473,8 +493,11 @@ function approximatePValue(t: number): number {
   // Abramowitz & Stegun approximation for the normal tail
   const x = Math.abs(t);
   const p = 0.3275911;
-  const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
-  const a4 = -1.453152027, a5 = 1.061405429;
+  const a1 = 0.254829592,
+    a2 = -0.284496736,
+    a3 = 1.421413741;
+  const a4 = -1.453152027,
+    a5 = 1.061405429;
   const k = 1 / (1 + p * x);
   const poly = k * (a1 + k * (a2 + k * (a3 + k * (a4 + k * a5))));
   const erf = 1 - poly * Math.exp(-x * x);

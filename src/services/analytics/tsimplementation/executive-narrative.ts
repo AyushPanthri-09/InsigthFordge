@@ -48,10 +48,21 @@ export function buildExecutiveNarrative(
   const absPct = Math.abs(deviationPct).toFixed(1);
 
   // ── Situation: what happened, factually ──────────────────────────────────
-  const situation = buildSituation(metric, observedValue, baselineValue, deviationPct, drivers);
+  const situation = buildSituation(
+    metric,
+    observedValue,
+    baselineValue,
+    deviationPct,
+    drivers,
+  );
 
   // ── Complication: why it matters / what's unusual ───────────────────────
-  const complication = buildComplication(metric, deviationPct, leadingHypotheses, domain);
+  const complication = buildComplication(
+    metric,
+    deviationPct,
+    leadingHypotheses,
+    domain,
+  );
 
   // ── Question: the key business question this raises ──────────────────────
   const question = buildQuestion(metric, isPositive, leadingHypotheses, domain);
@@ -65,7 +76,12 @@ export function buildExecutiveNarrative(
   );
 
   // ── Outlook: what's likely next, from forecast ───────────────────────────
-  const outlook = buildOutlook(metric, forecast, deviationPct, leadingHypotheses);
+  const outlook = buildOutlook(
+    metric,
+    forecast,
+    deviationPct,
+    leadingHypotheses,
+  );
 
   // ── Recommended action ───────────────────────────────────────────────────
   const recommendedAction = buildRecommendedAction(
@@ -77,7 +93,12 @@ export function buildExecutiveNarrative(
   );
 
   // ── Headline: one-sentence board-slide summary ───────────────────────────
-  const headline = buildHeadline(metric, deviationPct, leadingHypotheses, isPositive);
+  const headline = buildHeadline(
+    metric,
+    deviationPct,
+    leadingHypotheses,
+    isPositive,
+  );
 
   return {
     situation,
@@ -126,8 +147,9 @@ function buildComplication(
   const isPositive = deviationPct > 0;
 
   if (isPositive) {
-    const isEventDriven = leadingHypotheses.some((h) =>
-      h.id === "h_seasonal" || h.id === "h_discount" || h.id === "h_campaign",
+    const isEventDriven = leadingHypotheses.some(
+      (h) =>
+        h.id === "h_seasonal" || h.id === "h_discount" || h.id === "h_campaign",
     );
     if (isEventDriven) {
       return (
@@ -207,18 +229,19 @@ function buildAnswer(
   // Explicitly state what was ruled out
   if (rejectedHypotheses.length > 0) {
     const topRejected = rejectedHypotheses[0];
-    answer +=
-      `The following explanation was considered and rejected based on dataset evidence: "${topRejected.statement.split(".")[0]}" — ${topRejected.rationale} `;
+    answer += `The following explanation was considered and rejected based on dataset evidence: "${topRejected.statement.split(".")[0]}" — ${topRejected.rationale} `;
   }
 
   // Driver matrix summary
   const sigDrivers = drivers.filter((d) => d.isSignificant).slice(0, 3);
   if (sigDrivers.length > 0) {
-    answer +=
-      `Driver importance: ${sigDrivers.map((d) => `${d.label} (${d.contributionPct.toFixed(0)}%)`).join(", ")}.`;
+    answer += `Driver importance: ${sigDrivers.map((d) => `${d.label} (${d.contributionPct.toFixed(0)}%)`).join(", ")}.`;
   }
 
-  return answer.trim() || "Insufficient evidence to determine a primary driver from the available dataset columns.";
+  return (
+    answer.trim() ||
+    "Insufficient evidence to determine a primary driver from the available dataset columns."
+  );
 }
 
 function buildOutlook(
@@ -229,7 +252,9 @@ function buildOutlook(
 ): string {
   if (!forecast || forecast.nextPeriods.length === 0) {
     const isPositive = deviationPct > 0;
-    const isSeasonalH = leadingHypotheses.some((h) => h.id === "h_seasonal" && h.verdict === "supported");
+    const isSeasonalH = leadingHypotheses.some(
+      (h) => h.id === "h_seasonal" && h.verdict === "supported",
+    );
     if (isSeasonalH) {
       return `If the seasonal pattern holds, ${metric} should ${isPositive ? "normalise downward" : "recover"} in coming periods. Monitor against seasonal indices from prior years.`;
     }
@@ -286,7 +311,9 @@ function buildRecommendedAction(
   }
 
   if (topH.id === "h_geographic" && topH.verdict === "supported") {
-    const geoDriver = drivers.find((d) => /region|country|state|city/i.test(d.column));
+    const geoDriver = drivers.find((d) =>
+      /region|country|state|city/i.test(d.column),
+    );
     return geoDriver
       ? `Focus investigation on ${geoDriver.label} specifically. Deploy targeted resources (sales coverage, logistics, marketing) to ${isPositive ? "amplify" : "address"} the geographic driver before investing broadly.`
       : `Geographic concentration confirmed. Review regional strategy and resource allocation.`;

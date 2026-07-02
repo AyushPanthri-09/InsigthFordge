@@ -47,7 +47,7 @@ function Login() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
       <Toaster richColors closeButton position="top-center" />
-      
+
       {/* Dynamic neon orbs */}
       <div className="absolute -left-32 top-10 h-72 w-72 rounded-full bg-primary/20 blur-[120px]" />
       <div className="absolute -right-32 bottom-10 h-72 w-72 rounded-full bg-info/20 blur-[120px]" />
@@ -56,7 +56,7 @@ function Login() {
         {/* Brand header */}
         <div className="flex flex-col items-center text-center">
           <Brand />
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -74,11 +74,14 @@ function Login() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative rounded-2xl border border-white/10 bg-surface/60 p-8 shadow-2xl backdrop-blur-xl"
           style={{
-            boxShadow: "0 0 40px -10px oklch(0.85 0.19 95 / 8%), 0 16px 40px -20px oklch(0 0 0 / 80%)"
+            boxShadow:
+              "0 0 40px -10px oklch(0.85 0.19 95 / 8%), 0 16px 40px -20px oklch(0 0 0 / 80%)",
           }}
         >
           <div className="mb-6 space-y-1.5">
-            <h1 className="font-display text-2xl font-bold tracking-tight">Access platform</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight">
+              Access platform
+            </h1>
             <p className="text-sm text-muted-foreground">
               Sign in with your enterprise credentials
             </p>
@@ -86,7 +89,10 @@ function Login() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <label
+                htmlFor="email"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -108,7 +114,10 @@ function Login() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <label
+                  htmlFor="password"
+                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                >
                   Password
                 </label>
               </div>
@@ -134,14 +143,15 @@ function Login() {
               disabled={loading}
               className="group relative flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg hover:opacity-90 active:scale-[0.98] transition-all disabled:pointer-events-none disabled:opacity-50"
               style={{
-                boxShadow: "0 4px 20px -4px oklch(0.85 0.19 95 / 40%)"
+                boxShadow: "0 4px 20px -4px oklch(0.85 0.19 95 / 40%)",
               }}
             >
               {loading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
               ) : (
                 <>
-                  Authenticate <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  Authenticate{" "}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </>
               )}
             </button>

@@ -39,155 +39,416 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
   {
     domain: "ecommerce",
     terms: [
-      "order", "product", "customer", "cart", "checkout", "sku", "price",
-      "quantity", "discount", "coupon", "refund", "return", "shipping",
-      "payment", "invoice", "purchase", "item", "catalog",
+      "order",
+      "product",
+      "customer",
+      "cart",
+      "checkout",
+      "sku",
+      "price",
+      "quantity",
+      "discount",
+      "coupon",
+      "refund",
+      "return",
+      "shipping",
+      "payment",
+      "invoice",
+      "purchase",
+      "item",
+      "catalog",
     ],
-    valueTerms: ["pending", "shipped", "delivered", "cancelled", "refunded", "processing"],
+    valueTerms: [
+      "pending",
+      "shipped",
+      "delivered",
+      "cancelled",
+      "refunded",
+      "processing",
+    ],
     processName: "Order-to-Cash",
     coreEntities: ["Customer", "Order", "Product", "Payment"],
-    kpiHints: ["Revenue", "AOV", "Conversion Rate", "Cart Abandonment", "Refund Rate", "CLV"],
-    purposeTemplate: "Track and analyze online transactions, customer purchasing behaviour, and product performance.",
+    kpiHints: [
+      "Revenue",
+      "AOV",
+      "Conversion Rate",
+      "Cart Abandonment",
+      "Refund Rate",
+      "CLV",
+    ],
+    purposeTemplate:
+      "Track and analyze online transactions, customer purchasing behaviour, and product performance.",
   },
   {
     domain: "retail",
     terms: [
-      "store", "branch", "shelf", "pos", "transaction", "receipt", "barcode",
-      "category", "supplier", "inventory", "stock", "upc", "margin", "markup",
+      "store",
+      "branch",
+      "shelf",
+      "pos",
+      "transaction",
+      "receipt",
+      "barcode",
+      "category",
+      "supplier",
+      "inventory",
+      "stock",
+      "upc",
+      "margin",
+      "markup",
     ],
     valueTerms: ["in-stock", "out-of-stock", "clearance", "markdown"],
     processName: "Procure-to-Sell",
     coreEntities: ["Store", "Product", "Transaction", "Category"],
-    kpiHints: ["Same-Store Sales", "Inventory Turnover", "Gross Margin", "Shrinkage", "Sell-Through Rate"],
-    purposeTemplate: "Monitor retail sales performance, inventory health, and category profitability.",
+    kpiHints: [
+      "Same-Store Sales",
+      "Inventory Turnover",
+      "Gross Margin",
+      "Shrinkage",
+      "Sell-Through Rate",
+    ],
+    purposeTemplate:
+      "Monitor retail sales performance, inventory health, and category profitability.",
   },
   {
     domain: "finance",
     terms: [
-      "revenue", "profit", "expense", "cost", "budget", "forecast", "gl",
-      "ledger", "account", "debit", "credit", "balance", "accrual",
-      "amortization", "depreciation", "cashflow", "cash_flow", "ebitda",
+      "revenue",
+      "profit",
+      "expense",
+      "cost",
+      "budget",
+      "forecast",
+      "gl",
+      "ledger",
+      "account",
+      "debit",
+      "credit",
+      "balance",
+      "accrual",
+      "amortization",
+      "depreciation",
+      "cashflow",
+      "cash_flow",
+      "ebitda",
     ],
     valueTerms: ["income", "expense", "asset", "liability", "equity"],
     processName: "Record-to-Report",
     coreEntities: ["Account", "Transaction", "Period", "CostCenter"],
-    kpiHints: ["Net Revenue", "Gross Margin", "EBITDA", "Operating Expense Ratio", "Budget Variance"],
-    purposeTemplate: "Analyse financial performance, track budget vs actuals, and support period-end reporting.",
+    kpiHints: [
+      "Net Revenue",
+      "Gross Margin",
+      "EBITDA",
+      "Operating Expense Ratio",
+      "Budget Variance",
+    ],
+    purposeTemplate:
+      "Analyse financial performance, track budget vs actuals, and support period-end reporting.",
   },
   {
     domain: "banking",
     terms: [
-      "loan", "emi", "interest", "deposit", "withdraw", "account_number",
-      "ifsc", "npa", "default", "collateral", "kyc", "aml", "transaction_id",
-      "branch_code", "swift",
+      "loan",
+      "emi",
+      "interest",
+      "deposit",
+      "withdraw",
+      "account_number",
+      "ifsc",
+      "npa",
+      "default",
+      "collateral",
+      "kyc",
+      "aml",
+      "transaction_id",
+      "branch_code",
+      "swift",
     ],
     valueTerms: ["active", "closed", "defaulted", "npa", "sanctioned"],
     processName: "Loan-to-Collection",
     coreEntities: ["Customer", "Account", "Loan", "Branch"],
-    kpiHints: ["NPA Ratio", "Loan Disbursement", "Collection Efficiency", "Interest Income", "CASA Ratio"],
-    purposeTemplate: "Monitor loan portfolio quality, transaction activity, and branch performance.",
+    kpiHints: [
+      "NPA Ratio",
+      "Loan Disbursement",
+      "Collection Efficiency",
+      "Interest Income",
+      "CASA Ratio",
+    ],
+    purposeTemplate:
+      "Monitor loan portfolio quality, transaction activity, and branch performance.",
   },
   {
     domain: "healthcare",
     terms: [
-      "patient", "diagnosis", "treatment", "doctor", "hospital", "admission",
-      "discharge", "prescription", "icd", "procedure", "claim", "insurance",
-      "ward", "bed", "visit", "appointment",
+      "patient",
+      "diagnosis",
+      "treatment",
+      "doctor",
+      "hospital",
+      "admission",
+      "discharge",
+      "prescription",
+      "icd",
+      "procedure",
+      "claim",
+      "insurance",
+      "ward",
+      "bed",
+      "visit",
+      "appointment",
     ],
-    valueTerms: ["inpatient", "outpatient", "admitted", "discharged", "critical"],
+    valueTerms: [
+      "inpatient",
+      "outpatient",
+      "admitted",
+      "discharged",
+      "critical",
+    ],
     processName: "Patient-Care-Cycle",
     coreEntities: ["Patient", "Doctor", "Diagnosis", "Treatment"],
-    kpiHints: ["Avg Length of Stay", "Readmission Rate", "Bed Occupancy", "Claim Approval Rate"],
-    purposeTemplate: "Track patient outcomes, clinical operations, and healthcare cost management.",
+    kpiHints: [
+      "Avg Length of Stay",
+      "Readmission Rate",
+      "Bed Occupancy",
+      "Claim Approval Rate",
+    ],
+    purposeTemplate:
+      "Track patient outcomes, clinical operations, and healthcare cost management.",
   },
   {
     domain: "hr",
     terms: [
-      "employee", "salary", "department", "hire", "manager", "tenure",
-      "performance", "attrition", "resignation", "headcount", "payroll",
-      "grade", "band", "leave", "appraisal", "designation",
+      "employee",
+      "salary",
+      "department",
+      "hire",
+      "manager",
+      "tenure",
+      "performance",
+      "attrition",
+      "resignation",
+      "headcount",
+      "payroll",
+      "grade",
+      "band",
+      "leave",
+      "appraisal",
+      "designation",
     ],
     valueTerms: ["active", "resigned", "terminated", "on-leave", "probation"],
     processName: "Hire-to-Retire",
     coreEntities: ["Employee", "Department", "Role", "Manager"],
-    kpiHints: ["Attrition Rate", "Avg Tenure", "Headcount", "Salary Band Distribution", "Time-to-Hire"],
-    purposeTemplate: "Analyse workforce composition, attrition drivers, and compensation structures.",
+    kpiHints: [
+      "Attrition Rate",
+      "Avg Tenure",
+      "Headcount",
+      "Salary Band Distribution",
+      "Time-to-Hire",
+    ],
+    purposeTemplate:
+      "Analyse workforce composition, attrition drivers, and compensation structures.",
   },
   {
     domain: "marketing",
     terms: [
-      "campaign", "channel", "ctr", "impressions", "conversion", "spend",
-      "lead", "acquisition", "roas", "cpa", "cpm", "click", "ad", "email",
-      "open_rate", "bounce", "utm", "source", "medium",
+      "campaign",
+      "channel",
+      "ctr",
+      "impressions",
+      "conversion",
+      "spend",
+      "lead",
+      "acquisition",
+      "roas",
+      "cpa",
+      "cpm",
+      "click",
+      "ad",
+      "email",
+      "open_rate",
+      "bounce",
+      "utm",
+      "source",
+      "medium",
     ],
     valueTerms: ["email", "social", "paid", "organic", "referral", "direct"],
     processName: "Lead-to-Customer",
     coreEntities: ["Campaign", "Channel", "Lead", "Audience"],
     kpiHints: ["ROAS", "CPA", "CTR", "Conversion Rate", "CAC", "Marketing ROI"],
-    purposeTemplate: "Evaluate campaign effectiveness, channel ROI, and customer acquisition efficiency.",
+    purposeTemplate:
+      "Evaluate campaign effectiveness, channel ROI, and customer acquisition efficiency.",
   },
   {
     domain: "logistics",
     terms: [
-      "shipment", "delivery", "warehouse", "route", "carrier", "tracking",
-      "dispatch", "eta", "pod", "freight", "weight", "package", "manifest",
-      "dock", "load",
+      "shipment",
+      "delivery",
+      "warehouse",
+      "route",
+      "carrier",
+      "tracking",
+      "dispatch",
+      "eta",
+      "pod",
+      "freight",
+      "weight",
+      "package",
+      "manifest",
+      "dock",
+      "load",
     ],
     valueTerms: ["in-transit", "delivered", "delayed", "returned", "lost"],
     processName: "Ship-to-Deliver",
     coreEntities: ["Shipment", "Route", "Warehouse", "Carrier"],
-    kpiHints: ["On-Time Delivery Rate", "Avg Delivery Days", "Cost per Shipment", "Return Rate"],
-    purposeTemplate: "Monitor shipment performance, delivery SLAs, and logistics cost efficiency.",
+    kpiHints: [
+      "On-Time Delivery Rate",
+      "Avg Delivery Days",
+      "Cost per Shipment",
+      "Return Rate",
+    ],
+    purposeTemplate:
+      "Monitor shipment performance, delivery SLAs, and logistics cost efficiency.",
   },
   {
     domain: "saas",
     terms: [
-      "user", "subscription", "mrr", "arr", "churn", "plan", "trial",
-      "feature", "seat", "tier", "renewal", "upgrade", "downgrade",
-      "session", "event", "funnel",
+      "user",
+      "subscription",
+      "mrr",
+      "arr",
+      "churn",
+      "plan",
+      "trial",
+      "feature",
+      "seat",
+      "tier",
+      "renewal",
+      "upgrade",
+      "downgrade",
+      "session",
+      "event",
+      "funnel",
     ],
-    valueTerms: ["trial", "active", "churned", "cancelled", "paused", "enterprise", "pro", "free"],
+    valueTerms: [
+      "trial",
+      "active",
+      "churned",
+      "cancelled",
+      "paused",
+      "enterprise",
+      "pro",
+      "free",
+    ],
     processName: "Trial-to-Revenue",
     coreEntities: ["User", "Subscription", "Plan", "Feature"],
-    kpiHints: ["MRR", "ARR", "Churn Rate", "Net Revenue Retention", "Expansion MRR", "DAU/MAU"],
-    purposeTemplate: "Track subscription growth, churn, user engagement, and product-led revenue expansion.",
+    kpiHints: [
+      "MRR",
+      "ARR",
+      "Churn Rate",
+      "Net Revenue Retention",
+      "Expansion MRR",
+      "DAU/MAU",
+    ],
+    purposeTemplate:
+      "Track subscription growth, churn, user engagement, and product-led revenue expansion.",
   },
   {
     domain: "manufacturing",
     terms: [
-      "production", "machine", "batch", "defect", "yield", "downtime",
-      "shift", "line", "oee", "scrap", "rework", "bom", "material",
-      "work_order", "cycle_time",
+      "production",
+      "machine",
+      "batch",
+      "defect",
+      "yield",
+      "downtime",
+      "shift",
+      "line",
+      "oee",
+      "scrap",
+      "rework",
+      "bom",
+      "material",
+      "work_order",
+      "cycle_time",
     ],
     valueTerms: ["running", "idle", "maintenance", "breakdown", "completed"],
     processName: "Plan-to-Produce",
     coreEntities: ["Machine", "Batch", "Product", "WorkOrder"],
-    kpiHints: ["OEE", "Defect Rate", "Yield", "Cycle Time", "Scrap Rate", "Downtime"],
-    purposeTemplate: "Monitor production efficiency, equipment performance, and quality metrics.",
+    kpiHints: [
+      "OEE",
+      "Defect Rate",
+      "Yield",
+      "Cycle Time",
+      "Scrap Rate",
+      "Downtime",
+    ],
+    purposeTemplate:
+      "Monitor production efficiency, equipment performance, and quality metrics.",
   },
   {
     domain: "education",
     terms: [
-      "student", "course", "grade", "enrollment", "semester", "teacher",
-      "subject", "attendance", "marks", "exam", "pass", "fail", "cgpa",
+      "student",
+      "course",
+      "grade",
+      "enrollment",
+      "semester",
+      "teacher",
+      "subject",
+      "attendance",
+      "marks",
+      "exam",
+      "pass",
+      "fail",
+      "cgpa",
     ],
     valueTerms: ["pass", "fail", "absent", "present", "enrolled", "graduated"],
     processName: "Enroll-to-Graduate",
     coreEntities: ["Student", "Course", "Teacher", "Enrollment"],
-    kpiHints: ["Pass Rate", "Avg Score", "Attendance Rate", "Dropout Rate", "Enrollment Growth"],
-    purposeTemplate: "Analyse student performance, course outcomes, and institutional effectiveness.",
+    kpiHints: [
+      "Pass Rate",
+      "Avg Score",
+      "Attendance Rate",
+      "Dropout Rate",
+      "Enrollment Growth",
+    ],
+    purposeTemplate:
+      "Analyse student performance, course outcomes, and institutional effectiveness.",
   },
   {
     domain: "operations",
     terms: [
-      "task", "ticket", "incident", "sla", "resolution", "priority",
-      "escalation", "queue", "agent", "workload", "throughput",
+      "task",
+      "ticket",
+      "incident",
+      "sla",
+      "resolution",
+      "priority",
+      "escalation",
+      "queue",
+      "agent",
+      "workload",
+      "throughput",
     ],
-    valueTerms: ["open", "closed", "in-progress", "escalated", "resolved", "pending"],
+    valueTerms: [
+      "open",
+      "closed",
+      "in-progress",
+      "escalated",
+      "resolved",
+      "pending",
+    ],
     processName: "Request-to-Resolution",
     coreEntities: ["Ticket", "Agent", "Queue", "SLA"],
-    kpiHints: ["Resolution Rate", "Avg Handle Time", "SLA Breach Rate", "Backlog", "CSAT"],
-    purposeTemplate: "Track operational tickets, SLA compliance, and team throughput.",
+    kpiHints: [
+      "Resolution Rate",
+      "Avg Handle Time",
+      "SLA Breach Rate",
+      "Backlog",
+      "CSAT",
+    ],
+    purposeTemplate:
+      "Track operational tickets, SLA compliance, and team throughput.",
   },
 ];
 
@@ -226,7 +487,9 @@ export function inferBusinessDomain(
   sampleValues: string[] = [],
 ): DomainInferenceResult {
   const MINIMUM_CONFIDENCE = 0.15; // below this → generic
-  const lowerCols = columns.map((c) => c.toLowerCase().replace(/[_\-\s]+/g, " "));
+  const lowerCols = columns.map((c) =>
+    c.toLowerCase().replace(/[_\-\s]+/g, " "),
+  );
   const colStr = lowerCols.join(" ");
   const valStr = sampleValues.map((v) => String(v).toLowerCase()).join(" ");
 
@@ -237,12 +500,18 @@ export function inferBusinessDomain(
 
     // Sample-value hit ratio (secondary signal — weight 0.3)
     const valHits = desc.valueTerms.filter((t) => valStr.includes(t)).length;
-    const valScore = desc.valueTerms.length > 0 ? valHits / desc.valueTerms.length : 0;
+    const valScore =
+      desc.valueTerms.length > 0 ? valHits / desc.valueTerms.length : 0;
 
     return {
       domain: desc.domain,
       score: colScore * 0.7 + valScore * 0.3,
-      raw: { colHits, valHits, colTotal: desc.terms.length, valTotal: desc.valueTerms.length },
+      raw: {
+        colHits,
+        valHits,
+        colTotal: desc.terms.length,
+        valTotal: desc.valueTerms.length,
+      },
     };
   });
 
@@ -253,7 +522,8 @@ export function inferBusinessDomain(
     return {
       domain: "generic",
       confidence: 0.3,
-      rationale: "No strong domain signals found in column names or sample values. Defaulting to generic analysis.",
+      rationale:
+        "No strong domain signals found in column names or sample values. Defaulting to generic analysis.",
       processName: "Data-to-Insight",
       coreEntities: [],
       kpiHints: ["Record Count", "Completeness Rate"],
@@ -269,7 +539,12 @@ export function inferBusinessDomain(
   const runnerUp = sorted[1];
   const isAmbiguous = runnerUp && runnerUp.score > best.score * 0.8;
 
-  const rationale = buildDomainRationale(descriptor, columns, best.score, isAmbiguous ? runnerUp.domain : undefined);
+  const rationale = buildDomainRationale(
+    descriptor,
+    columns,
+    best.score,
+    isAmbiguous ? runnerUp.domain : undefined,
+  );
 
   return {
     domain: best.domain,
@@ -290,7 +565,9 @@ function buildDomainRationale(
   ambiguousWith?: BusinessDomain,
 ): string {
   const lc = columns.map((c) => c.toLowerCase());
-  const matched = desc.terms.filter((t) => lc.some((c) => c.includes(t))).slice(0, 5);
+  const matched = desc.terms
+    .filter((t) => lc.some((c) => c.includes(t)))
+    .slice(0, 5);
   let r = `Domain inferred as "${desc.domain}" (score ${(score * 100).toFixed(0)}%) based on column signals: ${matched.join(", ")}.`;
   if (ambiguousWith) {
     r += ` Note: dataset also shows signals for "${ambiguousWith}"; consider providing analyst notes if domain is unclear.`;
@@ -333,8 +610,16 @@ export function inferBusinessProcesses(
   }
 
   // Cross-domain process detection: returns/refunds
-  const returnSignals = ["return", "refund", "reversal", "chargeback", "cancellation"];
-  const returnCols = columns.filter((c) => returnSignals.some((s) => c.toLowerCase().includes(s)));
+  const returnSignals = [
+    "return",
+    "refund",
+    "reversal",
+    "chargeback",
+    "cancellation",
+  ];
+  const returnCols = columns.filter((c) =>
+    returnSignals.some((s) => c.toLowerCase().includes(s)),
+  );
   if (returnCols.length >= 2) {
     processes.push({
       name: "Return-to-Refund",
@@ -345,13 +630,20 @@ export function inferBusinessProcesses(
   }
 
   // Cross-domain process detection: time-series / forecasting process
-  const hasDate = columns.some((c) => /date|period|month|year|quarter|week/i.test(c));
-  const hasMeasure = columns.some((c) => /amount|revenue|sales|quantity|count|total/i.test(c));
+  const hasDate = columns.some((c) =>
+    /date|period|month|year|quarter|week/i.test(c),
+  );
+  const hasMeasure = columns.some((c) =>
+    /amount|revenue|sales|quantity|count|total/i.test(c),
+  );
   if (hasDate && hasMeasure) {
     processes.push({
       name: "Trend-and-Forecast",
-      description: "Time-series analysis to track performance over time and project future values.",
-      involvedColumns: columns.filter((c) => /date|period|month|year|quarter|week|amount|revenue|sales/i.test(c)),
+      description:
+        "Time-series analysis to track performance over time and project future values.",
+      involvedColumns: columns.filter((c) =>
+        /date|period|month|year|quarter|week|amount|revenue|sales/i.test(c),
+      ),
       confidence: 0.75,
     });
   }
@@ -367,7 +659,10 @@ export function inferBusinessProcesses(
  * Extracts primary business entities from column names.
  * Uses noun patterns common in transactional datasets.
  */
-export function extractPrimaryEntities(columns: string[], domain: BusinessDomain): string[] {
+export function extractPrimaryEntities(
+  columns: string[],
+  domain: BusinessDomain,
+): string[] {
   const domainDesc = DOMAIN_REGISTRY.find((d) => d.domain === domain);
   const knownEntities = domainDesc?.coreEntities ?? [];
 
@@ -412,14 +707,18 @@ export function suggestKPICandidates(
   if (!descriptor) return [];
 
   const lc = columns.map((c) => c.toLowerCase());
-  const kpis: Array<{ name: string; rationale: string; columns: string[] }> = [];
+  const kpis: Array<{ name: string; rationale: string; columns: string[] }> =
+    [];
 
   // Revenue / amount KPI
-  const revenueCol = columns.find((c) => /revenue|amount|sales|total|price/i.test(c));
+  const revenueCol = columns.find((c) =>
+    /revenue|amount|sales|total|price/i.test(c),
+  );
   if (revenueCol) {
     kpis.push({
       name: "Total Revenue",
-      rationale: "Sum of all transaction amounts — primary financial health indicator.",
+      rationale:
+        "Sum of all transaction amounts — primary financial health indicator.",
       columns: [revenueCol],
     });
   }
@@ -429,17 +728,21 @@ export function suggestKPICandidates(
   if (countCol) {
     kpis.push({
       name: "Total Volume",
-      rationale: "Aggregate units or transactions — operational throughput indicator.",
+      rationale:
+        "Aggregate units or transactions — operational throughput indicator.",
       columns: [countCol],
     });
   }
 
   // Date-based KPI
-  const dateCol = columns.find((c) => /date|time|period|created|updated/i.test(c));
+  const dateCol = columns.find((c) =>
+    /date|time|period|created|updated/i.test(c),
+  );
   if (dateCol && revenueCol) {
     kpis.push({
       name: "Period-over-Period Growth",
-      rationale: "Compare revenue across periods to identify trends and seasonality.",
+      rationale:
+        "Compare revenue across periods to identify trends and seasonality.",
       columns: [dateCol, revenueCol],
     });
   }
@@ -449,7 +752,10 @@ export function suggestKPICandidates(
   for (const hint of specificKpis) {
     if (!kpis.some((k) => k.name === hint)) {
       const relatedCols = columns.filter((c) =>
-        hint.toLowerCase().split(/\s+/).some((word) => c.toLowerCase().includes(word)),
+        hint
+          .toLowerCase()
+          .split(/\s+/)
+          .some((word) => c.toLowerCase().includes(word)),
       );
       kpis.push({
         name: hint,

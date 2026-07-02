@@ -18,9 +18,10 @@ interface ReportTableProps<T> {
   /** New API: preferred */
   rowTone?: (row: T) => "critical" | "warning" | "success" | undefined;
   /** Back-compat: older prop name */
-  getRowTone?: (row: T) => "critical" | "warning" | "success" | "info" | "neutral" | undefined;
+  getRowTone?: (
+    row: T,
+  ) => "critical" | "warning" | "success" | "info" | "neutral" | undefined;
 }
-
 
 export function ReportTable<T extends object>({
   columns,
@@ -37,7 +38,9 @@ export function ReportTable<T extends object>({
 
   return (
     <div className="rpt-table-wrap">
-      <table className={`rpt-table ${striped ? "rpt-table-striped" : ""} ${className}`}>
+      <table
+        className={`rpt-table ${striped ? "rpt-table-striped" : ""} ${className}`}
+      >
         <thead>
           <tr>
             {columns.map((col) => (
@@ -57,7 +60,9 @@ export function ReportTable<T extends object>({
           {visible.map((row, ri) => (
             <tr
               key={ri}
-              className={toneFn ? `rpt-table-row-${toneFn(row) ?? "neutral"}` : undefined}
+              className={
+                toneFn ? `rpt-table-row-${toneFn(row) ?? "neutral"}` : undefined
+              }
             >
               {columns.map((col) => (
                 <td

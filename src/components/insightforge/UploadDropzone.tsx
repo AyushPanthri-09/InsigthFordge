@@ -27,7 +27,10 @@ export function UploadDropzone({
     <motion.label
       role="button"
       aria-label="Upload dataset file"
-      onDragOver={(e) => { e.preventDefault(); if (!disabled) setDrag(true); }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        if (!disabled) setDrag(true);
+      }}
       onDragLeave={() => setDrag(false)}
       onDragEnd={() => setDrag(false)}
       onDrop={(e) => {
@@ -38,9 +41,7 @@ export function UploadDropzone({
       }}
       animate={{
         scale: drag ? 1.012 : 1,
-        borderColor: drag
-          ? "oklch(0.68 0.22 290 / 70%)"
-          : "oklch(1 0 0 / 12%)",
+        borderColor: drag ? "oklch(0.68 0.22 290 / 70%)" : "oklch(1 0 0 / 12%)",
       }}
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
@@ -107,7 +108,9 @@ export function UploadDropzone({
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
             >
-              <div className="text-base font-semibold text-primary">Release to upload</div>
+              <div className="text-base font-semibold text-primary">
+                Release to upload
+              </div>
               <p className="mt-1.5 text-sm text-muted-foreground">
                 Your file will start processing immediately
               </p>
@@ -120,7 +123,9 @@ export function UploadDropzone({
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
             >
-              <div className="text-base font-semibold">Drop your dataset to begin</div>
+              <div className="text-base font-semibold">
+                Drop your dataset to begin
+              </div>
               <p className="mt-1.5 text-sm text-muted-foreground">
                 Drag & drop or{" "}
                 <span className="font-medium text-primary underline underline-offset-2">

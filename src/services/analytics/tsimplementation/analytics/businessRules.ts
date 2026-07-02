@@ -14,10 +14,17 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
     {
       name: "Revenue",
       key: "revenue",
-      possibleColumns: ["revenue", "sales", "amount", "order_total", "grand_total", "total_price"],
+      possibleColumns: [
+        "revenue",
+        "sales",
+        "amount",
+        "order_total",
+        "grand_total",
+        "total_price",
+      ],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total sales revenue generated from online orders."
+      rationale: "Total sales revenue generated from online orders.",
     },
     {
       name: "Profit",
@@ -25,29 +32,39 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["profit", "net_profit", "earnings", "net_amount"],
       aggregation: "sum",
       unit: "$",
-      rationale: "Net profit generated after cost deduction."
+      rationale: "Net profit generated after cost deduction.",
     },
     {
       name: "Gross Margin",
       key: "margin",
-      possibleColumns: ["margin", "gross_margin", "profit_margin", "margin_pct"],
+      possibleColumns: [
+        "margin",
+        "gross_margin",
+        "profit_margin",
+        "margin_pct",
+      ],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average gross profit margin percentage."
+      rationale: "Average gross profit margin percentage.",
     },
     {
       name: "Orders",
       key: "orders",
-      possibleColumns: ["order_id", "invoice_id", "transaction_id", "order_number"],
+      possibleColumns: [
+        "order_id",
+        "invoice_id",
+        "transaction_id",
+        "order_number",
+      ],
       aggregation: "count",
-      rationale: "Total volume of completed purchase transactions."
+      rationale: "Total volume of completed purchase transactions.",
     },
     {
       name: "Customers",
       key: "customers",
       possibleColumns: ["customer_id", "user_id", "buyer_id", "email"],
       aggregation: "count",
-      rationale: "Total number of unique customer buyers."
+      rationale: "Total number of unique customer buyers.",
     },
     {
       name: "Average Order Value",
@@ -55,15 +72,20 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["aov", "average_order_value", "avg_order_value"],
       aggregation: "avg",
       unit: "$",
-      rationale: "Average monetary value spent per transaction."
+      rationale: "Average monetary value spent per transaction.",
     },
     {
       name: "Discount Rate",
       key: "discount_rate",
-      possibleColumns: ["discount", "discount_rate", "discount_pct", "coupon_discount"],
+      possibleColumns: [
+        "discount",
+        "discount_rate",
+        "discount_pct",
+        "coupon_discount",
+      ],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average promotional discount rate applied to sales."
+      rationale: "Average promotional discount rate applied to sales.",
     },
     {
       name: "Repeat Customer Rate",
@@ -71,8 +93,9 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["repeat_customer_rate", "repeat_rate"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of customers who have made more than one purchase."
-    }
+      rationale:
+        "Percentage of customers who have made more than one purchase.",
+    },
   ],
   retail: [
     {
@@ -81,7 +104,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["revenue", "sales", "sales_amount", "amount", "total"],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total store sales revenue."
+      rationale: "Total store sales revenue.",
     },
     {
       name: "Gross Margin",
@@ -89,29 +112,29 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["margin", "gross_margin", "profit_margin"],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average profit margin percentage."
+      rationale: "Average profit margin percentage.",
     },
     {
       name: "Transactions",
       key: "transactions",
       possibleColumns: ["transaction_id", "receipt_id", "receipt_no"],
       aggregation: "count",
-      rationale: "Total number of store register receipts."
+      rationale: "Total number of store register receipts.",
     },
     {
       name: "Quantity Sold",
       key: "quantity",
       possibleColumns: ["quantity", "qty", "units_sold", "units"],
       aggregation: "sum",
-      rationale: "Total volume of product units sold."
+      rationale: "Total volume of product units sold.",
     },
     {
       name: "Inventory Level",
       key: "inventory",
       possibleColumns: ["inventory", "stock", "stock_level", "qty_on_hand"],
       aggregation: "sum",
-      rationale: "Total quantity of units currently in stock."
-    }
+      rationale: "Total quantity of units currently in stock.",
+    },
   ],
   saas: [
     {
@@ -120,7 +143,8 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["mrr", "monthly_recurring_revenue", "monthly_revenue"],
       aggregation: "sum",
       unit: "$",
-      rationale: "Monthly Recurring Revenue generated from active subscriptions."
+      rationale:
+        "Monthly Recurring Revenue generated from active subscriptions.",
     },
     {
       name: "ARR",
@@ -128,7 +152,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["arr", "annual_recurring_revenue", "annual_revenue"],
       aggregation: "sum",
       unit: "$",
-      rationale: "Annualized value of active recurring subscription revenue."
+      rationale: "Annualized value of active recurring subscription revenue.",
     },
     {
       name: "Churn Rate",
@@ -136,7 +160,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["churn", "churn_rate", "cancelled", "canceled"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Rate of subscription cancellations over the period."
+      rationale: "Rate of subscription cancellations over the period.",
     },
     {
       name: "Net Revenue Retention",
@@ -144,15 +168,16 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["nrr", "net_revenue_retention", "retention_pct"],
       aggregation: "avg",
       unit: "%",
-      rationale: "Net revenue retained from existing customer cohort, including expansion."
+      rationale:
+        "Net revenue retained from existing customer cohort, including expansion.",
     },
     {
       name: "Active Users",
       key: "active_users",
       possibleColumns: ["user_id", "account_id", "active_users", "subscribers"],
       aggregation: "count",
-      rationale: "Total count of unique active client subscriptions or users."
-    }
+      rationale: "Total count of unique active client subscriptions or users.",
+    },
   ],
   finance: [
     {
@@ -161,23 +186,37 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["net_income", "profit", "net_profit", "earnings"],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total earnings after deducting all operating expenses, interest, and taxes."
+      rationale:
+        "Total earnings after deducting all operating expenses, interest, and taxes.",
     },
     {
       name: "Operating Cost",
       key: "operating_cost",
-      possibleColumns: ["cost", "expenses", "opex", "operating_cost", "operating_expense"],
+      possibleColumns: [
+        "cost",
+        "expenses",
+        "opex",
+        "operating_cost",
+        "operating_expense",
+      ],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total costs associated with running day-to-day business operations."
+      rationale:
+        "Total costs associated with running day-to-day business operations.",
     },
     {
       name: "Cash Flow",
       key: "cash_flow",
-      possibleColumns: ["cashflow", "cash_flow", "operating_cashflow", "net_cash"],
+      possibleColumns: [
+        "cashflow",
+        "cash_flow",
+        "operating_cashflow",
+        "net_cash",
+      ],
       aggregation: "sum",
       unit: "$",
-      rationale: "Net amount of cash moving into and out of the business operations."
+      rationale:
+        "Net amount of cash moving into and out of the business operations.",
     },
     {
       name: "ROI",
@@ -185,17 +224,22 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["roi", "return_on_investment", "roi_pct"],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average Return on Investment percentage."
-    }
+      rationale: "Average Return on Investment percentage.",
+    },
   ],
   banking: [
     {
       name: "Loan Disbursement",
       key: "loan_disbursement",
-      possibleColumns: ["loan_amount", "disbursement", "sanctioned_amount", "amount"],
+      possibleColumns: [
+        "loan_amount",
+        "disbursement",
+        "sanctioned_amount",
+        "amount",
+      ],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total volume of loan capital disbursed to clients."
+      rationale: "Total volume of loan capital disbursed to clients.",
     },
     {
       name: "Interest Income",
@@ -203,7 +247,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["interest", "interest_income", "yield"],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total interest earnings generated from the credit portfolio."
+      rationale: "Total interest earnings generated from the credit portfolio.",
     },
     {
       name: "NPA Ratio",
@@ -211,24 +255,31 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["npa", "default", "npa_ratio", "default_rate"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Non-Performing Assets ratio representing default risk."
+      rationale: "Non-Performing Assets ratio representing default risk.",
     },
     {
       name: "Active Accounts",
       key: "active_accounts",
       possibleColumns: ["account_number", "account_id", "customer_id"],
       aggregation: "count",
-      rationale: "Total volume of active financial accounts."
-    }
+      rationale: "Total volume of active financial accounts.",
+    },
   ],
   hr: [
     {
       name: "Attrition Rate",
       key: "attrition",
-      possibleColumns: ["attrition", "resigned", "terminated", "left", "separation"],
+      possibleColumns: [
+        "attrition",
+        "resigned",
+        "terminated",
+        "left",
+        "separation",
+      ],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of workforce leaving the organization over the period."
+      rationale:
+        "Percentage of workforce leaving the organization over the period.",
     },
     {
       name: "Average Salary",
@@ -236,7 +287,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["salary", "payroll", "compensation", "salary_amount"],
       aggregation: "avg",
       unit: "$",
-      rationale: "Average salary expense per employee."
+      rationale: "Average salary expense per employee.",
     },
     {
       name: "Promotion Rate",
@@ -244,22 +295,28 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["promoted", "promotion", "promoted_flag"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of employees receiving career promotions."
+      rationale: "Percentage of employees receiving career promotions.",
     },
     {
       name: "Experience Level",
       key: "experience",
-      possibleColumns: ["experience", "tenure", "years_exp", "years_of_experience"],
+      possibleColumns: [
+        "experience",
+        "tenure",
+        "years_exp",
+        "years_of_experience",
+      ],
       aggregation: "avg",
-      rationale: "Average tenure or years of professional experience across employees."
+      rationale:
+        "Average tenure or years of professional experience across employees.",
     },
     {
       name: "Headcount",
       key: "headcount",
       possibleColumns: ["employee_id", "emp_id", "staff_id"],
       aggregation: "count",
-      rationale: "Total active employee headcount."
-    }
+      rationale: "Total active employee headcount.",
+    },
   ],
   healthcare: [
     {
@@ -267,7 +324,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       key: "patients",
       possibleColumns: ["patient_id", "patient_no", "mrn", "patient_name"],
       aggregation: "count",
-      rationale: "Total unique patient volume admitted or treated."
+      rationale: "Total unique patient volume admitted or treated.",
     },
     {
       name: "Readmission Rate",
@@ -275,7 +332,8 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["readmitted", "readmission", "readmission_flag"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of patients readmitted within 30 days of discharge."
+      rationale:
+        "Percentage of patients readmitted within 30 days of discharge.",
     },
     {
       name: "Mortality Rate",
@@ -283,15 +341,20 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["mortality", "deceased", "death_flag", "died"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of patient encounters resulting in mortality."
+      rationale: "Percentage of patient encounters resulting in mortality.",
     },
     {
       name: "Average Length of Stay",
       key: "avg_stay",
-      possibleColumns: ["length_of_stay", "stay_days", "days_in_hospital", "los"],
+      possibleColumns: [
+        "length_of_stay",
+        "stay_days",
+        "days_in_hospital",
+        "los",
+      ],
       aggregation: "avg",
-      rationale: "Average number of days a patient spends in the hospital."
-    }
+      rationale: "Average number of days a patient spends in the hospital.",
+    },
   ],
   manufacturing: [
     {
@@ -300,15 +363,21 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["oee", "overall_equipment_effectiveness", "oee_pct"],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average Overall Equipment Effectiveness metric."
+      rationale: "Average Overall Equipment Effectiveness metric.",
     },
     {
       name: "Defect Rate",
       key: "defect_rate",
-      possibleColumns: ["defect", "defective", "defects", "defect_rate", "fail_flag"],
+      possibleColumns: [
+        "defect",
+        "defective",
+        "defects",
+        "defect_rate",
+        "fail_flag",
+      ],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of manufactured units classified as defective."
+      rationale: "Percentage of manufactured units classified as defective.",
     },
     {
       name: "Yield Rate",
@@ -316,22 +385,27 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["yield", "yield_pct", "success_rate"],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average yield rate of manufacturing processes."
+      rationale: "Average yield rate of manufacturing processes.",
     },
     {
       name: "Downtime Hours",
       key: "downtime",
-      possibleColumns: ["downtime", "idle_time", "downtime_hours", "maintenance_time"],
+      possibleColumns: [
+        "downtime",
+        "idle_time",
+        "downtime_hours",
+        "maintenance_time",
+      ],
       aggregation: "sum",
-      rationale: "Total production equipment downtime in hours."
+      rationale: "Total production equipment downtime in hours.",
     },
     {
       name: "Total Produced",
       key: "produced",
       possibleColumns: ["produced", "output", "units_produced", "batch_size"],
       aggregation: "sum",
-      rationale: "Total volume of goods or batches produced."
-    }
+      rationale: "Total volume of goods or batches produced.",
+    },
   ],
   logistics: [
     {
@@ -340,39 +414,55 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["on_time", "ontime", "otd", "delivered_on_time"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of shipments arriving on or before the ETA."
+      rationale: "Percentage of shipments arriving on or before the ETA.",
     },
     {
       name: "Avg Delivery Days",
       key: "delivery_days",
-      possibleColumns: ["delivery_days", "days_to_deliver", "transit_time", "shipping_days"],
+      possibleColumns: [
+        "delivery_days",
+        "days_to_deliver",
+        "transit_time",
+        "shipping_days",
+      ],
       aggregation: "avg",
-      rationale: "Average transit days required to complete delivery."
+      rationale: "Average transit days required to complete delivery.",
     },
     {
       name: "Shipment Cost",
       key: "shipment_cost",
-      possibleColumns: ["shipping_cost", "freight_cost", "freight_amount", "cost"],
+      possibleColumns: [
+        "shipping_cost",
+        "freight_cost",
+        "freight_amount",
+        "cost",
+      ],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total expenditures spent on carrier transport."
+      rationale: "Total expenditures spent on carrier transport.",
     },
     {
       name: "Shipments",
       key: "shipments",
       possibleColumns: ["shipment_id", "tracking_number", "consignment_id"],
       aggregation: "count",
-      rationale: "Total volume of shipments processed."
-    }
+      rationale: "Total volume of shipments processed.",
+    },
   ],
   marketing: [
     {
       name: "Marketing Spend",
       key: "spend",
-      possibleColumns: ["spend", "cost", "marketing_spend", "budget_spent", "amount_spent"],
+      possibleColumns: [
+        "spend",
+        "cost",
+        "marketing_spend",
+        "budget_spent",
+        "amount_spent",
+      ],
       aggregation: "sum",
       unit: "$",
-      rationale: "Total ad spend across media channels."
+      rationale: "Total ad spend across media channels.",
     },
     {
       name: "CTR",
@@ -380,29 +470,29 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["ctr", "click_through_rate", "ctr_pct"],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average click-through rate percentage."
+      rationale: "Average click-through rate percentage.",
     },
     {
       name: "Impressions",
       key: "impressions",
       possibleColumns: ["impressions", "views", "reach"],
       aggregation: "sum",
-      rationale: "Total number of times marketing creatives were viewed."
+      rationale: "Total number of times marketing creatives were viewed.",
     },
     {
       name: "Conversions",
       key: "conversions",
       possibleColumns: ["conversions", "leads_generated", "leads", "converts"],
       aggregation: "sum",
-      rationale: "Total number of desired conversion actions completed."
+      rationale: "Total number of desired conversion actions completed.",
     },
     {
       name: "ROAS",
       key: "roas",
       possibleColumns: ["roas", "return_on_ad_spend", "marketing_roi"],
       aggregation: "avg",
-      rationale: "Return on Ad Spend multiplier (Revenue / Spend)."
-    }
+      rationale: "Return on Ad Spend multiplier (Revenue / Spend).",
+    },
   ],
   education: [
     {
@@ -410,7 +500,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       key: "students",
       possibleColumns: ["student_id", "student_no", "roll_no"],
       aggregation: "count",
-      rationale: "Total student body size."
+      rationale: "Total student body size.",
     },
     {
       name: "Attendance Rate",
@@ -418,7 +508,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["attendance", "present", "attendance_rate"],
       aggregation: "avg",
       unit: "%",
-      rationale: "Average student attendance rate."
+      rationale: "Average student attendance rate.",
     },
     {
       name: "Pass Rate",
@@ -426,15 +516,15 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["pass", "passed", "pass_rate", "status_pass"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of students passing exams."
+      rationale: "Percentage of students passing exams.",
     },
     {
       name: "Average GPA",
       key: "avg_gpa",
       possibleColumns: ["gpa", "cgpa", "grades", "marks", "score"],
       aggregation: "avg",
-      rationale: "Arithmetic average of GPA or test scores."
-    }
+      rationale: "Arithmetic average of GPA or test scores.",
+    },
   ],
   operations: [
     {
@@ -442,7 +532,7 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       key: "backlog",
       possibleColumns: ["ticket_id", "ticket_number", "id"],
       aggregation: "count",
-      rationale: "Total operational task or ticket volume."
+      rationale: "Total operational task or ticket volume.",
     },
     {
       name: "SLA Breach Rate",
@@ -450,15 +540,15 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       possibleColumns: ["sla_breached", "breach", "sla_status", "overdue"],
       aggregation: "rate",
       unit: "%",
-      rationale: "Percentage of tickets failing SLA compliance guidelines."
+      rationale: "Percentage of tickets failing SLA compliance guidelines.",
     },
     {
       name: "Avg Resolution Time",
       key: "resolution_time",
       possibleColumns: ["resolution_time", "time_to_resolve", "duration"],
       aggregation: "avg",
-      rationale: "Average time in hours or days to resolve ticket issues."
-    }
+      rationale: "Average time in hours or days to resolve ticket issues.",
+    },
   ],
   generic: [
     {
@@ -466,21 +556,21 @@ export const DOMAIN_KPIS: Record<BusinessDomain, KPIMapping[]> = {
       key: "total_val",
       possibleColumns: ["amount", "value", "total", "sum"],
       aggregation: "sum",
-      rationale: "Sum value of the numeric column."
+      rationale: "Sum value of the numeric column.",
     },
     {
       name: "Average Value",
       key: "avg_val",
       possibleColumns: ["average", "mean", "rate"],
       aggregation: "avg",
-      rationale: "Average value of the numeric column."
-    }
-  ]
+      rationale: "Average value of the numeric column.",
+    },
+  ],
 };
 
 export const CORRELATION_THRESHOLDS = {
   strong: 0.7,
-  moderate: 0.4
+  moderate: 0.4,
 };
 
 export const QUALITY_WEIGHTS = {
@@ -488,5 +578,5 @@ export const QUALITY_WEIGHTS = {
   uniqueness: 0.15,
   consistency: 0.2,
   outliers: 0.2,
-  validity: 0.2
+  validity: 0.2,
 };

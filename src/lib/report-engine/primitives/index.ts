@@ -1,10 +1,10 @@
-export { ReportPage }    from "./ReportPage";
+export { ReportPage } from "./ReportPage";
 export { ReportSection } from "./ReportSection";
-export { ReportGrid }    from "./ReportGrid";
-export { ReportBlock }   from "./ReportBlock";
-export { ReportBadge }   from "./ReportBadge";
-export { ReportTable }   from "./ReportTable";
-export { ReportChart }   from "./ReportChart";
+export { ReportGrid } from "./ReportGrid";
+export { ReportBlock } from "./ReportBlock";
+export { ReportBadge } from "./ReportBadge";
+export { ReportTable } from "./ReportTable";
+export { ReportChart } from "./ReportChart";
 export { ReportCallout } from "./ReportCallout";
 export { ReportExecutiveInsight } from "./ReportExecutiveInsight";
 export { ReportHeroMetric } from "./ReportHeroMetric";

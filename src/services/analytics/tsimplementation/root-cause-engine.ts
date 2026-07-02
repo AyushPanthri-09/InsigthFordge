@@ -20,7 +20,12 @@
  */
 
 import * as ss from "simple-statistics";
-import type { ColumnProfile, ExtendedNumericStats, RootCauseAnalysis, RootCauseNode } from "../types";
+import type {
+  ColumnProfile,
+  ExtendedNumericStats,
+  RootCauseAnalysis,
+  RootCauseNode,
+} from "../types";
 import { computeSegmentBreakdown } from "./statistical-engine";
 import { rcaConfidence } from "./shared-confidence";
 
@@ -64,7 +69,8 @@ export function analyseRootCause(
     const dimensions = profiles
       .filter(
         (p) =>
-          (p.inferredRole === "dimension" || p.inferredType === "categorical") &&
+          (p.inferredRole === "dimension" ||
+            p.inferredType === "categorical") &&
           p.uniqueCount >= 2 &&
           p.uniqueCount <= 30 &&
           p.name !== metricCol,
@@ -72,20 +78,46 @@ export function analyseRootCause(
       .slice(0, 6);
     if (dimensions.length === 0) return null;
 
-    const anomalyRows = deviation > 0
-      ? rows.filter((r) => Number(r[metricCol]) >= threshold)
-      : rows.filter((r) => Number(r[metricCol]) <= p10);
+    const anomalyRows =
+      deviation > 0
+        ? rows.filter((r) => Number(r[metricCol]) >= threshold)
+        : rows.filter((r) => Number(r[metricCol]) <= p10);
 
     const rootCauses: RootCauseNode[] = [];
     for (const dim of dimensions) {
-      const node = buildRootCauseNode(rows, anomalyRows, metricCol, dim.name, baseline, deviation, domain, 0, maxDepth, profiles);
+      const node = buildRootCauseNode(
+        rows,
+        anomalyRows,
+        metricCol,
+        dim.name,
+        baseline,
+        deviation,
+        domain,
+        0,
+        maxDepth,
+        profiles,
+      );
       if (node) rootCauses.push(node);
     }
     if (rootCauses.length === 0) return null;
 
-    rootCauses.sort((a, b) => (b.segments[0]?.contribution ?? 0) - (a.segments[0]?.contribution ?? 0));
-    const confidence = computeRCAConfidence(rootCauses, rows.length, Math.abs(deviationPct));
-    const conclusion = buildRCAConclusion(metricCol, anomalyValue, baseline, deviationPct, rootCauses, domain);
+    rootCauses.sort(
+      (a, b) =>
+        (b.segments[0]?.contribution ?? 0) - (a.segments[0]?.contribution ?? 0),
+    );
+    const confidence = computeRCAConfidence(
+      rootCauses,
+      rows.length,
+      Math.abs(deviationPct),
+    );
+    const conclusion = buildRCAConclusion(
+      metricCol,
+      anomalyValue,
+      baseline,
+      deviationPct,
+      rootCauses,
+      domain,
+    );
 
     return {
       targetMetric: metricCol,
@@ -131,9 +163,12 @@ export function analyseRootCause(
 
   // Filter rows to anomaly context (top 10% of values for the metric)
   const threshold = ss.quantile(metricValues, 0.9);
-  const anomalyRows = deviation > 0
-    ? rows.filter((r) => Number(r[metricCol]) >= threshold)
-    : rows.filter((r) => Number(r[metricCol]) <= ss.quantile(metricValues, 0.1));
+  const anomalyRows =
+    deviation > 0
+      ? rows.filter((r) => Number(r[metricCol]) >= threshold)
+      : rows.filter(
+          (r) => Number(r[metricCol]) <= ss.quantile(metricValues, 0.1),
+        );
 
   // Build root cause nodes for top dimensions
   const rootCauses: RootCauseNode[] = [];
@@ -162,7 +197,11 @@ export function analyseRootCause(
       (b.segments[0]?.contribution ?? 0) - (a.segments[0]?.contribution ?? 0),
   );
 
-  const confidence = computeRCAConfidence(rootCauses, rows.length, Math.abs(deviationPct));
+  const confidence = computeRCAConfidence(
+    rootCauses,
+    rows.length,
+    Math.abs(deviationPct),
+  );
 
   const conclusion = buildRCAConclusion(
     metricCol,
@@ -202,7 +241,12 @@ function buildRootCauseNode(
   maxDepth: number,
   allProfiles: ColumnProfile[],
 ): RootCauseNode | null {
-  const segments = computeSegmentBreakdown(anomalyRows, metricCol, dimensionCol, baseline);
+  const segments = computeSegmentBreakdown(
+    anomalyRows,
+    metricCol,
+    dimensionCol,
+    baseline,
+  );
   if (segments.length === 0) return null;
 
   // Map segments to RootCauseNode shape
@@ -241,7 +285,8 @@ function buildRootCauseNode(
         (p) =>
           p.name !== dimensionCol &&
           p.name !== metricCol &&
-          (p.inferredRole === "dimension" || p.inferredType === "categorical") &&
+          (p.inferredRole === "dimension" ||
+            p.inferredType === "categorical") &&
           p.uniqueCount >= 2 &&
           p.uniqueCount <= 20,
       );

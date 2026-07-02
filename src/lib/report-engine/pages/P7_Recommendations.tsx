@@ -22,24 +22,23 @@ function priorityColor(priority: string): string {
 export function P7_Recommendations({ data, datasetName, generatedAt }: Props) {
   const sorted = [...data.recommendations].sort(
     (a, b) =>
-      (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9)
+      (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9),
   );
-  
+
   const highPriorityCount = sorted.filter(
-    (r) => r.priority === "critical" || r.priority === "high"
+    (r) => r.priority === "critical" || r.priority === "high",
   ).length;
 
   return (
     <ReportPage
-      pageNumber={10}
-      totalPages={11}
+      pageNumber={12}
+      totalPages={13}
       title="Strategic Recommendations"
       subtitle="Prioritized strategic recommendations, expected impact, timeline, and execution difficulty"
       datasetName={datasetName}
       generatedAt={generatedAt}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        
         {/* Action Thesis Summary */}
         {data.executiveSummary && (
           <div
@@ -55,18 +54,54 @@ export function P7_Recommendations({ data, datasetName, generatedAt }: Props) {
             }}
           >
             <div>
-              <div style={{ fontSize: 9, fontWeight: 800, color: "var(--rpt-brand)", textTransform: "uppercase", marginBottom: 4 }}>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 800,
+                  color: "var(--rpt-brand)",
+                  textTransform: "uppercase",
+                  marginBottom: 4,
+                }}
+              >
                 Action Thesis
               </div>
-              <p style={{ fontSize: 11, color: "var(--rpt-ink)", lineHeight: 1.55, margin: 0 }}>
+              <p
+                style={{
+                  fontSize: 11,
+                  color: "var(--rpt-ink)",
+                  lineHeight: 1.55,
+                  margin: 0,
+                }}
+              >
                 {data.executiveSummary}
               </p>
             </div>
-            <div style={{ textAlign: "right", borderLeft: "1px solid var(--rpt-border)", paddingLeft: 20 }}>
-              <div style={{ fontSize: 24, fontWeight: 850, color: "var(--rpt-brand-dark)", lineHeight: 1 }}>
+            <div
+              style={{
+                textAlign: "right",
+                borderLeft: "1px solid var(--rpt-border)",
+                paddingLeft: 20,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 850,
+                  color: "var(--rpt-brand-dark)",
+                  lineHeight: 1,
+                }}
+              >
                 {highPriorityCount}
               </div>
-              <div style={{ fontSize: 8, fontWeight: 800, color: "var(--rpt-text-muted)", textTransform: "uppercase", marginTop: 4 }}>
+              <div
+                style={{
+                  fontSize: 8,
+                  fontWeight: 800,
+                  color: "var(--rpt-text-muted)",
+                  textTransform: "uppercase",
+                  marginTop: 4,
+                }}
+              >
                 Key Initiatives
               </div>
             </div>
@@ -101,22 +136,56 @@ export function P7_Recommendations({ data, datasetName, generatedAt }: Props) {
                   }}
                 />
 
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 6 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    marginBottom: 6,
+                  }}
+                >
                   <div>
-                    <span style={{ fontSize: 11.5, fontWeight: 700, color: "var(--rpt-brand-dark)" }}>
+                    <span
+                      style={{
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        color: "var(--rpt-brand-dark)",
+                      }}
+                    >
                       {rec.title}
                     </span>
-                    <span style={{ fontSize: 9, color: "var(--rpt-text-muted)", marginLeft: 8 }}>
+                    <span
+                      style={{
+                        fontSize: 9,
+                        color: "var(--rpt-text-muted)",
+                        marginLeft: 8,
+                      }}
+                    >
                       Ref: {rec.id}
                     </span>
                   </div>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <ReportBadge label={rec.priority} variant={rec.priority} dot />
-                    <ReportBadge label={`${Math.round(rec.confidence * 100)}% Confidence`} variant="neutral" />
+                    <ReportBadge
+                      label={rec.priority}
+                      variant={rec.priority}
+                      dot
+                    />
+                    <ReportBadge
+                      label={`${Math.round(rec.confidence * 100)}% Confidence`}
+                      variant="neutral"
+                    />
                   </div>
                 </div>
 
-                <p style={{ fontSize: 10, color: "var(--rpt-text)", lineHeight: 1.45, margin: "0 0 10px 0" }}>
+                <p
+                  style={{
+                    fontSize: 10,
+                    color: "var(--rpt-text)",
+                    lineHeight: 1.45,
+                    margin: "0 0 10px 0",
+                  }}
+                >
                   {rec.observation} / {rec.recommendation}
                 </p>
 
@@ -132,23 +201,34 @@ export function P7_Recommendations({ data, datasetName, generatedAt }: Props) {
                   }}
                 >
                   <div>
-                    <span style={{ color: "var(--rpt-text-muted)" }}>Expected Impact: </span>
-                    <strong style={{ color: "var(--rpt-brand-dark)" }}>{rec.expectedImpact}</strong>
+                    <span style={{ color: "var(--rpt-text-muted)" }}>
+                      Expected Impact:{" "}
+                    </span>
+                    <strong style={{ color: "var(--rpt-brand-dark)" }}>
+                      {rec.expectedImpact}
+                    </strong>
                   </div>
                   <div>
-                    <span style={{ color: "var(--rpt-text-muted)" }}>Timeline: </span>
-                    <strong style={{ color: "var(--rpt-brand-dark)" }}>{rec.timeHorizon || "Medium-term"}</strong>
+                    <span style={{ color: "var(--rpt-text-muted)" }}>
+                      Timeline:{" "}
+                    </span>
+                    <strong style={{ color: "var(--rpt-brand-dark)" }}>
+                      {rec.timeHorizon || "Medium-term"}
+                    </strong>
                   </div>
                   <div>
-                    <span style={{ color: "var(--rpt-text-muted)" }}>Success Metric: </span>
-                    <strong style={{ color: "var(--rpt-brand-dark)" }}>{rec.successMetric || "Operational lift"}</strong>
+                    <span style={{ color: "var(--rpt-text-muted)" }}>
+                      Success Metric:{" "}
+                    </span>
+                    <strong style={{ color: "var(--rpt-brand-dark)" }}>
+                      {rec.successMetric || "Operational lift"}
+                    </strong>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </ReportSection>
-
       </div>
     </ReportPage>
   );

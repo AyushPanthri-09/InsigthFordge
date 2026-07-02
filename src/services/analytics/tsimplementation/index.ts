@@ -11,7 +11,7 @@
  *    domain-aware null/outlier reasoning.
  *  - runEDA() accepts and passes EDAContext built from the understanding output.
  *  - runAnalytics() passes measures, dimensions, time, and process context to
- *    Gemini so insights are domain-specific, not generic.
+ *    local engines so insights are domain-specific, not generic.
  *  - analyzeAll() caches the understanding output and threads it through
  *    every downstream stage (no repeated profile computations).
  *
@@ -66,11 +66,17 @@ import { detectAndComputeKPIs } from "./analytics/kpiEngine";
 import { computeCorrelationMatrix } from "./analytics/correlationEngine";
 import { detectAnomalies } from "./analytics/anomalyEngine";
 import { runSegmentationAnalysis } from "./analytics/segmentation";
-import { generateAdvancedForecast, type ExtendedForecastResult } from "./analytics/forecastingEngine";
+import {
+  generateAdvancedForecast,
+  type ExtendedForecastResult,
+} from "./analytics/forecastingEngine";
 import { generateRecommendations } from "./analytics/recommendationEngine";
 import { calculateDataQuality } from "./analytics/qualityScore";
 import { generateStructuredInsights } from "./analytics/insightEngine";
-import { generateSCQANarrative, compileSCQANarrativeText } from "./analytics/narrativeEngine";
+import {
+  generateSCQANarrative,
+  compileSCQANarrativeText,
+} from "./analytics/narrativeEngine";
 
 // ---------------------------------------------------------------------------
 // In-process session store
@@ -246,9 +252,16 @@ export const tsAnalyticsService: AnalyticsService = {
     const dupCount =
       heuristicIssues.find((i) => i.id.startsWith("dup_"))?.affectedRows ?? 0;
 
-    const numericCols = profiles.filter(p => p.inferredRole === "measure").map(p => p.name);
+    const numericCols = profiles
+      .filter((p) => p.inferredRole === "measure")
+      .map((p) => p.name);
     const anomalies = detectAnomalies(ds.rows, ds.columns, numericCols, []);
-    const quality = calculateDataQuality(ds.rows, profiles, anomalies, dupCount);
+    const quality = calculateDataQuality(
+      ds.rows,
+      profiles,
+      anomalies,
+      dupCount,
+    );
 
     try {
       const ai = await reasonCleaningIssues({
@@ -294,7 +307,7 @@ export const tsAnalyticsService: AnalyticsService = {
       const merged = [...aiIssues, ...heuristicIssues].map(
         enforceDAIEGovernance,
       );
-      
+
       const report = buildReport(
         datasetId,
         merged,
@@ -314,7 +327,8 @@ export const tsAnalyticsService: AnalyticsService = {
         heuristicIssues,
         ds.rowCount,
         ds.rowCount,
-        "Heuristic + Data Quality Intelligence cleaning report with deterministic readiness evidence.\n\n" + quality.recommendations.join("\n"),
+        "Heuristic + Data Quality Intelligence cleaning report with deterministic readiness evidence.\n\n" +
+          quality.recommendations.join("\n"),
       );
       report.qualityScore = quality.overallScore;
       return report;
@@ -695,18 +709,31 @@ function buildFallbackAnalytics(
   columns: string[],
   profiles: ColumnProfile[],
 ): AnalyticsReport {
-  const prettify = (name: string) => name.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const numericCols = profiles.filter(p => p.inferredRole === "measure").map(p => p.name);
-  
+  const prettify = (name: string) =>
+    name.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const numericCols = profiles
+    .filter((p) => p.inferredRole === "measure")
+    .map((p) => p.name);
+
   // 1. Correlation Matrix
   const correlationMatrix = computeCorrelationMatrix(rows, numericCols);
-  
+
   // 2. Anomaly Detection
-  const anomalies = detectAnomalies(rows, columns, numericCols, eda.timeSeriesAnalysis || []);
-  
+  const anomalies = detectAnomalies(
+    rows,
+    columns,
+    numericCols,
+    eda.timeSeriesAnalysis || [],
+  );
+
   // 3. Recommendation Engine
-  const recommendations = generateRecommendations(domain as any, eda.kpis, anomalies, correlationMatrix);
-  
+  const recommendations = generateRecommendations(
+    domain as any,
+    eda.kpis,
+    anomalies,
+    correlationMatrix,
+  );
+
   // 4. Time Series Forecasts Extraction
   const forecasts: ExtendedForecastResult[] = [];
   if (eda.timeSeriesAnalysis) {
@@ -716,7 +743,7 @@ function buildFallbackAnalytics(
           ...ts.forecast,
           selectedMethod: ts.forecast.method as any,
           explanation: `Forecasting projection for measure '${prettify(ts.measureColumn)}'.`,
-          mape: 1 - ts.forecast.confidence
+          mape: 1 - ts.forecast.confidence,
         });
       }
     }
@@ -730,7 +757,7 @@ function buildFallbackAnalytics(
     anomalies,
     eda.segmentation,
     forecasts,
-    recommendations
+    recommendations,
   );
 
   // 6. Executive Narrative SCQA
@@ -740,14 +767,15 @@ function buildFallbackAnalytics(
     eda.kpis,
     anomalies,
     correlationMatrix,
-    recommendations
+    recommendations,
   );
   const scqaText = compileSCQANarrativeText(scqa);
 
   // 7. Quality Score calculation for business health reference
   const totalCells = rows.length * profiles.length;
   const nullCount = profiles.reduce((sum, p) => sum + p.nullCount, 0);
-  const completeness = totalCells > 0 ? (totalCells - nullCount) / totalCells : 1;
+  const completeness =
+    totalCells > 0 ? (totalCells - nullCount) / totalCells : 1;
   const healthScore = Math.round(completeness * 100);
 
   return {
@@ -757,6 +785,6 @@ function buildFallbackAnalytics(
     descriptive: insights.descriptive,
     diagnostic: insights.diagnostic,
     predictive: insights.predictive,
-    prescriptive: insights.prescriptive
+    prescriptive: insights.prescriptive,
   };
 }

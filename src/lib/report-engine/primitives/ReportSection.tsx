@@ -6,7 +6,11 @@ interface ReportSectionProps {
   className?: string;
 }
 
-export function ReportSection({ title, children, className = "" }: ReportSectionProps) {
+export function ReportSection({
+  title,
+  children,
+  className = "",
+}: ReportSectionProps) {
   return (
     <div className={`rpt-section ${className}`}>
       <div className="rpt-section-title">{title}</div>

@@ -32,24 +32,24 @@ export type ColumnSemanticType =
 
 /** High-level business category a column belongs to. */
 export type BusinessColumnCategory =
-  | "financial_metric"    // revenue, cost, margin, profit
+  | "financial_metric" // revenue, cost, margin, profit
   | "operational_metric" // units, quantity, count, volume
-  | "time_dimension"     // dates, periods, fiscal calendar
-  | "geo_dimension"      // region, country, city, territory
-  | "entity_key"         // customer id, order id, product id
-  | "descriptor"         // names, labels, free-text
-  | "status_flag"        // boolean / enum status fields
-  | "ratio_metric"       // rates, percentages, scores
+  | "time_dimension" // dates, periods, fiscal calendar
+  | "geo_dimension" // region, country, city, territory
+  | "entity_key" // customer id, order id, product id
+  | "descriptor" // names, labels, free-text
+  | "status_flag" // boolean / enum status fields
+  | "ratio_metric" // rates, percentages, scores
   | "unknown";
 
 /** How a column participates in a star/snowflake schema. */
 export type SchemaRole =
-  | "fact_measure"        // additive numeric measure in a fact table
-  | "fact_degenerate"    // non-key, non-measure in a fact table (e.g. invoice number)
-  | "dimension_attribute"// descriptive attribute in a dimension
-  | "dimension_key"      // FK reference to a dimension
-  | "primary_key"        // PK of a table
-  | "date_key"           // date/time FK
+  | "fact_measure" // additive numeric measure in a fact table
+  | "fact_degenerate" // non-key, non-measure in a fact table (e.g. invoice number)
+  | "dimension_attribute" // descriptive attribute in a dimension
+  | "dimension_key" // FK reference to a dimension
+  | "primary_key" // PK of a table
+  | "date_key" // date/time FK
   | "unknown";
 
 /** Intelligence produced per-column by the Column Intelligence Engine. */
@@ -84,12 +84,12 @@ export interface ColumnRelationship {
   relationshipType:
     | "primary_key"
     | "foreign_key"
-    | "date_hierarchy"   // e.g. Year → Quarter → Month
-    | "geo_hierarchy"    // e.g. Country → State → City
-    | "measure_dimension"// e.g. Amount aggregated by Region
-    | "parent_child"     // self-referential hierarchy
-    | "lookup"           // code → label mapping
-    | "correlated";      // statistical correlation
+    | "date_hierarchy" // e.g. Year → Quarter → Month
+    | "geo_hierarchy" // e.g. Country → State → City
+    | "measure_dimension" // e.g. Amount aggregated by Region
+    | "parent_child" // self-referential hierarchy
+    | "lookup" // code → label mapping
+    | "correlated"; // statistical correlation
   confidence: number;
   rationale: string;
 }
@@ -201,7 +201,13 @@ export interface ExtendedNumericStats extends NumericStats {
   /** Number of values flagged as anomalies by z-score method. */
   anomalyCount: number;
   /** Detected distribution shape. */
-  distributionShape: "normal" | "right_skewed" | "left_skewed" | "bimodal" | "uniform" | "unknown";
+  distributionShape:
+    | "normal"
+    | "right_skewed"
+    | "left_skewed"
+    | "bimodal"
+    | "uniform"
+    | "unknown";
   /** Plain-English business explanation of the distribution. */
   distributionExplanation: string;
   /** Percentile breakdown: p5, p10, p25, p50, p75, p90, p95. */
@@ -265,9 +271,19 @@ export interface TimeSeriesAnalysis {
 /** Lightweight forecast result (no ML models — pure statistical). */
 export interface ForecastResult {
   /** Method used: moving_average | exponential_smoothing | holt_trend. */
-  method: "moving_average" | "exponential_smoothing" | "holt_trend" | "weighted_moving_average" | "linear_regression";
+  method:
+    | "moving_average"
+    | "exponential_smoothing"
+    | "holt_trend"
+    | "weighted_moving_average"
+    | "linear_regression";
   /** Forecast values for the next periods. */
-  nextPeriods: Array<{ period: string; predicted: number; lower: number; upper: number }>;
+  nextPeriods: Array<{
+    period: string;
+    predicted: number;
+    lower: number;
+    upper: number;
+  }>;
   /** 0–1 confidence in the forecast. */
   confidence: number;
   /** Assumptions made by the forecast model. */
@@ -285,8 +301,8 @@ export interface RootCauseNode {
   /** Top-N segments that explain the observation. */
   segments: Array<{
     value: string;
-    contribution: number;  // % of the total effect
-    delta: number;         // absolute difference from dataset average
+    contribution: number; // % of the total effect
+    delta: number; // absolute difference from dataset average
     isTopContributor: boolean;
   }>;
   /** Ranked hypotheses for WHY this column drives the observation. */
@@ -330,7 +346,12 @@ export interface InvestigativeQuestion {
   /** Which column was examined to answer this question. */
   targetColumn: string;
   /** Type of analysis performed. */
-  analysisType: "segment_comparison" | "correlation" | "distribution_shift" | "temporal_pattern" | "group_difference";
+  analysisType:
+    | "segment_comparison"
+    | "correlation"
+    | "distribution_shift"
+    | "temporal_pattern"
+    | "group_difference";
   /** What the data actually shows in answer to this question. */
   dataAnswer: string;
   /** Numeric evidence value (e.g. correlation r, mean difference, %). */
@@ -499,7 +520,12 @@ export interface DatasetUnderstanding {
   primaryEntities: string[]; // e.g. ["Customer", "Order", "Product"]
   suggestedKPIs: Array<{ name: string; rationale: string; columns: string[] }>;
   columnProfiles: ColumnProfile[];
-  relationships: Array<{ from: string; to: string; type: string; confidence: number }>;
+  relationships: Array<{
+    from: string;
+    to: string;
+    type: string;
+    confidence: number;
+  }>;
   warnings: string[];
 
   // -----------------------------------------------------------------------
@@ -538,7 +564,7 @@ export interface DatasetUnderstanding {
   /** Detected dimension columns with their hierarchy hints. */
   dimensions?: Array<{
     column: string;
-    hierarchy?: string[];   // e.g. ["Country", "Region", "City"]
+    hierarchy?: string[]; // e.g. ["Country", "Region", "City"]
     cardinality: "low" | "medium" | "high";
     businessMeaning: string;
   }>;
@@ -637,7 +663,8 @@ export interface KPI {
   rationale: string;
 }
 
-export type ChartType = "bar" | "line" | "area" | "pie" | "scatter" | "histogram" | "heatmap";
+export type ChartType =
+  "bar" | "line" | "area" | "pie" | "scatter" | "histogram" | "heatmap";
 
 export interface ChartSpec {
   id: string;
@@ -687,7 +714,8 @@ export interface EDAReport {
   segmentation?: any;
 }
 
-export type InsightLevel = "descriptive" | "diagnostic" | "predictive" | "prescriptive";
+export type InsightLevel =
+  "descriptive" | "diagnostic" | "predictive" | "prescriptive";
 
 export interface Evidence {
   type: "dataset" | "external" | "inference";
@@ -760,7 +788,13 @@ export interface AnalyticsReport {
 
 export interface ReasoningStep {
   timestamp: number;
-  phase: "understanding" | "profiling" | "cleaning" | "eda" | "analytics" | "reporting";
+  phase:
+    | "understanding"
+    | "profiling"
+    | "cleaning"
+    | "eda"
+    | "analytics"
+    | "reporting";
   message: string;
   detail?: string;
 }
@@ -781,11 +815,20 @@ export interface AnalyzeOptions {
  */
 export interface AnalyticsService {
   parseFile(file: File): Promise<ParsedDataset>;
-  understandDataset(datasetId: string, notes?: AnalystNotes): Promise<DatasetUnderstanding>;
-  proposeCleaning(datasetId: string, notes?: AnalystNotes): Promise<CleaningReport>;
+  understandDataset(
+    datasetId: string,
+    notes?: AnalystNotes,
+  ): Promise<DatasetUnderstanding>;
+  proposeCleaning(
+    datasetId: string,
+    notes?: AnalystNotes,
+  ): Promise<CleaningReport>;
   applyCleaning(datasetId: string, issueIds: string[]): Promise<CleaningReport>;
   runEDA(datasetId: string, notes?: AnalystNotes): Promise<EDAReport>;
-  runAnalytics(datasetId: string, notes?: AnalystNotes): Promise<AnalyticsReport>;
+  runAnalytics(
+    datasetId: string,
+    notes?: AnalystNotes,
+  ): Promise<AnalyticsReport>;
   /** Convenience: full pipeline orchestrator. */
   analyzeAll(file: File, options?: AnalyzeOptions): Promise<FullAnalysis>;
 }

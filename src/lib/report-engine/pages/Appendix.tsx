@@ -32,22 +32,30 @@ export function Appendix({ data, datasetName, generatedAt }: Props) {
 
   return (
     <ReportPage
-      pageNumber={11}
-      totalPages={11}
+      pageNumber={13}
+      totalPages={13}
       title="Technical Appendix"
       subtitle="Staged dataset profiles, p-value verification metrics, and assumptions"
       datasetName={datasetName}
       generatedAt={generatedAt}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        
         {/* Dataset Metadata */}
         <ReportSection title="Analytical Metadata Register">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: 10,
+            }}
+          >
             {[
               { label: "Dataset Filename", value: data.datasetName },
               { label: "Detected Domain", value: data.domain },
-              { label: "Total Record Count", value: data.rowCount.toLocaleString() },
+              {
+                label: "Total Record Count",
+                value: data.rowCount.toLocaleString(),
+              },
               { label: "Feature Columns", value: String(data.columnCount) },
             ].map(({ label, value }) => (
               <div
@@ -59,10 +67,26 @@ export function Appendix({ data, datasetName, generatedAt }: Props) {
                   padding: "12px 10px",
                 }}
               >
-                <div style={{ fontSize: 8.5, fontWeight: 800, textTransform: "uppercase", color: "var(--rpt-text-muted)", letterSpacing: "0.05em", marginBottom: 4 }}>
+                <div
+                  style={{
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    textTransform: "uppercase",
+                    color: "var(--rpt-text-muted)",
+                    letterSpacing: "0.05em",
+                    marginBottom: 4,
+                  }}
+                >
                   {label}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 750, color: "var(--rpt-ink)", wordBreak: "break-all" }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 750,
+                    color: "var(--rpt-ink)",
+                    wordBreak: "break-all",
+                  }}
+                >
                   {value}
                 </div>
               </div>
@@ -91,14 +115,24 @@ export function Appendix({ data, datasetName, generatedAt }: Props) {
         )}
 
         {/* Statistical Test Details & Assumptions */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.15fr 0.85fr", gap: 14 }}>
-          
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.15fr 0.85fr",
+            gap: 14,
+          }}
+        >
           <ReportSection title="Statistical Verification Register">
             {data.statisticalTests.length > 0 ? (
               <ReportTable
                 columns={[
                   { key: "testName", header: "Method" },
-                  { key: "statistic", header: "Statistic", align: "right", render: (r) => Number(r.statistic).toFixed(2) },
+                  {
+                    key: "statistic",
+                    header: "Statistic",
+                    align: "right",
+                    render: (r) => Number(r.statistic).toFixed(2),
+                  },
                   {
                     key: "pValue",
                     header: "p-value",
@@ -121,7 +155,15 @@ export function Appendix({ data, datasetName, generatedAt }: Props) {
                 maxRows={4}
               />
             ) : (
-              <div style={{ fontSize: 9.5, color: "var(--rpt-text-muted)", padding: 10, background: "var(--rpt-surface2)", borderRadius: 6 }}>
+              <div
+                style={{
+                  fontSize: 9.5,
+                  color: "var(--rpt-text-muted)",
+                  padding: 10,
+                  background: "var(--rpt-surface2)",
+                  borderRadius: 6,
+                }}
+              >
                 No explicit multi-variant test records registered.
               </div>
             )}
@@ -136,25 +178,41 @@ export function Appendix({ data, datasetName, generatedAt }: Props) {
                 padding: 12,
               }}
             >
-              <div style={{ fontSize: 10, fontWeight: 750, color: "var(--rpt-brand-dark)", marginBottom: 4 }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 750,
+                  color: "var(--rpt-brand-dark)",
+                  marginBottom: 4,
+                }}
+              >
                 Governed Framework Notes
               </div>
-              <ul style={{ margin: 0, paddingLeft: 12, fontSize: 8.8, color: "var(--rpt-text-muted)", lineHeight: 1.45 }}>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: 12,
+                  fontSize: 8.8,
+                  color: "var(--rpt-text-muted)",
+                  lineHeight: 1.45,
+                }}
+              >
                 <li style={{ marginBottom: 4 }}>
-                  Confidence intervals are set at a baseline of 95% threshold across numeric variables.
+                  Confidence intervals are set at a baseline of 95% threshold
+                  across numeric variables.
                 </li>
                 <li style={{ marginBottom: 4 }}>
-                  Pearson coefficients compute linear relationships ($r$). Multilinear relations require additional model regressors.
+                  Pearson coefficients compute linear relationships ($r$).
+                  Multilinear relations require additional model regressors.
                 </li>
                 <li>
-                  Anomaly thresholds flag records with absolute z-scores greater than 3.0.
+                  Anomaly thresholds flag records with absolute z-scores greater
+                  than 3.0.
                 </li>
               </ul>
             </div>
           </ReportSection>
-
         </div>
-
       </div>
     </ReportPage>
   );

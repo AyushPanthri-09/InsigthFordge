@@ -29,7 +29,7 @@ export function detectAnomalies(
   rows: Record<string, unknown>[],
   columns: string[],
   numericColumns: string[],
-  timeSeriesArr: TimeSeriesAnalysis[]
+  timeSeriesArr: TimeSeriesAnalysis[],
 ): AnomalyResult[] {
   const anomalies: AnomalyResult[] = [];
   let anomalyIdCounter = 0;
@@ -39,9 +39,19 @@ export function detectAnomalies(
 
   // 1. Check for Duplicate Transactions (identical values on ID/entity + date + amount)
   // Let's identify columns representing Customer/User, Date, and Amount
-  const dateCol = columns.find(c => c.toLowerCase().includes("date") || c.toLowerCase().includes("time"));
-  const amtCol = numericColumns.find(c => ["revenue", "sales", "amount", "price", "total", "grand_total"].includes(c.toLowerCase()));
-  const custCol = columns.find(c => ["customer_id", "user_id", "email", "card", "account"].some(k => c.toLowerCase().includes(k)));
+  const dateCol = columns.find(
+    (c) => c.toLowerCase().includes("date") || c.toLowerCase().includes("time"),
+  );
+  const amtCol = numericColumns.find((c) =>
+    ["revenue", "sales", "amount", "price", "total", "grand_total"].includes(
+      c.toLowerCase(),
+    ),
+  );
+  const custCol = columns.find((c) =>
+    ["customer_id", "user_id", "email", "card", "account"].some((k) =>
+      c.toLowerCase().includes(k),
+    ),
+  );
 
   if (dateCol && amtCol) {
     const transactions = new Map<string, number[]>();
@@ -68,18 +78,33 @@ export function detectAnomalies(
         severity: duplicateCount > rows.length * 0.05 ? "HIGH" : "MEDIUM",
         description: `Detected ${duplicateCount} duplicate transactions having identical identifiers, date/timestamps, and financial amounts.`,
         affectedRowCount: duplicateCount,
-        remedy: "Filter out exact duplicates or review logs for payment gateway double-triggers."
+        remedy:
+          "Filter out exact duplicates or review logs for payment gateway double-triggers.",
       });
     }
   }
 
   // 2. Check for Negative Inventory and Negative Revenue/Sales (Impossible Values)
   for (const col of numericColumns) {
-    const isInventory = ["inventory", "stock", "stock_level", "qty_on_hand", "quantity", "qty"].some(k => col.toLowerCase().includes(k));
-    const isRevenue = ["revenue", "sales", "price", "amount", "total", "grand_total"].some(k => col.toLowerCase().includes(k));
+    const isInventory = [
+      "inventory",
+      "stock",
+      "stock_level",
+      "qty_on_hand",
+      "quantity",
+      "qty",
+    ].some((k) => col.toLowerCase().includes(k));
+    const isRevenue = [
+      "revenue",
+      "sales",
+      "price",
+      "amount",
+      "total",
+      "grand_total",
+    ].some((k) => col.toLowerCase().includes(k));
 
     if (isInventory || isRevenue) {
-      const negativeRows = rows.filter(r => {
+      const negativeRows = rows.filter((r) => {
         const v = Number(r[col]);
         return Number.isFinite(v) && v < 0;
       });
@@ -89,12 +114,13 @@ export function detectAnomalies(
           id: nextId(),
           type: isInventory ? "negative_inventory" : "negative_revenue",
           column: col,
-          severity: negativeRows.length > rows.length * 0.01 ? "CRITICAL" : "HIGH",
+          severity:
+            negativeRows.length > rows.length * 0.01 ? "CRITICAL" : "HIGH",
           description: `Column '${prettify(col)}' contains ${negativeRows.length} negative values. Negative ${isInventory ? "inventory quantities" : "revenue amounts"} represent physical or accounting errors.`,
           affectedRowCount: negativeRows.length,
           remedy: isInventory
             ? "Verify stock adjustment logs and write-off codes."
-            : "Review refunds/chargebacks processing or treat negative entries as adjustment journals."
+            : "Review refunds/chargebacks processing or treat negative entries as adjustment journals.",
         });
       }
     }
@@ -103,15 +129,17 @@ export function detectAnomalies(
   // 3. Statistical Outliers via Z-score
   for (const col of numericColumns) {
     const vals = rows
-      .map(r => Number(r[col]))
-      .filter(v => Number.isFinite(v));
+      .map((r) => Number(r[col]))
+      .filter((v) => Number.isFinite(v));
 
     if (vals.length >= 10) {
       const meanVal = ss.mean(vals);
       const stdevVal = ss.standardDeviation(vals);
 
       if (stdevVal > 0) {
-        const outliers = vals.filter(v => Math.abs((v - meanVal) / stdevVal) > 3.0);
+        const outliers = vals.filter(
+          (v) => Math.abs((v - meanVal) / stdevVal) > 3.0,
+        );
         if (outliers.length > 0) {
           const isHighSeverity = outliers.length > vals.length * 0.03;
           anomalies.push({
@@ -121,7 +149,8 @@ export function detectAnomalies(
             severity: isHighSeverity ? "HIGH" : "LOW",
             description: `Detected ${outliers.length} extreme statistical outliers (Z-score > 3.0) in column '${prettify(col)}'. Max outlier value: ${Math.max(...outliers.map(Math.abs))}.`,
             affectedRowCount: outliers.length,
-            remedy: "Verify data source formatting or apply Winsorization/clipping techniques to reduce outlier leverage in ML models."
+            remedy:
+              "Verify data source formatting or apply Winsorization/clipping techniques to reduce outlier leverage in ML models.",
           });
         }
       }
@@ -140,7 +169,8 @@ export function detectAnomalies(
         column: ts.measureColumn,
         severity: Math.abs(ap.zScore ?? 0) > 3.0 ? "HIGH" : "MEDIUM",
         description: `Time series '${prettify(ts.measureColumn)}' showed a large ${isSpike ? "spike" : "drop"} in period ${ap.period} (z-score: ${(ap.zScore ?? 0).toFixed(2)}).`,
-        remedy: "Drill down into transaction activity during this period to identify promotional events or operational disruptions."
+        remedy:
+          "Drill down into transaction activity during this period to identify promotional events or operational disruptions.",
       });
     }
 
@@ -149,7 +179,10 @@ export function detectAnomalies(
     if (ts.periods.length > 4) {
       // Analyze date granularity and check gaps
       // Simple heuristic: if values of date are temporal, sort them and look for gaps
-      const hasGaps = checkTimeGaps(ts.periods.map((p: any) => p.period), ts.granularity);
+      const hasGaps = checkTimeGaps(
+        ts.periods.map((p: any) => p.period),
+        ts.granularity,
+      );
       if (hasGaps) {
         anomalies.push({
           id: nextId(),
@@ -157,7 +190,8 @@ export function detectAnomalies(
           column: ts.dateColumn,
           severity: "MEDIUM",
           description: `Timeline gaps detected in date column '${prettify(ts.dateColumn)}' relative to expected ${ts.granularity}ly intervals.`,
-          remedy: "Fill missing date intervals with zero or carry-forward imputations."
+          remedy:
+            "Fill missing date intervals with zero or carry-forward imputations.",
         });
       }
     }
@@ -170,8 +204,8 @@ function checkTimeGaps(periods: string[], granularity: string): boolean {
   if (periods.length < 5) return false;
   // Parse periods
   const dates = periods
-    .map(p => new Date(p))
-    .filter(d => !isNaN(d.getTime()))
+    .map((p) => new Date(p))
+    .filter((d) => !isNaN(d.getTime()))
     .sort((a, b) => a.getTime() - b.getTime());
 
   if (dates.length < 5) return false;

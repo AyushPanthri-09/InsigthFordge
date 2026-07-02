@@ -9,7 +9,9 @@ import { createHttpAnalyticsService } from "./httpImplementation";
  * FastAPI backend (must implement the contracts in `./types.ts`).
  * Without it, the local TypeScript implementation is used.
  */
-const apiUrl = (import.meta.env.VITE_INSIGHTFORGE_API_URL as string | undefined)?.trim();
+const apiUrl = (
+  import.meta.env.VITE_INSIGHTFORGE_API_URL as string | undefined
+)?.trim();
 
 export const analyticsService: AnalyticsService = apiUrl
   ? createHttpAnalyticsService(apiUrl)

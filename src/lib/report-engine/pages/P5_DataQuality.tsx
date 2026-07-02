@@ -18,7 +18,11 @@ interface Props {
 export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
   const qualityScore = Number(data.qualityScore ?? 0);
   const status: "success" | "warning" | "critical" =
-    qualityScore >= 80 ? "success" : qualityScore >= 60 ? "warning" : "critical";
+    qualityScore >= 80
+      ? "success"
+      : qualityScore >= 60
+        ? "warning"
+        : "critical";
 
   const issues = data.issues ?? [];
   const hasIssues = issues.length > 0;
@@ -108,14 +112,20 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
 
   return (
     <ReportPage
-      pageNumber={5}
-      totalPages={11}
+      pageNumber={4}
+      totalPages={13}
       title="Data Quality Posture"
       subtitle="Comprehensive data cleaning metrics, missing values, duplicates, and column decisions"
       datasetName={datasetName}
       generatedAt={generatedAt}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--rpt-space-xl, 32px)" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--rpt-space-xl, 32px)",
+        }}
+      >
         {/* Row 1 */}
         <ReportExecutiveInsight
           insight={`Dataset meets governance standards with ${qualityScore}% completeness.`}
@@ -125,7 +135,13 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
         />
 
         {/* Row 2 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "var(--rpt-space-xl)" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1.2fr",
+            gap: "var(--rpt-space-xl)",
+          }}
+        >
           <div>
             <ReportHeroMetric
               label="Data Quality Index"
@@ -141,8 +157,14 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
                 marginTop: "var(--rpt-space-md)",
               }}
             >
-              <ReportSummaryTile label="Rows Removed" value={data.rowsRemoved} />
-              <ReportSummaryTile label="Columns Inspected" value={data.daieDecisions?.length || 0} />
+              <ReportSummaryTile
+                label="Rows Removed"
+                value={data.rowsRemoved}
+              />
+              <ReportSummaryTile
+                label="Columns Inspected"
+                value={data.daieDecisions?.length || 0}
+              />
             </div>
           </div>
 
@@ -180,7 +202,11 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
                 maxRows={6}
                 striped
                 rowTone={(row) =>
-                  row.status === "critical" ? "critical" : row.status === "warning" ? "warning" : undefined
+                  row.status === "critical"
+                    ? "critical"
+                    : row.status === "warning"
+                      ? "warning"
+                      : undefined
                 }
               />
             ) : (
@@ -203,7 +229,13 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
           <div>
             <ReportSectionHeader title="Quality Alerts" />
             {hasIssues ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--rpt-space-sm)" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "var(--rpt-space-sm)",
+                }}
+              >
                 {issuesForCards.map((issue) => (
                   <ReportInsightCard
                     key={issue.id}
@@ -228,4 +260,3 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
     </ReportPage>
   );
 }
-

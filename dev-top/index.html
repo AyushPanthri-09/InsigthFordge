@@ -1,712 +1,804 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InsightForge AI — Autonomous AI Data Scientist (Top Half Test)</title>
-  <style>
-    @import url('../tokens.css');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      InsightForge AI — Autonomous AI Data Scientist (Top Half Test)
+    </title>
+    <style>
+      @import url("../tokens.css");
 
-    /* ----- COMPONENT LAYOUTS & UTILITIES ----- */
-    
-    /* Header & Navigation */
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--gray-100);
-      box-shadow: 0 4px 30px rgba(15, 23, 42, 0.02);
-      transition: all 0.2s ease;
-    }
-    .nav-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 80px;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-weight: 700;
-      font-size: 1.25rem;
-      color: var(--gray-900);
-      text-decoration: none;
-      letter-spacing: -0.02em;
-    }
-    .logo-dot {
-      color: var(--primary);
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 2.2rem;
-    }
-    .nav-link {
-      color: var(--gray-600);
-      font-weight: 500;
-      font-size: 0.95rem;
-      text-decoration: none;
-      position: relative;
-      padding: 0.4rem 0;
-      transition: color 0.2s ease;
-    }
-    .nav-link:hover {
-      color: var(--gray-900);
-    }
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: var(--primary);
-      transform: scaleX(0);
-      transform-origin: right;
-      transition: transform 0.25s ease-out;
-    }
-    .nav-link:hover::after {
-      transform: scaleX(1);
-      transform-origin: left;
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .nav-actions .btn-outline,
-    .nav-actions .btn-primary {
-      padding: 0.6rem 1.6rem;
-      font-size: 0.9rem;
-    }
+      /* ----- COMPONENT LAYOUTS & UTILITIES ----- */
 
-    /* Hamburger Menu Button */
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 24px;
-      height: 18px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      z-index: 110;
-      padding: 0;
-    }
-    .hamburger span {
-      width: 100%;
-      height: 2px;
-      background-color: var(--gray-900);
-      border-radius: var(--radius-pill);
-      transition: all 0.2s ease-in-out;
-    }
-
-    /* Hero Section */
-    .hero {
-      position: relative;
-      padding-top: calc(var(--space-section) - 40px);
-      padding-bottom: var(--space-section);
-      overflow: hidden;
-      background: radial-gradient(ellipse 800px 500px at 50% -10%, rgba(79, 70, 229, 0.05), transparent 70%);
-    }
-    .hero-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      max-width: 800px;
-    }
-    .hero-title {
-      font-size: 3.5rem;
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      color: var(--gray-900);
-      margin-bottom: 1rem;
-    }
-    .hero-subtitle {
-      font-size: 1.75rem;
-      font-weight: 500;
-      color: var(--gray-600);
-      margin-bottom: 2rem;
-      letter-spacing: -0.02em;
-    }
-    .hero-description {
-      font-size: 1.125rem;
-      color: var(--gray-600);
-      line-height: 1.7;
-      margin-bottom: 2.5rem;
-      max-width: 720px;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 1.2rem;
-    }
-
-    /* Capabilities (The 4 Levels) */
-    .section {
-      padding-top: var(--space-section);
-      padding-bottom: var(--space-section);
-    }
-    .section-bg {
-      background: var(--gray-50);
-    }
-    .section-header {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto 4.5rem auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .badge-gold {
-      display: inline-flex;
-      align-items: center;
-      background: var(--accent-gold-bg);
-      color: var(--accent-gold);
-      border: 1px solid rgba(212, 163, 115, 0.25);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.35rem 0.9rem;
-      border-radius: var(--radius-pill);
-      margin-bottom: 1.25rem;
-      box-shadow: 0 2px 8px rgba(212, 163, 115, 0.04);
-    }
-    .section-title {
-      font-size: 2.25rem;
-      font-weight: 600;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      color: var(--gray-900);
-      margin-bottom: 1rem;
-    }
-    .section-subtitle {
-      font-size: 1.05rem;
-      color: var(--gray-600);
-    }
-    
-    .capabilities-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
-      position: relative;
-    }
-    .capability-card {
-      background: var(--white);
-      border: 1px solid var(--gray-100);
-      border-radius: var(--radius-card);
-      padding: 2rem;
-      box-shadow: var(--shadow-card);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 310px;
-      transition: all 0.2s ease;
-    }
-    .capability-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
-      border-color: var(--gray-200);
-    }
-    .card-number {
-      font-size: 1.75rem;
-      color: var(--primary);
-      font-weight: 600;
-      margin-bottom: 1rem;
-      display: block;
-      line-height: 1;
-    }
-    .card-title {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--gray-900);
-      margin-bottom: 0.35rem;
-      letter-spacing: -0.01em;
-    }
-    .card-question {
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--primary);
-      margin-bottom: 1rem;
-      display: block;
-    }
-    .card-text {
-      font-size: 0.9rem;
-      color: var(--gray-600);
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
-      flex-grow: 1;
-    }
-    .btn-pill {
-      align-self: flex-start;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.45rem 1.1rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--gray-600);
-      background: transparent;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius-pill);
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .btn-pill:hover {
-      color: var(--gray-900);
-      border-color: var(--gray-900);
-      background: var(--gray-50);
-    }
-
-    /* Horizontal Progression Arrows (Desktop) */
-    .card-connector {
-      position: absolute;
-      top: 50%;
-      right: -1rem;
-      transform: translateY(-50%);
-      color: var(--gray-200);
-      z-index: 10;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-    }
-    .card-connector svg {
-      width: 18px;
-      height: 18px;
-      stroke: var(--gray-200);
-    }
-    .capability-card:hover .card-connector {
-      color: var(--primary);
-    }
-    .capability-card:hover .card-connector svg {
-      stroke: var(--primary);
-    }
-
-    /* How It Works (5 Steps) */
-    .workflow-container {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1.25rem;
-    }
-    /* Horizontal Progress Connecting Line (Desktop) */
-    .workflow-line {
-      position: absolute;
-      top: 32px;
-      left: 10%;
-      right: 10%;
-      height: 2px;
-      background: var(--gray-100);
-      z-index: 1;
-    }
-    .workflow-step {
-      position: relative;
-      z-index: 2;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      cursor: default;
-    }
-    .step-icon-wrapper {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: var(--white);
-      border: 2px solid var(--gray-100);
-      color: var(--gray-600);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.15rem;
-      margin-bottom: 1.25rem;
-      box-shadow: var(--shadow-card);
-      transition: all 0.25s ease;
-    }
-    .workflow-step:hover .step-icon-wrapper {
-      border-color: var(--primary);
-      background: var(--primary);
-      color: var(--white);
-      transform: scale(1.05);
-      box-shadow: 0 8px 24px rgba(79, 70, 229, 0.2);
-    }
-    .step-title-row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      margin-bottom: 0.6rem;
-    }
-    .step-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--gray-900);
-      letter-spacing: -0.01em;
-    }
-    .badge-time {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      background: var(--accent-gold-bg);
-      color: var(--accent-gold);
-      border: 1px solid rgba(212, 163, 115, 0.15);
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 0.15rem 0.55rem;
-      border-radius: var(--radius-pill);
-      white-space: nowrap;
-    }
-    .step-text {
-      font-size: 0.85rem;
-      color: var(--gray-600);
-      line-height: 1.5;
-      padding: 0 0.5rem;
-    }
-
-    /* Custom Responsive Adjustments */
-    @media (max-width: 1024px) {
-      .capabilities-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;
+      /* Header & Navigation */
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--gray-100);
+        box-shadow: 0 4px 30px rgba(15, 23, 42, 0.02);
+        transition: all 0.2s ease;
       }
-      .card-connector {
-        display: none; /* Hide horizontal connectors on tablets */
+      .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 80px;
       }
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 0 1.5rem;
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--gray-900);
+        text-decoration: none;
+        letter-spacing: -0.02em;
       }
-      .hamburger {
-        display: flex; /* Show Hamburger menu button */
+      .logo-dot {
+        color: var(--primary);
       }
-      
-      /* Mobile Navigation Drawer */
       .nav-links {
-        position: fixed;
-        top: 80px;
+        display: flex;
+        align-items: center;
+        gap: 2.2rem;
+      }
+      .nav-link {
+        color: var(--gray-600);
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-decoration: none;
+        position: relative;
+        padding: 0.4rem 0;
+        transition: color 0.2s ease;
+      }
+      .nav-link:hover {
+        color: var(--gray-900);
+      }
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
         left: 0;
         width: 100%;
-        height: 0;
-        background: var(--white);
-        border-bottom: 1px solid var(--gray-100);
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 0 2rem;
-        gap: 1.5rem;
-        overflow: hidden;
-        z-index: 99;
-        transition: all 0.3s ease-in-out;
+        height: 2px;
+        background: var(--primary);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.25s ease-out;
       }
-      .nav-links.active {
-        height: 280px;
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.05);
+      .nav-link:hover::after {
+        transform: scaleX(1);
+        transform-origin: left;
       }
       .nav-actions {
-        display: none; /* Hide inline actions, can render them in drawer or hide */
+        display: flex;
+        align-items: center;
+        gap: 1rem;
       }
-      
-      /* Active Hamburger states */
-      .hamburger.active span:nth-child(1) {
-        transform: translateY(8px) rotate(45deg);
+      .nav-actions .btn-outline,
+      .nav-actions .btn-primary {
+        padding: 0.6rem 1.6rem;
+        font-size: 0.9rem;
       }
-      .hamburger.active span:nth-child(2) {
-        opacity: 0;
+
+      /* Hamburger Menu Button */
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 24px;
+        height: 18px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        z-index: 110;
+        padding: 0;
       }
-      .hamburger.active span:nth-child(3) {
-        transform: translateY(-8px) rotate(-45deg);
+      .hamburger span {
+        width: 100%;
+        height: 2px;
+        background-color: var(--gray-900);
+        border-radius: var(--radius-pill);
+        transition: all 0.2s ease-in-out;
       }
-      
-      /* Hero sizes */
+
+      /* Hero Section */
+      .hero {
+        position: relative;
+        padding-top: calc(var(--space-section) - 40px);
+        padding-bottom: var(--space-section);
+        overflow: hidden;
+        background: radial-gradient(
+          ellipse 800px 500px at 50% -10%,
+          rgba(79, 70, 229, 0.05),
+          transparent 70%
+        );
+      }
+      .hero-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 800px;
+      }
       .hero-title {
-        font-size: 2.5rem;
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        color: var(--gray-900);
+        margin-bottom: 1rem;
       }
       .hero-subtitle {
-        font-size: 1.35rem;
+        font-size: 1.75rem;
+        font-weight: 500;
+        color: var(--gray-600);
+        margin-bottom: 2rem;
+        letter-spacing: -0.02em;
+      }
+      .hero-description {
+        font-size: 1.125rem;
+        color: var(--gray-600);
+        line-height: 1.7;
+        margin-bottom: 2.5rem;
+        max-width: 720px;
       }
       .hero-actions {
-        flex-direction: column;
-        width: 100%;
-        max-width: 320px;
-        gap: 0.8rem;
-      }
-      .hero-actions .btn-primary,
-      .hero-actions .btn-outline {
         display: flex;
-        justify-content: center;
-        width: 100%;
+        gap: 1.2rem;
+      }
+
+      /* Capabilities (The 4 Levels) */
+      .section {
+        padding-top: var(--space-section);
+        padding-bottom: var(--space-section);
+      }
+      .section-bg {
+        background: var(--gray-50);
+      }
+      .section-header {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto 4.5rem auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .badge-gold {
+        display: inline-flex;
+        align-items: center;
+        background: var(--accent-gold-bg);
+        color: var(--accent-gold);
+        border: 1px solid rgba(212, 163, 115, 0.25);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.35rem 0.9rem;
+        border-radius: var(--radius-pill);
+        margin-bottom: 1.25rem;
+        box-shadow: 0 2px 8px rgba(212, 163, 115, 0.04);
+      }
+      .section-title {
+        font-size: 2.25rem;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        color: var(--gray-900);
+        margin-bottom: 1rem;
+      }
+      .section-subtitle {
+        font-size: 1.05rem;
+        color: var(--gray-600);
       }
 
       .capabilities-grid {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        position: relative;
       }
-      
-      /* How it Works Vertical Timeline conversion (Mobile) */
-      .workflow-line {
-        top: 0;
-        bottom: 0;
-        left: 32px;
-        width: 2px;
-        height: 85%;
-        margin-top: 32px;
-        background: var(--gray-100);
-      }
-      .workflow-container {
+      .capability-card {
+        background: var(--white);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-card);
+        padding: 2rem;
+        box-shadow: var(--shadow-card);
+        position: relative;
+        display: flex;
         flex-direction: column;
-        gap: 3rem;
-        padding-left: 0.5rem;
+        justify-content: space-between;
+        min-height: 310px;
+        transition: all 0.2s ease;
+      }
+      .capability-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+        border-color: var(--gray-200);
+      }
+      .card-number {
+        font-size: 1.75rem;
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: block;
+        line-height: 1;
+      }
+      .card-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.35rem;
+        letter-spacing: -0.01em;
+      }
+      .card-question {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        display: block;
+      }
+      .card-text {
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+      }
+      .btn-pill {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.45rem 1.1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        background: transparent;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-pill);
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-pill:hover {
+        color: var(--gray-900);
+        border-color: var(--gray-900);
+        background: var(--gray-50);
+      }
+
+      /* Horizontal Progression Arrows (Desktop) */
+      .card-connector {
+        position: absolute;
+        top: 50%;
+        right: -1rem;
+        transform: translateY(-50%);
+        color: var(--gray-200);
+        z-index: 10;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+      }
+      .card-connector svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--gray-200);
+      }
+      .capability-card:hover .card-connector {
+        color: var(--primary);
+      }
+      .capability-card:hover .card-connector svg {
+        stroke: var(--primary);
+      }
+
+      /* How It Works (5 Steps) */
+      .workflow-container {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.25rem;
+      }
+      /* Horizontal Progress Connecting Line (Desktop) */
+      .workflow-line {
+        position: absolute;
+        top: 32px;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: var(--gray-100);
+        z-index: 1;
       }
       .workflow-step {
-        flex-direction: row;
-        align-items: flex-start;
-        text-align: left;
-        width: 100%;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        cursor: default;
       }
       .step-icon-wrapper {
-        margin-bottom: 0;
-        margin-right: 1.5rem;
-        flex-shrink: 0;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--white);
+        border: 2px solid var(--gray-100);
+        color: var(--gray-600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.15rem;
+        margin-bottom: 1.25rem;
+        box-shadow: var(--shadow-card);
+        transition: all 0.25s ease;
+      }
+      .workflow-step:hover .step-icon-wrapper {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: var(--white);
+        transform: scale(1.05);
+        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.2);
       }
       .step-title-row {
-        flex-direction: row;
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        flex-wrap: wrap;
-        margin-bottom: 0.35rem;
+        gap: 0.4rem;
+        margin-bottom: 0.6rem;
+      }
+      .step-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        letter-spacing: -0.01em;
+      }
+      .badge-time {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: var(--accent-gold-bg);
+        color: var(--accent-gold);
+        border: 1px solid rgba(212, 163, 115, 0.15);
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.15rem 0.55rem;
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
       }
       .step-text {
-        padding: 0;
+        font-size: 0.85rem;
+        color: var(--gray-600);
+        line-height: 1.5;
+        padding: 0 0.5rem;
       }
-    }
-  </style>
-</head>
-<body>
 
-  <!-- ── NAVIGATION BAR ──────────────────────────────────────── -->
-  <header class="header">
-    <div class="container nav-container">
-      <a href="#" class="logo">
-        <svg class="logo-icon" viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        <span>InsightForge<span class="logo-dot">.</span></span>
-      </a>
-      
-      <!-- Desktop Drawer Wrapper -->
-      <nav class="nav-links" id="navLinks">
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#workflow" class="nav-link">Workflow</a>
-        <a href="#pricing" class="nav-link">Pricing</a>
-      </nav>
-      
-      <div class="nav-actions">
-        <a href="#demo" class="btn-outline">Live Demo</a>
-        <a href="#workspace" class="btn-primary">Launch Workspace &rarr;</a>
-      </div>
-      
-      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-  </header>
+      /* Custom Responsive Adjustments */
+      @media (max-width: 1024px) {
+        .capabilities-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem;
+        }
+        .card-connector {
+          display: none; /* Hide horizontal connectors on tablets */
+        }
+      }
 
-  <!-- ── HERO SECTION ────────────────────────────────────────── -->
-  <section class="hero">
-    <div class="container hero-content">
-      <h1 class="hero-title">Autonomous AI Data Scientist</h1>
-      <h2 class="hero-subtitle">Never analyze before <span style="color: var(--primary); font-weight: 700;">understanding</span>.</h2>
-      <p class="hero-description">
-        InsightForge AI reads your dataset the way a senior data scientist would — identifying business context, justifying every decision, and delivering evidence-backed recommendations, not just statistics.
-      </p>
-      <div class="hero-actions">
-        <a href="#workspace" class="btn-primary">Upload Dataset &rarr;</a>
-        <a href="#demo" class="btn-outline">See Live Demo</a>
-      </div>
-    </div>
-  </section>
+      @media (max-width: 768px) {
+        .container {
+          padding: 0 1.5rem;
+        }
+        .hamburger {
+          display: flex; /* Show Hamburger menu button */
+        }
 
-  <!-- ── CAPABILITIES (THE 4 LEVELS) ─────────────────────────── -->
-  <section class="section section-bg" id="features" style="margin-bottom: var(--space-section);">
-    <div class="container">
-      <div class="section-header">
-        <span class="badge-gold">Human-in-the-loop guidance</span>
-        <h2 class="section-title">Four levels of analytics, fully explained</h2>
-        <p class="section-subtitle">Every insight tagged with source and confidence score.</p>
-      </div>
-      
-      <div class="capabilities-grid">
-        
-        <!-- Card 1 -->
-        <div class="capability-card">
-          <div>
-            <span class="card-number">①</span>
-            <h3 class="card-title">Descriptive Analytics</h3>
-            <span class="card-question">What happened</span>
-            <p class="card-text">KPIs, trends, and patterns derived directly from the dataset.</p>
-          </div>
-          <a href="#features" class="btn-pill">Learn more</a>
-          <div class="card-connector">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
+        /* Mobile Navigation Drawer */
+        .nav-links {
+          position: fixed;
+          top: 80px;
+          left: 0;
+          width: 100%;
+          height: 0;
+          background: var(--white);
+          border-bottom: 1px solid var(--gray-100);
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 0 2rem;
+          gap: 1.5rem;
+          overflow: hidden;
+          z-index: 99;
+          transition: all 0.3s ease-in-out;
+        }
+        .nav-links.active {
+          height: 280px;
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+          box-shadow: 0 16px 30px rgba(15, 23, 42, 0.05);
+        }
+        .nav-actions {
+          display: none; /* Hide inline actions, can render them in drawer or hide */
+        }
+
+        /* Active Hamburger states */
+        .hamburger.active span:nth-child(1) {
+          transform: translateY(8px) rotate(45deg);
+        }
+        .hamburger.active span:nth-child(2) {
+          opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+          transform: translateY(-8px) rotate(-45deg);
+        }
+
+        /* Hero sizes */
+        .hero-title {
+          font-size: 2.5rem;
+        }
+        .hero-subtitle {
+          font-size: 1.35rem;
+        }
+        .hero-actions {
+          flex-direction: column;
+          width: 100%;
+          max-width: 320px;
+          gap: 0.8rem;
+        }
+        .hero-actions .btn-primary,
+        .hero-actions .btn-outline {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
+
+        .capabilities-grid {
+          grid-template-columns: 1fr;
+        }
+
+        /* How it Works Vertical Timeline conversion (Mobile) */
+        .workflow-line {
+          top: 0;
+          bottom: 0;
+          left: 32px;
+          width: 2px;
+          height: 85%;
+          margin-top: 32px;
+          background: var(--gray-100);
+        }
+        .workflow-container {
+          flex-direction: column;
+          gap: 3rem;
+          padding-left: 0.5rem;
+        }
+        .workflow-step {
+          flex-direction: row;
+          align-items: flex-start;
+          text-align: left;
+          width: 100%;
+        }
+        .step-icon-wrapper {
+          margin-bottom: 0;
+          margin-right: 1.5rem;
+          flex-shrink: 0;
+        }
+        .step-title-row {
+          flex-direction: row;
+          align-items: center;
+          flex-wrap: wrap;
+          margin-bottom: 0.35rem;
+        }
+        .step-text {
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── NAVIGATION BAR ──────────────────────────────────────── -->
+    <header class="header">
+      <div class="container nav-container">
+        <a href="#" class="logo">
+          <svg
+            class="logo-icon"
+            viewBox="0 0 24 24"
+            width="26"
+            height="26"
+            stroke="currentColor"
+            stroke-width="2.5"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="color: var(--primary)"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+          <span>InsightForge<span class="logo-dot">.</span></span>
+        </a>
+
+        <!-- Desktop Drawer Wrapper -->
+        <nav class="nav-links" id="navLinks">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#workflow" class="nav-link">Workflow</a>
+          <a href="#pricing" class="nav-link">Pricing</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a href="#demo" class="btn-outline">Live Demo</a>
+          <a href="#workspace" class="btn-primary">Launch Workspace &rarr;</a>
         </div>
 
-        <!-- Card 2 -->
-        <div class="capability-card">
-          <div>
-            <span class="card-number">②</span>
-            <h3 class="card-title">Diagnostic Reasoning</h3>
-            <span class="card-question">Why it happened</span>
-            <p class="card-text">multiple hypotheses tested against evidence, ranked by confidence.</p>
-          </div>
-          <a href="#features" class="btn-pill">Learn more</a>
-          <div class="card-connector">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="capability-card">
-          <div>
-            <span class="card-number">③</span>
-            <h3 class="card-title">Predictive Forecasts</h3>
-            <span class="card-question">What will happen</span>
-            <p class="card-text">only when supported by the data, with assumptions spelled out.</p>
-          </div>
-          <a href="#features" class="btn-pill">Learn more</a>
-          <div class="card-connector">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="capability-card">
-          <div>
-            <span class="card-number">④</span>
-            <h3 class="card-title">Prescriptive Guidance</h3>
-            <span class="card-question">What to do</span>
-            <p class="card-text">prioritized actions tied to evidence and expected business impact.</p>
-          </div>
-          <a href="#features" class="btn-pill">Learn more</a>
-        </div>
-
+        <button
+          class="hamburger"
+          id="hamburgerBtn"
+          aria-label="Toggle Navigation"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <!-- ── HOW IT WORKS (5 STEPS) ──────────────────────────────── -->
-  <section class="section" id="workflow" style="margin-bottom: var(--space-section);">
-    <div class="container">
-      <div class="section-header">
-        <span class="badge-gold">Enterprise Ready</span>
-        <h2 class="section-title">From raw file to trusted decision</h2>
-        <p class="section-subtitle">Five stages. Every decision logged. Every conclusion backed by evidence.</p>
+    <!-- ── HERO SECTION ────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="container hero-content">
+        <h1 class="hero-title">Autonomous AI Data Scientist</h1>
+        <h2 class="hero-subtitle">
+          Never analyze before
+          <span style="color: var(--primary); font-weight: 700"
+            >understanding</span
+          >.
+        </h2>
+        <p class="hero-description">
+          InsightForge AI reads your dataset the way a senior data scientist
+          would — identifying business context, justifying every decision, and
+          delivering evidence-backed recommendations, not just statistics.
+        </p>
+        <div class="hero-actions">
+          <a href="#workspace" class="btn-primary">Upload Dataset &rarr;</a>
+          <a href="#demo" class="btn-outline">See Live Demo</a>
+        </div>
       </div>
-      
-      <div class="workflow-container">
-        
-        <!-- Background Connecting Line (Desktop) -->
-        <div class="workflow-line"></div>
-        
-        <!-- Step 1 -->
-        <div class="workflow-step">
-          <div class="step-icon-wrapper">1</div>
-          <div class="step-content">
-            <div class="step-title-row">
-              <span class="step-title">Upload</span>
-              <span class="badge-time">⚡ ~2s</span>
+    </section>
+
+    <!-- ── CAPABILITIES (THE 4 LEVELS) ─────────────────────────── -->
+    <section
+      class="section section-bg"
+      id="features"
+      style="margin-bottom: var(--space-section)"
+    >
+      <div class="container">
+        <div class="section-header">
+          <span class="badge-gold">Human-in-the-loop guidance</span>
+          <h2 class="section-title">
+            Four levels of analytics, fully explained
+          </h2>
+          <p class="section-subtitle">
+            Every insight tagged with source and confidence score.
+          </p>
+        </div>
+
+        <div class="capabilities-grid">
+          <!-- Card 1 -->
+          <div class="capability-card">
+            <div>
+              <span class="card-number">①</span>
+              <h3 class="card-title">Descriptive Analytics</h3>
+              <span class="card-question">What happened</span>
+              <p class="card-text">
+                KPIs, trends, and patterns derived directly from the dataset.
+              </p>
             </div>
-            <p class="step-text">Drag & drop CSV, Excel, or JSON. Firebase stores it securely.</p>
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="workflow-step">
-          <div class="step-icon-wrapper">2</div>
-          <div class="step-content">
-            <div class="step-title-row">
-              <span class="step-title">AI Understanding</span>
-              <span class="badge-time">⚡ ~5s</span>
+            <a href="#features" class="btn-pill">Learn more</a>
+            <div class="card-connector">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
             </div>
-            <p class="step-text">Domain detection, column semantics, KPIs and relationships.</p>
           </div>
-        </div>
 
-        <!-- Step 3 -->
-        <div class="workflow-step">
-          <div class="step-icon-wrapper">3</div>
-          <div class="step-content">
-            <div class="step-title-row">
-              <span class="step-title">Clean & Analyze</span>
-              <span class="badge-time">⚡ ~10s</span>
+          <!-- Card 2 -->
+          <div class="capability-card">
+            <div>
+              <span class="card-number">②</span>
+              <h3 class="card-title">Diagnostic Reasoning</h3>
+              <span class="card-question">Why it happened</span>
+              <p class="card-text">
+                multiple hypotheses tested against evidence, ranked by
+                confidence.
+              </p>
             </div>
-            <p class="step-text">Reasoning-justified cleaning with confidence and business impact.</p>
-          </div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="workflow-step">
-          <div class="step-icon-wrapper">4</div>
-          <div class="step-content">
-            <div class="step-title-row">
-              <span class="step-title">Visualization</span>
-              <span class="badge-time">⚡ ~3s</span>
+            <a href="#features" class="btn-pill">Learn more</a>
+            <div class="card-connector">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
             </div>
-            <p class="step-text">Stats, distributions, correlations, and auto-selected charts.</p>
           </div>
-        </div>
 
-        <!-- Step 5 -->
-        <div class="workflow-step">
-          <div class="step-icon-wrapper">5</div>
-          <div class="step-content">
-            <div class="step-title-row">
-              <span class="step-title">Report Generation</span>
-              <span class="badge-time">⚡ ~2s</span>
+          <!-- Card 3 -->
+          <div class="capability-card">
+            <div>
+              <span class="card-number">③</span>
+              <h3 class="card-title">Predictive Forecasts</h3>
+              <span class="card-question">What will happen</span>
+              <p class="card-text">
+                only when supported by the data, with assumptions spelled out.
+              </p>
             </div>
-            <p class="step-text">Executive PDF with reasoning logs and prioritized recommendations.</p>
+            <a href="#features" class="btn-pill">Learn more</a>
+            <div class="card-connector">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="capability-card">
+            <div>
+              <span class="card-number">④</span>
+              <h3 class="card-title">Prescriptive Guidance</h3>
+              <span class="card-question">What to do</span>
+              <p class="card-text">
+                prioritized actions tied to evidence and expected business
+                impact.
+              </p>
+            </div>
+            <a href="#features" class="btn-pill">Learn more</a>
           </div>
         </div>
-
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── JAVASCRIPT CONTROLLER ───────────────────────────────── -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const hamburgerBtn = document.getElementById("hamburgerBtn");
-      const navLinks = document.getElementById("navLinks");
+    <!-- ── HOW IT WORKS (5 STEPS) ──────────────────────────────── -->
+    <section
+      class="section"
+      id="workflow"
+      style="margin-bottom: var(--space-section)"
+    >
+      <div class="container">
+        <div class="section-header">
+          <span class="badge-gold">Enterprise Ready</span>
+          <h2 class="section-title">From raw file to trusted decision</h2>
+          <p class="section-subtitle">
+            Five stages. Every decision logged. Every conclusion backed by
+            evidence.
+          </p>
+        </div>
 
-      if (hamburgerBtn && navLinks) {
-        hamburgerBtn.addEventListener("click", () => {
-          hamburgerBtn.classList.toggle("active");
-          navLinks.classList.toggle("active");
-        });
+        <div class="workflow-container">
+          <!-- Background Connecting Line (Desktop) -->
+          <div class="workflow-line"></div>
 
-        // Close menu drawer when any link is clicked
-        navLinks.querySelectorAll("a").forEach(link => {
-          link.addEventListener("click", () => {
-            hamburgerBtn.classList.remove("active");
-            navLinks.classList.remove("active");
+          <!-- Step 1 -->
+          <div class="workflow-step">
+            <div class="step-icon-wrapper">1</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Upload</span>
+                <span class="badge-time">⚡ ~2s</span>
+              </div>
+              <p class="step-text">
+                Drag & drop CSV, Excel, or JSON. Firebase stores it securely.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="workflow-step">
+            <div class="step-icon-wrapper">2</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">AI Understanding</span>
+                <span class="badge-time">⚡ ~5s</span>
+              </div>
+              <p class="step-text">
+                Domain detection, column semantics, KPIs and relationships.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="workflow-step">
+            <div class="step-icon-wrapper">3</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Clean & Analyze</span>
+                <span class="badge-time">⚡ ~10s</span>
+              </div>
+              <p class="step-text">
+                Reasoning-justified cleaning with confidence and business
+                impact.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="workflow-step">
+            <div class="step-icon-wrapper">4</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Visualization</span>
+                <span class="badge-time">⚡ ~3s</span>
+              </div>
+              <p class="step-text">
+                Stats, distributions, correlations, and auto-selected charts.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="workflow-step">
+            <div class="step-icon-wrapper">5</div>
+            <div class="step-content">
+              <div class="step-title-row">
+                <span class="step-title">Report Generation</span>
+                <span class="badge-time">⚡ ~2s</span>
+              </div>
+              <p class="step-text">
+                Executive PDF with reasoning logs and prioritized
+                recommendations.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── JAVASCRIPT CONTROLLER ───────────────────────────────── -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const hamburgerBtn = document.getElementById("hamburgerBtn");
+        const navLinks = document.getElementById("navLinks");
+
+        if (hamburgerBtn && navLinks) {
+          hamburgerBtn.addEventListener("click", () => {
+            hamburgerBtn.classList.toggle("active");
+            navLinks.classList.toggle("active");
           });
-        });
-      }
-    });
-  </script>
-</body>
+
+          // Close menu drawer when any link is clicked
+          navLinks.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+              hamburgerBtn.classList.remove("active");
+              navLinks.classList.remove("active");
+            });
+          });
+        }
+      });
+    </script>
+  </body>
 </html>

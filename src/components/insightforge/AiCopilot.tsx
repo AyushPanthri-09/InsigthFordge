@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { 
-  Bot, 
-  Send, 
-  X, 
-  MessageSquare, 
-  Sparkles, 
+import {
+  Bot,
+  Send,
+  X,
+  MessageSquare,
+  Sparkles,
   ArrowRight,
   User,
-  BrainCircuit
+  BrainCircuit,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -18,15 +18,21 @@ interface Message {
   timestamp: string;
 }
 
-export function AiCopilot({ dataset, understanding }: { dataset: any; understanding: any }) {
+export function AiCopilot({
+  dataset,
+  understanding,
+}: {
+  dataset: any;
+  understanding: any;
+}) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "ai",
       text: "Hello! I am your AI Copilot. I have mapped the uploaded dataset and columns. Ask me to identify metrics, check quality issues, or forecast trends!",
-      timestamp: "Just now"
-    }
+      timestamp: "Just now",
+    },
   ]);
   const [typing, setTyping] = useState(false);
   const feedEndRef = useRef<HTMLDivElement>(null);
@@ -38,45 +44,68 @@ export function AiCopilot({ dataset, understanding }: { dataset: any; understand
   const presetPrompts = [
     "Summarize dataset dimensions",
     "Identify columns metadata",
-    "Find potential correlations"
+    "Find potential correlations",
   ];
 
   const handleSend = (text: string) => {
     if (!text.trim() || typing) return;
-    
+
     // Add user message
     const newMsg: Message = {
       sender: "user",
       text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
-    
-    setMessages(prev => [...prev, newMsg]);
+
+    setMessages((prev) => [...prev, newMsg]);
     setInput("");
     setTyping(true);
 
     // Simulate AI response based on dataset parameters
     setTimeout(() => {
-      let responseText = "I parsed your query but couldn't map it directly to a statistical formula. Could you clarify your business metric goal?";
-      
+      let responseText =
+        "I parsed your query but couldn't map it directly to a statistical formula. Could you clarify your business metric goal?";
+
       const promptLower = text.toLowerCase();
       const colListStr = dataset?.columns?.join(", ") || "no columns loaded";
-      
-      if (promptLower.includes("summarize") || promptLower.includes("dimension")) {
+
+      if (
+        promptLower.includes("summarize") ||
+        promptLower.includes("dimension")
+      ) {
         responseText = `This dataset contains ${dataset?.rowCount?.toLocaleString() || 0} rows and ${dataset?.columnCount || 0} columns. The inferred business domain is "${understanding?.domain || "general"}" with a high structural confidence score of 95%.`;
-      } else if (promptLower.includes("columns") || promptLower.includes("metadata") || promptLower.includes("type")) {
+      } else if (
+        promptLower.includes("columns") ||
+        promptLower.includes("metadata") ||
+        promptLower.includes("type")
+      ) {
         responseText = `I mapped the column schema: \`[ ${colListStr} ]\`. The Technical Profiler classified key measure columns as float/integer types and categoricals as metadata dimensions.`;
-      } else if (promptLower.includes("correlation") || promptLower.includes("relation")) {
+      } else if (
+        promptLower.includes("correlation") ||
+        promptLower.includes("relation")
+      ) {
         responseText = `Pearson regression models indicate strong positive linear correlations between your primary measure variables (r = 0.85). I recommend charting these trends inside the EDA tab to isolate performance drivers.`;
-      } else if (promptLower.includes("quality") || promptLower.includes("clean")) {
+      } else if (
+        promptLower.includes("quality") ||
+        promptLower.includes("clean")
+      ) {
         responseText = `Data health profiling is complete. System audit detects minor inconsistencies and duplicate indexes in early rows. Propose applying structural standardizations to maximize analysis safety.`;
       }
 
-      setMessages(prev => [...prev, {
-        sender: "ai",
-        text: responseText,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: responseText,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
       setTyping(false);
     }, 1200);
   };
@@ -88,7 +117,8 @@ export function AiCopilot({ dataset, understanding }: { dataset: any; understand
         onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl transition-all hover:scale-110 active:scale-95"
         style={{
-          boxShadow: "0 8px 32px -4px oklch(0.85 0.19 95 / 45%), 0 0 0 1px oklch(0.85 0.19 95 / 30%)"
+          boxShadow:
+            "0 8px 32px -4px oklch(0.85 0.19 95 / 45%), 0 0 0 1px oklch(0.85 0.19 95 / 30%)",
         }}
         whileHover={{ rotate: 5 }}
       >
@@ -105,7 +135,7 @@ export function AiCopilot({ dataset, understanding }: { dataset: any; understand
             transition={{ type: "spring", damping: 20, stiffness: 120 }}
             className="fixed inset-y-0 right-0 z-50 w-full max-w-[400px] border-l border-white/10 bg-surface/90 shadow-2xl backdrop-blur-2xl flex flex-col justify-between"
             style={{
-              boxShadow: "-10px 0 50px -15px oklch(0 0 0 / 80%)"
+              boxShadow: "-10px 0 50px -15px oklch(0 0 0 / 80%)",
             }}
           >
             {/* Header */}
@@ -113,11 +143,15 @@ export function AiCopilot({ dataset, understanding }: { dataset: any; understand
               <div className="flex items-center gap-2">
                 <BrainCircuit className="h-5 w-5 text-primary" />
                 <div className="space-y-0.5">
-                  <h3 className="text-sm font-bold tracking-tight">AI Copilot</h3>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Insight Scientist</span>
+                  <h3 className="text-sm font-bold tracking-tight">
+                    AI Copilot
+                  </h3>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                    Insight Scientist
+                  </span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setOpen(false)}
                 className="h-8 w-8 rounded-lg border border-white/5 flex items-center justify-center hover:bg-white/5 hover:border-white/10"
               >
@@ -128,24 +162,37 @@ export function AiCopilot({ dataset, understanding }: { dataset: any; understand
             {/* Chat Messages Feed */}
             <div className="flex-grow overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin">
               {messages.map((msg, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className={cn(
                     "flex flex-col max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed space-y-1 relative",
-                    msg.sender === "user" 
+                    msg.sender === "user"
                       ? "ml-auto bg-primary text-primary-foreground rounded-tr-none border border-primary/20 shadow-md"
-                      : "bg-background/50 border border-white/5 rounded-tl-none"
+                      : "bg-background/50 border border-white/5 rounded-tl-none",
                   )}
-                  style={msg.sender === "user" ? {
-                    boxShadow: "0 4px 12px -3px oklch(0.85 0.19 95 / 25%)"
-                  } : {}}
+                  style={
+                    msg.sender === "user"
+                      ? {
+                          boxShadow:
+                            "0 4px 12px -3px oklch(0.85 0.19 95 / 25%)",
+                        }
+                      : {}
+                  }
                 >
                   <div className="flex items-center gap-1.5 opacity-60 text-[9px] font-semibold uppercase tracking-wider mb-0.5">
-                    {msg.sender === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
-                    <span>{msg.sender === "user" ? "You" : "InsightForge AI"}</span>
+                    {msg.sender === "user" ? (
+                      <User className="h-3 w-3" />
+                    ) : (
+                      <Bot className="h-3 w-3" />
+                    )}
+                    <span>
+                      {msg.sender === "user" ? "You" : "InsightForge AI"}
+                    </span>
                   </div>
                   <p>{msg.text}</p>
-                  <span className="text-[8px] opacity-40 text-right self-end mt-1">{msg.timestamp}</span>
+                  <span className="text-[8px] opacity-40 text-right self-end mt-1">
+                    {msg.timestamp}
+                  </span>
                 </div>
               ))}
 

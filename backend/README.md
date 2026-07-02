@@ -5,6 +5,7 @@ An enterprise-grade, production-ready Python backend built with FastAPI to parse
 ---
 
 ## Technical Stack
+
 - **Framework**: Python 3.12+, FastAPI
 - **Parsing & Math**: Pandas, NumPy, OpenPyXL
 - **Validation**: Pydantic v2, Pydantic Settings
@@ -13,6 +14,7 @@ An enterprise-grade, production-ready Python backend built with FastAPI to parse
 ---
 
 ## Structure
+
 - `app.py`: FastAPI server setup, middleware (CORS), and routers mounting.
 - `core/`: Logger configuration, security layers, and configuration loader.
 - `api/`: Endpoint controllers for `/health`, `/upload`, and `/analyze`.
@@ -25,12 +27,14 @@ An enterprise-grade, production-ready Python backend built with FastAPI to parse
 ## Installation & Setup
 
 1. **Change Directory**:
+
    ```bash
    cd backend
    ```
 
 2. **Initialize Environment Configuration**:
    Create a `.env` file from the example:
+
    ```bash
    cp .env.example .env
    ```
@@ -45,6 +49,7 @@ An enterprise-grade, production-ready Python backend built with FastAPI to parse
 ## Running the Server
 
 Start the FastAPI application in reload mode:
+
 ```bash
 uvicorn app:app --reload
 ```
@@ -58,6 +63,7 @@ uvicorn app:app --reload
 ## Running Automated Tests
 
 Run the test suite from the root of the project:
+
 ```bash
 python -m pytest backend/tests/
 ```

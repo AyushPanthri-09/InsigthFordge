@@ -6,15 +6,23 @@ import * as ss from "simple-statistics";
  * Finds a matching column name in the dataset.
  * Compares lowercase and removes symbols to maximize match likelihood.
  */
-export function findMatchingColumn(columns: string[], possibleColumns: string[]): string | undefined {
-  const normCols = columns.map(c => ({
+export function findMatchingColumn(
+  columns: string[],
+  possibleColumns: string[],
+): string | undefined {
+  const normCols = columns.map((c) => ({
     original: c,
-    normalized: c.toLowerCase().replace(/[_\-\s]+/g, "")
+    normalized: c.toLowerCase().replace(/[_\-\s]+/g, ""),
   }));
 
   for (const pos of possibleColumns) {
     const normPos = pos.toLowerCase().replace(/[_\-\s]+/g, "");
-    const found = normCols.find(nc => nc.normalized === normPos || nc.normalized.includes(normPos) || normPos.includes(nc.normalized));
+    const found = normCols.find(
+      (nc) =>
+        nc.normalized === normPos ||
+        nc.normalized.includes(normPos) ||
+        normPos.includes(nc.normalized),
+    );
     if (found) return found.original;
   }
   return undefined;
@@ -26,9 +34,9 @@ export function findMatchingColumn(columns: string[], possibleColumns: string[])
 export function computeSingleKPI(
   rows: Record<string, unknown>[],
   kpiMap: KPIMapping,
-  colName: string
+  colName: string,
 ): KPI {
-  const values = rows.map(r => r[colName]);
+  const values = rows.map((r) => r[colName]);
 
   let calculatedValue: number | string = 0;
   let rationale = kpiMap.rationale;
@@ -36,10 +44,15 @@ export function computeSingleKPI(
 
   if (kpiMap.aggregation === "count") {
     // Unique count for IDs / Keys, non-null count for others
-    const nonNulls = values.filter(v => v !== null && v !== undefined && v !== "");
-    const isIdOrKey = colName.toLowerCase().includes("id") || colName.toLowerCase().includes("number") || colName.toLowerCase().includes("code");
+    const nonNulls = values.filter(
+      (v) => v !== null && v !== undefined && v !== "",
+    );
+    const isIdOrKey =
+      colName.toLowerCase().includes("id") ||
+      colName.toLowerCase().includes("number") ||
+      colName.toLowerCase().includes("code");
     if (isIdOrKey) {
-      const uniques = new Set(nonNulls.map(v => String(v)));
+      const uniques = new Set(nonNulls.map((v) => String(v)));
       calculatedValue = uniques.size;
       rationale = `Calculated unique count of '${colName}'. Total: ${uniques.size} entities.`;
     } else {
@@ -49,7 +62,7 @@ export function computeSingleKPI(
   } else {
     // Numeric metrics
     const numericValues = values
-      .map(v => {
+      .map((v) => {
         if (typeof v === "number") return v;
         if (typeof v === "string") {
           const clean = v.replace(/[$£€¥₹%,]/g, "").trim();
@@ -59,7 +72,7 @@ export function computeSingleKPI(
         if (typeof v === "boolean") return v ? 1 : 0;
         return NaN;
       })
-      .filter(v => !isNaN(v));
+      .filter((v) => !isNaN(v));
 
     if (numericValues.length === 0) {
       calculatedValue = 0;
@@ -73,16 +86,17 @@ export function computeSingleKPI(
       rationale = `Calculated average of '${colName}' across ${numericValues.length} rows.`;
     } else if (kpiMap.aggregation === "rate") {
       // For rates, check if the column contains raw percentages or is boolean
-      const isBooleanLike = numericValues.every(v => v === 0 || v === 1);
+      const isBooleanLike = numericValues.every((v) => v === 0 || v === 1);
       if (isBooleanLike) {
-        const trues = numericValues.filter(v => v === 1).length;
+        const trues = numericValues.filter((v) => v === 1).length;
         calculatedValue = (trues / numericValues.length) * 100;
         rationale = `Calculated rate of occurrences in '${colName}' (${trues}/${numericValues.length}).`;
       } else {
         // Average rate representation
         const meanVal = ss.mean(numericValues);
         // If mean is between 0 and 1, represent as percentage 0-100
-        calculatedValue = meanVal <= 1 && meanVal >= 0 ? meanVal * 100 : meanVal;
+        calculatedValue =
+          meanVal <= 1 && meanVal >= 0 ? meanVal * 100 : meanVal;
         rationale = `Calculated average rate in '${colName}' across ${numericValues.length} rows.`;
       }
     }
@@ -97,7 +111,9 @@ export function computeSingleKPI(
     } else if (kpiMap.unit === "$") {
       formattedValue = `$${formatMoney(numValue)}`;
     } else {
-      formattedValue = numValue.toLocaleString(undefined, { maximumFractionDigits: 1 });
+      formattedValue = numValue.toLocaleString(undefined, {
+        maximumFractionDigits: 1,
+      });
     }
   }
 
@@ -108,7 +124,7 @@ export function computeSingleKPI(
     formattedValue,
     unit: kpiMap.unit,
     confidence,
-    rationale
+    rationale,
   };
 }
 
@@ -126,7 +142,7 @@ function formatMoney(v: number): string {
 export function detectAndComputeKPIs(
   rows: Record<string, unknown>[],
   columns: string[],
-  domain: BusinessDomain
+  domain: BusinessDomain,
 ): KPI[] {
   const kpis: KPI[] = [];
 
@@ -151,7 +167,7 @@ export function detectAndComputeKPIs(
     value: rows.length,
     formattedValue: rows.length.toLocaleString(),
     confidence: 1.0,
-    rationale: "Total number of cleaned records."
+    rationale: "Total number of cleaned records.",
   });
 
   return kpis;

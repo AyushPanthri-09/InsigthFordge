@@ -6,7 +6,12 @@ export interface CorrelationResult {
   a: string;
   b: string;
   r: number;
-  strength: "strong_positive" | "strong_negative" | "moderate_positive" | "moderate_negative" | "weak";
+  strength:
+    | "strong_positive"
+    | "strong_negative"
+    | "moderate_positive"
+    | "moderate_negative"
+    | "weak";
   explanation: string;
 }
 
@@ -15,16 +20,16 @@ export interface CorrelationResult {
  */
 export function computeCorrelationMatrix(
   rows: Record<string, unknown>[],
-  numericColumns: string[]
+  numericColumns: string[],
 ): CorrelationResult[] {
   const results: CorrelationResult[] = [];
-  
+
   if (numericColumns.length < 2) return results;
 
   // Extract and clean values for numerical columns first to avoid repeated conversions
   const colVectors = new Map<string, number[]>();
   for (const col of numericColumns) {
-    const vec = rows.map(r => {
+    const vec = rows.map((r) => {
       const v = r[col];
       if (typeof v === "number") return v;
       if (typeof v === "string") {
@@ -82,16 +87,17 @@ export function computeCorrelationMatrix(
         const labelA = prettify(colA);
         const labelB = prettify(colB);
 
-        const explanation = strength === "weak"
-          ? `There is a weak or negligible linear relationship between ${labelA} and ${labelB} (${r.toFixed(2)}).`
-          : `${labelA} has a ${strengthText} correlation with ${labelB} (${r.toFixed(2)}).`;
+        const explanation =
+          strength === "weak"
+            ? `There is a weak or negligible linear relationship between ${labelA} and ${labelB} (${r.toFixed(2)}).`
+            : `${labelA} has a ${strengthText} correlation with ${labelB} (${r.toFixed(2)}).`;
 
         results.push({
           a: colA,
           b: colB,
           r,
           strength,
-          explanation
+          explanation,
         });
       } catch (e) {
         // Skip on calculations error (like constant values)

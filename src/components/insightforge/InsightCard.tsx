@@ -1,8 +1,16 @@
 import type { AIInsight, Hypothesis } from "@/services/analytics/types";
 import { ConfidenceBadge } from "./ConfidenceBadge";
 import {
-  Brain, Lightbulb, Activity, Target, ChevronDown,
-  Eye, GitBranch, CheckCircle2, XCircle, MinusCircle,
+  Brain,
+  Lightbulb,
+  Activity,
+  Target,
+  ChevronDown,
+  Eye,
+  GitBranch,
+  CheckCircle2,
+  XCircle,
+  MinusCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -15,10 +23,26 @@ const ICONS = {
 };
 
 const TONES = {
-  descriptive:  { border: "border-info/25",       bg: "from-info/12 to-transparent",       icon: "bg-info/15 text-info" },
-  diagnostic:   { border: "border-primary/25",    bg: "from-primary/12 to-transparent",    icon: "bg-primary/15 text-primary" },
-  predictive:   { border: "border-warning/25",    bg: "from-warning/12 to-transparent",    icon: "bg-warning/15 text-warning" },
-  prescriptive: { border: "border-success/25",    bg: "from-success/12 to-transparent",    icon: "bg-success/15 text-success" },
+  descriptive: {
+    border: "border-info/25",
+    bg: "from-info/12 to-transparent",
+    icon: "bg-info/15 text-info",
+  },
+  diagnostic: {
+    border: "border-primary/25",
+    bg: "from-primary/12 to-transparent",
+    icon: "bg-primary/15 text-primary",
+  },
+  predictive: {
+    border: "border-warning/25",
+    bg: "from-warning/12 to-transparent",
+    icon: "bg-warning/15 text-warning",
+  },
+  prescriptive: {
+    border: "border-success/25",
+    bg: "from-success/12 to-transparent",
+    icon: "bg-success/15 text-success",
+  },
 };
 
 export function InsightCard({ insight }: { insight: AIInsight }) {
@@ -39,7 +63,9 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
         className="flex w-full items-start gap-4 px-5 py-4 text-left transition-colors hover:bg-white/[0.02]"
       >
         {/* Level icon */}
-        <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${tone.icon}`}>
+        <div
+          className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${tone.icon}`}
+        >
           <Icon className="h-4 w-4" />
         </div>
 
@@ -49,8 +75,12 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
             <span className="section-label">{insight.level}</span>
             <ConfidenceBadge value={insight.confidence} />
           </div>
-          <h3 className="text-sm font-semibold leading-snug">{insight.title}</h3>
-          <p className="mt-1.5 text-sm leading-relaxed text-foreground/75">{insight.summary}</p>
+          <h3 className="text-sm font-semibold leading-snug">
+            {insight.title}
+          </h3>
+          <p className="mt-1.5 text-sm leading-relaxed text-foreground/75">
+            {insight.summary}
+          </p>
         </div>
 
         {/* Chevron */}
@@ -95,7 +125,9 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
                     {insight.evidence.map((e, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs">
                         <EvidenceTag type={e.type} />
-                        <span className="text-foreground/80">{e.description}</span>
+                        <span className="text-foreground/80">
+                          {e.description}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -104,7 +136,11 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
 
               {/* Conclusion */}
               {insight.conclusion && (
-                <InfoPanel icon={CheckCircle2} label="Conclusion" tone="primary">
+                <InfoPanel
+                  icon={CheckCircle2}
+                  label="Conclusion"
+                  tone="primary"
+                >
                   {insight.conclusion}
                   <div className="mt-2">
                     <ConfidenceBadge value={insight.confidence} />
@@ -121,7 +157,9 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
               {insight.assumptions && insight.assumptions.length > 0 && (
                 <Field label="Assumptions">
                   <ul className="list-disc space-y-1 pl-4">
-                    {insight.assumptions.map((a, i) => <li key={i}>{a}</li>)}
+                    {insight.assumptions.map((a, i) => (
+                      <li key={i}>{a}</li>
+                    ))}
                   </ul>
                 </Field>
               )}
@@ -130,7 +168,9 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
               {insight.limitations && insight.limitations.length > 0 && (
                 <Field label="Limitations">
                   <ul className="list-disc space-y-1 pl-4">
-                    {insight.limitations.map((a, i) => <li key={i}>{a}</li>)}
+                    {insight.limitations.map((a, i) => (
+                      <li key={i}>{a}</li>
+                    ))}
                   </ul>
                 </Field>
               )}
@@ -145,7 +185,7 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
 /* ── Sub-components ─────────────────────────────────────── */
 
 const TONE_STYLES = {
-  info:    "border-info/25 bg-info/5 text-info",
+  info: "border-info/25 bg-info/5 text-info",
   primary: "border-primary/25 bg-primary/5 text-primary",
   warning: "border-warning/25 bg-warning/5 text-warning",
 };
@@ -162,8 +202,12 @@ function InfoPanel({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`rounded-xl border p-3.5 ${TONE_STYLES[tone].split(" ").slice(0, 2).join(" ")}`}>
-      <div className={`flex items-center gap-1.5 ${TONE_STYLES[tone].split(" ")[2]}`}>
+    <div
+      className={`rounded-xl border p-3.5 ${TONE_STYLES[tone].split(" ").slice(0, 2).join(" ")}`}
+    >
+      <div
+        className={`flex items-center gap-1.5 ${TONE_STYLES[tone].split(" ")[2]}`}
+      >
         <Icon className="h-3 w-3" />
         <span className="section-label">{label}</span>
       </div>
@@ -176,7 +220,13 @@ const FieldLabel = ({ children }: { children: React.ReactNode }) => (
   <div className="field-label">{children}</div>
 );
 
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+const Field = ({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) => (
   <div>
     <FieldLabel>{label}</FieldLabel>
     <div className="mt-1.5 text-sm text-foreground/80">{children}</div>
@@ -185,8 +235,8 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
 
 function EvidenceTag({ type }: { type: "dataset" | "external" | "inference" }) {
   const map = {
-    dataset:   { label: "Dataset",   cls: "bg-info/15 text-info" },
-    external:  { label: "External",  cls: "bg-accent/15 text-accent" },
+    dataset: { label: "Dataset", cls: "bg-info/15 text-info" },
+    external: { label: "External", cls: "bg-accent/15 text-accent" },
     inference: { label: "Inference", cls: "bg-warning/15 text-warning" },
   };
   return (
@@ -202,7 +252,9 @@ function HypothesesBlock({ hypotheses }: { hypotheses: Hypothesis[] }) {
   const surviving = hypotheses
     .filter((h) => h.verdict !== "rejected")
     .slice()
-    .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || b.confidence - a.confidence);
+    .sort(
+      (a, b) => (a.rank ?? 99) - (b.rank ?? 99) || b.confidence - a.confidence,
+    );
   const rejected = hypotheses.filter((h) => h.verdict === "rejected");
 
   return (
@@ -225,9 +277,21 @@ function HypothesesBlock({ hypotheses }: { hypotheses: Hypothesis[] }) {
 
 function HypothesisCard({ h, rank }: { h: Hypothesis; rank?: number }) {
   const verdictMap = {
-    supported:    { Icon: CheckCircle2, cls: "bg-success/12 text-success",     border: "border-success/25" },
-    rejected:     { Icon: XCircle,      cls: "bg-destructive/12 text-destructive", border: "border-destructive/25 opacity-65" },
-    inconclusive: { Icon: MinusCircle,  cls: "bg-warning/12 text-warning",     border: "border-warning/25" },
+    supported: {
+      Icon: CheckCircle2,
+      cls: "bg-success/12 text-success",
+      border: "border-success/25",
+    },
+    rejected: {
+      Icon: XCircle,
+      cls: "bg-destructive/12 text-destructive",
+      border: "border-destructive/25 opacity-65",
+    },
+    inconclusive: {
+      Icon: MinusCircle,
+      cls: "bg-warning/12 text-warning",
+      border: "border-warning/25",
+    },
   } as const;
   const v = verdictMap[h.verdict];
 
@@ -240,7 +304,9 @@ function HypothesisCard({ h, rank }: { h: Hypothesis; rank?: number }) {
               {rank}
             </span>
           )}
-          <span className={`text-sm ${h.verdict === "rejected" ? "line-through opacity-60" : ""}`}>
+          <span
+            className={`text-sm ${h.verdict === "rejected" ? "line-through opacity-60" : ""}`}
+          >
             {h.statement}
           </span>
         </div>
@@ -258,10 +324,18 @@ function HypothesisCard({ h, rank }: { h: Hypothesis; rank?: number }) {
       {(h.supportingEvidence?.length > 0 || h.opposingEvidence?.length > 0) && (
         <div className="mt-3 grid gap-2 md:grid-cols-2">
           {h.supportingEvidence?.length > 0 && (
-            <EvidenceList title="Supporting" tone="success" items={h.supportingEvidence} />
+            <EvidenceList
+              title="Supporting"
+              tone="success"
+              items={h.supportingEvidence}
+            />
           )}
           {h.opposingEvidence?.length > 0 && (
-            <EvidenceList title="Opposing" tone="destructive" items={h.opposingEvidence} />
+            <EvidenceList
+              title="Opposing"
+              tone="destructive"
+              items={h.opposingEvidence}
+            />
           )}
         </div>
       )}
@@ -280,7 +354,10 @@ function EvidenceList({
 }: {
   title: string;
   tone: "success" | "destructive";
-  items: Array<{ type: "dataset" | "external" | "inference"; description: string }>;
+  items: Array<{
+    type: "dataset" | "external" | "inference";
+    description: string;
+  }>;
 }) {
   const cls = tone === "success" ? "text-success" : "text-destructive";
   return (

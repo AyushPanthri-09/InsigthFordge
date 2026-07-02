@@ -2,7 +2,11 @@ import * as ss from "simple-statistics";
 import type { ForecastResult } from "../../types";
 
 export interface ExtendedForecastResult extends ForecastResult {
-  selectedMethod: "moving_average" | "weighted_moving_average" | "exponential_smoothing" | "linear_regression";
+  selectedMethod:
+    | "moving_average"
+    | "weighted_moving_average"
+    | "exponential_smoothing"
+    | "linear_regression";
   explanation: string;
   mape: number;
 }
@@ -13,7 +17,7 @@ export interface ExtendedForecastResult extends ForecastResult {
 export function generateAdvancedForecast(
   historicalValues: number[],
   periodLabels: string[],
-  nextN = 4
+  nextN = 4,
 ): ExtendedForecastResult {
   const n = historicalValues.length;
 
@@ -29,9 +33,18 @@ export function generateAdvancedForecast(
   // Let's compute MAPE for each candidate method
   const mapes = {
     moving_average: evaluateMA(historicalValues, trainLimit, backtestCount),
-    weighted_moving_average: evaluateWMA(historicalValues, trainLimit, backtestCount),
-    exponential_smoothing: evaluateES(historicalValues, trainLimit, backtestCount, 0.3),
-    linear_regression: evaluateLR(historicalValues, trainLimit, backtestCount)
+    weighted_moving_average: evaluateWMA(
+      historicalValues,
+      trainLimit,
+      backtestCount,
+    ),
+    exponential_smoothing: evaluateES(
+      historicalValues,
+      trainLimit,
+      backtestCount,
+      0.3,
+    ),
+    linear_regression: evaluateLR(historicalValues, trainLimit, backtestCount),
   };
 
   // Find optimal method (minimum MAPE)
@@ -74,19 +87,26 @@ export function generateAdvancedForecast(
 
   // 4. Calculate Confidence Intervals
   // We estimate standard error of predictions from the historical residuals
-  const residuals = historicalValues.slice(1).map((val, idx) => {
-    // simple single-period forecast comparison
-    const histPred = bestMethod === "moving_average"
-      ? forecastMA(historicalValues.slice(0, idx + 1), 1, 3)[0]
-      : bestMethod === "weighted_moving_average"
-      ? forecastWMA(historicalValues.slice(0, idx + 1), 1, 3)[0]
-      : bestMethod === "exponential_smoothing"
-      ? forecastES(historicalValues.slice(0, idx + 1), 1, 0.3)[0]
-      : forecastLR(historicalValues.slice(0, idx + 1), 1)[0];
-    return val - histPred;
-  }).filter(r => !isNaN(r));
+  const residuals = historicalValues
+    .slice(1)
+    .map((val, idx) => {
+      // simple single-period forecast comparison
+      const histPred =
+        bestMethod === "moving_average"
+          ? forecastMA(historicalValues.slice(0, idx + 1), 1, 3)[0]
+          : bestMethod === "weighted_moving_average"
+            ? forecastWMA(historicalValues.slice(0, idx + 1), 1, 3)[0]
+            : bestMethod === "exponential_smoothing"
+              ? forecastES(historicalValues.slice(0, idx + 1), 1, 0.3)[0]
+              : forecastLR(historicalValues.slice(0, idx + 1), 1)[0];
+      return val - histPred;
+    })
+    .filter((r) => !isNaN(r));
 
-  const stdError = residuals.length > 1 ? ss.standardDeviation(residuals) : (ss.mean(historicalValues) * 0.1);
+  const stdError =
+    residuals.length > 1
+      ? ss.standardDeviation(residuals)
+      : ss.mean(historicalValues) * 0.1;
 
   const nextPeriods = predictions.map((pred, i) => {
     // Confidence bounds widen as we look further into the future (sqrt(i+1) factor)
@@ -95,7 +115,7 @@ export function generateAdvancedForecast(
       period: nextLabels[i],
       predicted: Math.max(0, pred),
       lower: Math.max(0, pred - margin),
-      upper: pred + margin
+      upper: pred + margin,
     };
   });
 
@@ -103,7 +123,8 @@ export function generateAdvancedForecast(
   const confidence = Math.max(0.4, Math.min(0.95, 1 - minMape));
 
   return {
-    method: methodLabel as "moving_average" | "exponential_smoothing" | "holt_trend",
+    method: methodLabel as
+      "moving_average" | "exponential_smoothing" | "holt_trend",
     selectedMethod: bestMethod,
     nextPeriods,
     confidence,
@@ -111,18 +132,24 @@ export function generateAdvancedForecast(
     mape: minMape,
     assumptions: [
       "The underlying business drivers will remain stable during the forecast period.",
-      bestMethod === "linear_regression" ? "Historical linear growth/decay trend will continue." : "Recent demand levels are indicative of near-term performance."
+      bestMethod === "linear_regression"
+        ? "Historical linear growth/decay trend will continue."
+        : "Recent demand levels are indicative of near-term performance.",
     ],
     risks: [
       "Unanticipated supply chain anomalies or external market shocks.",
-      "Out-of-sample trend shifts that depart from the calculated historical fit."
-    ]
+      "Out-of-sample trend shifts that depart from the calculated historical fit.",
+    ],
   };
 }
 
 // --- Algorithm Evaluators & Forecasters ---
 
-function evaluateMA(vals: number[], trainLimit: number, testCount: number): number {
+function evaluateMA(
+  vals: number[],
+  trainLimit: number,
+  testCount: number,
+): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);
@@ -143,7 +170,11 @@ function forecastMA(vals: number[], count: number, k = 3): number[] {
   return result.slice(-count);
 }
 
-function evaluateWMA(vals: number[], trainLimit: number, testCount: number): number {
+function evaluateWMA(
+  vals: number[],
+  trainLimit: number,
+  testCount: number,
+): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);
@@ -162,13 +193,19 @@ function forecastWMA(vals: number[], count: number, k = 3): number[] {
     // Pad with mean if fewer than k items
     while (slice.length < k) slice.unshift(ss.mean(slice.length ? slice : [0]));
 
-    const pred = slice[2] * weights[0] + slice[1] * weights[1] + slice[0] * weights[2];
+    const pred =
+      slice[2] * weights[0] + slice[1] * weights[1] + slice[0] * weights[2];
     result.push(pred);
   }
   return result.slice(-count);
 }
 
-function evaluateES(vals: number[], trainLimit: number, testCount: number, alpha: number): number {
+function evaluateES(
+  vals: number[],
+  trainLimit: number,
+  testCount: number,
+  alpha: number,
+): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);
@@ -187,7 +224,11 @@ function forecastES(vals: number[], count: number, alpha = 0.3): number[] {
   return Array(count).fill(level);
 }
 
-function evaluateLR(vals: number[], trainLimit: number, testCount: number): number {
+function evaluateLR(
+  vals: number[],
+  trainLimit: number,
+  testCount: number,
+): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);
@@ -238,7 +279,14 @@ function generateFutureLabels(labels: string[], nextN: number): string[] {
       const nextDate = new Date(lastDate);
       nextDate.setMonth(lastDate.getMonth() + i);
       const isIso = lastLabel.includes("-");
-      nextLabels.push(isIso ? nextDate.toISOString().slice(0, 7) : nextDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }));
+      nextLabels.push(
+        isIso
+          ? nextDate.toISOString().slice(0, 7)
+          : nextDate.toLocaleDateString("en-US", {
+              month: "short",
+              year: "numeric",
+            }),
+      );
     }
     return nextLabels;
   }
@@ -250,14 +298,18 @@ function generateFutureLabels(labels: string[], nextN: number): string[] {
   return nextLabels;
 }
 
-function buildFallbackForecast(vals: number[], labels: string[], nextN: number): ExtendedForecastResult {
+function buildFallbackForecast(
+  vals: number[],
+  labels: string[],
+  nextN: number,
+): ExtendedForecastResult {
   const mean = vals.length > 0 ? ss.mean(vals) : 100;
   const nextLabels = generateFutureLabels(labels, nextN);
   const nextPeriods = Array.from({ length: nextN }, (_, i) => ({
     period: nextLabels[i],
     predicted: mean,
     lower: mean * 0.7,
-    upper: mean * 1.3
+    upper: mean * 1.3,
   }));
 
   return {
@@ -265,9 +317,10 @@ function buildFallbackForecast(vals: number[], labels: string[], nextN: number):
     selectedMethod: "moving_average",
     nextPeriods,
     confidence: 0.5,
-    explanation: "Simple average baseline was selected due to insufficient historical periods (< 4) for advanced models.",
+    explanation:
+      "Simple average baseline was selected due to insufficient historical periods (< 4) for advanced models.",
     mape: 0.3,
     assumptions: ["Historical averages represent future levels."],
-    risks: ["Extreme volatility or data structural shifts."]
+    risks: ["Extreme volatility or data structural shifts."],
   };
 }

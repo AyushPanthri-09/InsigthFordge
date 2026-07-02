@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, validation_alias="PORT")
     debug: bool = Field(default=True, validation_alias="DEBUG")
     database_url: str = Field(default="sqlite:///./insightforge.db", validation_alias="DATABASE_URL")
-    gemini_api_key: str = Field(default="", validation_alias="GEMINI_API_KEY")
     max_upload_size: int = Field(default=10485760, validation_alias="MAX_UPLOAD_SIZE")
 
     model_config = SettingsConfigDict(

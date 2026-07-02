@@ -2,7 +2,14 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "motion/react";
-import { KeyRound, Mail, Sparkles, ArrowRight, Shield, UserCircle2 } from "lucide-react";
+import {
+  KeyRound,
+  Mail,
+  Sparkles,
+  ArrowRight,
+  Shield,
+  UserCircle2,
+} from "lucide-react";
 import { Brand } from "@/components/insightforge/Brand";
 import { authService } from "@/services/auth";
 import { Toaster } from "@/components/ui/sonner";
@@ -31,9 +38,10 @@ function Register() {
     try {
       await authService.register(email, password, role);
       toast.success("Account registered!", {
-        description: "Your user profile was successfully created. Logging in...",
+        description:
+          "Your user profile was successfully created. Logging in...",
       });
-      
+
       // Auto login after register
       await authService.login(email, password);
       router.navigate({ to: "/dashboard" });
@@ -50,7 +58,7 @@ function Register() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
       <Toaster richColors closeButton position="top-center" />
-      
+
       {/* Background neon elements */}
       <div className="absolute -left-32 bottom-10 h-72 w-72 rounded-full bg-primary/20 blur-[120px]" />
       <div className="absolute -right-32 top-10 h-72 w-72 rounded-full bg-info/20 blur-[120px]" />
@@ -58,7 +66,7 @@ function Register() {
       <div className="relative w-full max-w-[440px] space-y-6">
         <div className="flex flex-col items-center text-center">
           <Brand />
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -75,11 +83,14 @@ function Register() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative rounded-2xl border border-white/10 bg-surface/60 p-8 shadow-2xl backdrop-blur-xl"
           style={{
-            boxShadow: "0 0 40px -10px oklch(0.85 0.19 95 / 8%), 0 16px 40px -20px oklch(0 0 0 / 80%)"
+            boxShadow:
+              "0 0 40px -10px oklch(0.85 0.19 95 / 8%), 0 16px 40px -20px oklch(0 0 0 / 80%)",
           }}
         >
           <div className="mb-6 space-y-1.5">
-            <h1 className="font-display text-2xl font-bold tracking-tight">Create account</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight">
+              Create account
+            </h1>
             <p className="text-sm text-muted-foreground">
               Register a new seat in the tenant environment
             </p>
@@ -87,7 +98,10 @@ function Register() {
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <label
+                htmlFor="email"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -108,7 +122,10 @@ function Register() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <label
+                htmlFor="password"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
                 Password
               </label>
               <div className="relative">
@@ -129,7 +146,10 @@ function Register() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="role" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <label
+                htmlFor="role"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
                 Workspace Role
               </label>
               <div className="relative">
@@ -143,7 +163,7 @@ function Register() {
                   disabled={loading}
                   className="w-full rounded-xl border border-white/8 bg-background/50 py-3 pl-10 pr-4 text-sm font-medium transition-all duration-200 focus:border-primary focus:bg-background/80 focus:ring-1 focus:ring-primary appearance-none"
                   style={{
-                    colorScheme: "dark"
+                    colorScheme: "dark",
                   }}
                 >
                   <option value="Viewer">Viewer (Read-only)</option>
@@ -159,14 +179,15 @@ function Register() {
               disabled={loading}
               className="group relative flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg hover:opacity-90 active:scale-[0.98] transition-all disabled:pointer-events-none disabled:opacity-50"
               style={{
-                boxShadow: "0 4px 20px -4px oklch(0.85 0.19 95 / 40%)"
+                boxShadow: "0 4px 20px -4px oklch(0.85 0.19 95 / 40%)",
               }}
             >
               {loading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
               ) : (
                 <>
-                  Register Seat <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  Register Seat{" "}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </>
               )}
             </button>
