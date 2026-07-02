@@ -1,0 +1,11 @@
+export { P1_Cover } from "./P1_Cover";
+export { P2_ExecutiveSummary } from "./P2_ExecutiveSummary";
+export { P3_TOC } from "./P3_TOC";
+export { P4_KPIDashboard } from "./P4_KPIDashboard";
+export { P5_DataQuality } from "./P5_DataQuality";
+export { P6_Trends } from "./P6_Trends";
+export { P7_Correlations } from "./P7_Correlations";
+export { P5_Anomalies } from "./P5_Anomalies";
+export { P6_Forecast } from "./P6_Forecast";
+export { P7_Recommendations } from "./P7_Recommendations";
+export { Appendix } from "./Appendix";

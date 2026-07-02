@@ -1,0 +1,119 @@
+@font-face {
+  font-family: "InsightForge Report";
+  src: local("Aptos"), local("Segoe UI"), local("Inter");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@page report-landscape {
+  size: A4 landscape;
+  margin: 0;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #e8edf5;
+  color: #182230;
+  font-family: "InsightForge Report", "Segoe UI", system-ui, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  text-rendering: geometricPrecision;
+}
+
+#print-root {
+  display: block;
+  width: 210mm;
+  margin: 0 auto;
+  background: #ffffff;
+}
+
+.rpt-document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 210mm;
+  margin: 0 auto;
+  background: #ffffff;
+}
+
+.rpt-page {
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  page: report;
+  break-after: page;
+  page-break-after: always;
+  box-shadow: none;
+  margin: 0;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.rpt-page:last-child {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+.rpt-page-header,
+.rpt-page-footer {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.rpt-card,
+.rpt-card-sm,
+.rpt-card-accent,
+.rpt-kpi,
+.rpt-ai-block,
+.rpt-risk-block,
+.rpt-stat-tile,
+.rpt-callout,
+.rpt-chart-panel {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.rpt-table-wrap,
+.rpt-table,
+.rpt-table tr,
+.rpt-table td,
+.rpt-table th {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+svg,
+canvas {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+* {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  #print-root,
+  .rpt-document {
+    width: 210mm;
+    margin: 0;
+    background: #ffffff;
+  }
+
+  .rpt-page {
+    margin: 0;
+  }
+}
