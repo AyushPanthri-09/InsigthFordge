@@ -114,7 +114,7 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
                         }}
                       >
                         <span style={{ fontSize: 7.5, fontWeight: 700, textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden", width: "100%", textAlign: "center" }}>
-                          {colA === colB ? "SELF" : `${colA.substring(0, 6)}×${colB.substring(0, 6)}`}
+                          {colA === colB ? "SELF" : `${colA.substring(0, 6)} x ${colB.substring(0, 6)}`}
                         </span>
                         <span style={{ fontSize: 11, fontWeight: 850, marginTop: 2 }}>
                           {val.toFixed(2)}
@@ -138,7 +138,7 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
                   <div key={i} className="rpt-card-sm" style={{ padding: 10, display: "grid", gridTemplateColumns: "1fr 48px", alignItems: "center", gap: 8 }}>
                     <div>
                       <div style={{ fontSize: 9.8, fontWeight: 700, color: "var(--rpt-brand-dark)" }}>
-                        {c.a} × {c.b}
+                        {c.a} x {c.b}
                       </div>
                       <div style={{ fontSize: 8.5, color: "var(--rpt-text-muted)", marginTop: 2 }}>
                         Strength: {c.strength} positive link
@@ -162,7 +162,7 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
                   <div key={i} className="rpt-card-sm" style={{ padding: 10, display: "grid", gridTemplateColumns: "1fr 48px", alignItems: "center", gap: 8 }}>
                     <div>
                       <div style={{ fontSize: 9.8, fontWeight: 700, color: "var(--rpt-brand-dark)" }}>
-                        {c.a} × {c.b}
+                        {c.a} x {c.b}
                       </div>
                       <div style={{ fontSize: 8.5, color: "var(--rpt-text-muted)", marginTop: 2 }}>
                         Strength: {c.strength} relationship

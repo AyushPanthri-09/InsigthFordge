@@ -1,9 +1,12 @@
 import React from "react";
 import type { P2PerformanceData } from "../types";
 import { ReportPage } from "../primitives/ReportPage";
-import { ReportSection } from "../primitives/ReportSection";
-import { ReportBadge } from "../primitives/ReportBadge";
 import { ReportChart } from "../primitives/ReportChart";
+import { ReportExecutiveInsight } from "../primitives/ReportExecutiveInsight";
+import { ReportHeroMetric } from "../primitives/ReportHeroMetric";
+import { ReportInsightCard } from "../primitives/ReportInsightCard";
+import { ReportSectionHeader } from "../primitives/ReportSectionHeader";
+import { ReportSummaryTile } from "../primitives/ReportSummaryTile";
 
 interface Props {
   data: P2PerformanceData;
@@ -24,44 +27,83 @@ function fmt(v: number | string): string {
 export function P4_KPIDashboard({ data, datasetName, generatedAt, businessHealthScore = 85, dataQualityScore = 95 }: Props) {
   const { kpis } = data;
 
-  // Dynamically resolve or construct core KPIs with elegant fallback representations
-  const findKPI = (labelOrId: string, defaultVal: number, defaultFormat: string, rationale: string) => {
-    const k = kpis.find(item => 
-      item.label.toLowerCase().includes(labelOrId.toLowerCase()) || 
-      item.id.toLowerCase().includes(labelOrId.toLowerCase())
-    );
-    return k ? {
-      label: k.label,
-      value: k.value,
-      formatted: k.formattedValue,
-      rationale: k.rationale
-    } : {
-      label: labelOrId,
-      value: defaultVal,
-      formatted: defaultFormat,
-      rationale
-    };
+  const isNumericKPI = (kpi: (typeof kpis)[number]) => Number.isFinite(Number(kpi.value));
+  const labelIs = (kpi: (typeof kpis)[number], labels: string[]) =>
+    labels.some((label) => kpi.label.trim().toLowerCase() === label || kpi.id.trim().toLowerCase() === label);
+  const labelIncludes = (kpi: (typeof kpis)[number], terms: string[]) => {
+    const text = `${kpi.label} ${kpi.id}`.toLowerCase();
+    return terms.some((term) => text.includes(term));
   };
 
-  const revenueKPI = findKPI("Revenue", 450000, "$450.0K", "Aggregated financial income sum.");
-  const ordersKPI = findKPI("Orders", 1250, "1,250", "Total volume of receipts processed.");
-  const customersKPI = findKPI("Customers", 980, "980", "Unique customer identification count.");
-  const profitKPI = findKPI("Profit", 135000, "$135.0K", "Calculated margin overhead.");
-  const aovKPI = findKPI("Average Order", 360, "$360.00", "Revenue divided by transaction volume.");
-  const growthKPI = findKPI("Growth", 12.4, "+12.4%", "Period-over-period percentage shift.");
-  const conversionKPI = findKPI("Conversion", 2.8, "2.8%", "Visitor purchasing activity rate.");
+  const exactRevenue = kpis.find((kpi) => labelIs(kpi, ["revenue", "total revenue", "sales"]) && isNumericKPI(kpi));
+  const exactProfit = kpis.find((kpi) => labelIs(kpi, ["profit", "net income"]) && isNumericKPI(kpi));
+  const firstNumeric = kpis.find(isNumericKPI);
+  const heroKPI = exactRevenue ?? exactProfit;
+  const heroMetric = heroKPI
+    ? {
+        label: heroKPI.label,
+        value: heroKPI.formattedValue || fmt(heroKPI.value),
+        caption: heroKPI.rationale,
+        trend: undefined as number | undefined,
+      }
+    : {
+        label: "Business Health",
+        value: `${businessHealthScore}%`,
+        caption: "Weighted operational readiness index.",
+        trend: undefined as number | undefined,
+      };
 
-  const kpiGrid = [
-    { ...revenueKPI, color: "var(--rpt-brand)" },
-    { ...ordersKPI, color: "var(--rpt-accent)" },
-    { ...customersKPI, color: "#7c3aed" },
-    { ...profitKPI, color: "#10b981" },
-    { ...aovKPI, color: "#f59e0b" },
-    { ...growthKPI, color: "#ec4899" },
-    { ...conversionKPI, color: "#06b6d4" },
-    { label: "Business Health", value: businessHealthScore, formatted: `${businessHealthScore}%`, rationale: "Weighted operational ready index.", color: "var(--rpt-success)" },
-    { label: "Data Quality Score", value: dataQualityScore, formatted: `${dataQualityScore}%`, rationale: "Structural validation and cleaning rating.", color: "var(--rpt-info)" }
+  const preferredSupport = [
+    { terms: ["order"], fallbackLabel: "Orders" },
+    { terms: ["customer"], fallbackLabel: "Customers" },
+    { terms: ["average order", "aov"], fallbackLabel: "AOV" },
+    { terms: ["growth"], fallbackLabel: "Growth" },
   ];
+
+  const usedIds = new Set(heroKPI ? [heroKPI.id] : []);
+  const supportFromLabels = preferredSupport
+    .map((candidate) => {
+      const match = kpis.find((kpi) => !usedIds.has(kpi.id) && isNumericKPI(kpi) && labelIncludes(kpi, candidate.terms));
+      if (match) usedIds.add(match.id);
+      return match
+        ? {
+            label: match.label,
+            value: match.formattedValue || fmt(match.value),
+            caption: match.rationale,
+          }
+        : undefined;
+    })
+    .filter(Boolean) as Array<{ label: string; value: string; caption?: string }>;
+
+  const remainingNumeric = kpis
+    .filter((kpi) => !usedIds.has(kpi.id) && isNumericKPI(kpi))
+    .slice(0, Math.max(0, 4 - supportFromLabels.length))
+    .map((kpi) => ({
+      label: kpi.label,
+      value: kpi.formattedValue || fmt(kpi.value),
+      caption: kpi.rationale,
+    }));
+
+  const supportingMetrics = [...supportFromLabels, ...remainingNumeric].slice(0, 4);
+  if (supportingMetrics.length < 4) {
+    supportingMetrics.push(
+      {
+        label: "Data Quality",
+        value: `${dataQualityScore}%`,
+        caption: "Input readiness score.",
+      },
+      {
+        label: "Business Health",
+        value: `${businessHealthScore}%`,
+        caption: "Executive operating index.",
+      },
+    );
+  }
+
+  const executiveInsight =
+    data.descriptiveInsights[0]?.summary ||
+    `Overall ${data.domain} performance is summarized through revenue, order, customer, profitability, and quality indicators.`;
+  const primaryInsight = data.descriptiveInsights[0];
 
   return (
     <ReportPage
@@ -72,122 +114,58 @@ export function P4_KPIDashboard({ data, datasetName, generatedAt, businessHealth
       datasetName={datasetName}
       generatedAt={generatedAt}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        
-        {/* Metric Cards Grid */}
-        <ReportSection title="Premium KPI Scoreboard">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {kpiGrid.map((k, i) => (
-              <div
-                key={i}
-                style={{
-                  background: "var(--rpt-surface2)",
-                  border: "1px solid var(--rpt-border)",
-                  borderRadius: 8,
-                  padding: "16px 14px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  minHeight: 104,
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: 4,
-                    height: "100%",
-                    background: k.color,
-                  }}
-                />
-                
-                <div>
-                  <div
-                    style={{
-                      fontSize: 8.5,
-                      fontWeight: 800,
-                      textTransform: "uppercase",
-                      color: "var(--rpt-text-muted)",
-                      letterSpacing: "0.08em",
-                      marginBottom: 6,
-                    }}
-                  >
-                    {k.label}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 850,
-                      color: "var(--rpt-brand-dark)",
-                      lineHeight: 1.1,
-                    }}
-                  >
-                    {k.formatted}
-                  </div>
-                </div>
-                
-                <p
-                  style={{
-                    fontSize: 8.5,
-                    color: "var(--rpt-text-muted)",
-                    margin: "8px 0 0 0",
-                    lineHeight: 1.35,
-                    borderTop: "1px solid var(--rpt-border-light)",
-                    paddingTop: 6,
-                  }}
-                >
-                  {k.rationale}
-                </p>
-              </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--rpt-space-xl, 32px)" }}>
+        <ReportSectionHeader
+          eyebrow="Status Page"
+          title="Performance KPI Dashboard"
+          description={`Core performance posture for ${data.domain}.`}
+        />
+
+        <ReportExecutiveInsight
+          insight={executiveInsight}
+          impact={heroMetric.caption || "Primary indicators are ready for executive review."}
+          confidence={businessHealthScore}
+          status={businessHealthScore >= 80 ? "success" : businessHealthScore >= 60 ? "warning" : "critical"}
+        />
+
+        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "var(--rpt-space-xl, 32px)" }}>
+
+          <ReportHeroMetric
+            label={heroMetric.label}
+            value={heroMetric.value}
+            trend={heroMetric.trend}
+            variant={businessHealthScore >= 80 ? "success" : "primary"}
+            badge="Hero KPI"
+          />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--rpt-space-md, 16px)", height: "100%" }}>
+            {supportingMetrics.slice(0, 4).map((metric, index) => (
+            <ReportSummaryTile
+                key={`${metric.label}-${index}`}
+                label={metric.label}
+                value={metric.value}
+                caption={metric.caption}
+                tone={index === 0 ? "primary" : "neutral"}
+              />
             ))}
           </div>
-        </ReportSection>
+        </div>
 
-        {/* Primary and Supporting Charts */}
         {data.primaryCharts && data.primaryCharts.length > 0 && (
-          <ReportSection title="Analytical Volume Analysis">
-            <div style={{ display: "grid", gridTemplateColumns: "1.3fr 0.7fr", gap: 14 }}>
-              <div className="rpt-card" style={{ padding: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--rpt-brand-dark)", marginBottom: 8 }}>
-                  {data.primaryCharts[0].title}
-                </div>
-                <div className="rpt-chart-panel">
-                  <ReportChart spec={data.primaryCharts[0]} height={170} />
-                </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1.4fr 0.6fr", gap: "var(--rpt-space-xl, 32px)", marginTop: "var(--rpt-space-lg, 24px)" }}>
+            <div className="rpt-card" style={{ padding: 16, minHeight: 338 }}>
+              <div style={{ fontSize: 12, fontWeight: 850, color: "var(--rpt-brand-dark)", marginBottom: 10 }}>
+                {data.primaryCharts[0].title}
               </div>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {data.descriptiveInsights.slice(0, 2).map((ins, i) => (
-                  <div
-                    key={i}
-                    className="rpt-ai-block"
-                    style={{
-                      background: "var(--rpt-brand-soft)",
-                      border: "1px solid rgba(21, 94, 239, 0.12)",
-                      borderRadius: 6,
-                      padding: 10,
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: 10, fontWeight: 750, color: "var(--rpt-brand-dark)", marginBottom: 4 }}>
-                        {ins.title}
-                      </div>
-                      <p style={{ fontSize: 8.8, color: "var(--rpt-text-muted)", lineHeight: 1.4, margin: 0 }}>
-                        {ins.summary}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+              <div className="rpt-chart-panel" style={{ height: 280 }}>
+                <ReportChart spec={data.primaryCharts[0]} height={280} />
               </div>
             </div>
-          </ReportSection>
+            <ReportInsightCard title={primaryInsight?.title || "Executive Readout"} badge="AI Insight">
+              <p style={{ margin: 0 }}>
+                {primaryInsight?.summary || "No narrative insight was generated for this KPI set."}
+              </p>
+            </ReportInsightCard>
+          </div>
         )}
       </div>
     </ReportPage>

@@ -1,114 +1,135 @@
 import React from "react";
+import type { P1ExecutiveData, P2PerformanceData } from "../types";
 import { ReportPage } from "../primitives/ReportPage";
 import { ReportSection } from "../primitives/ReportSection";
+import { ReportBadge } from "../primitives/ReportBadge";
+import { ReportChart } from "../primitives/ReportChart";
 
 interface Props {
   datasetName: string;
   generatedAt: string;
+  executiveData?: P1ExecutiveData;
+  performanceData?: P2PerformanceData;
 }
 
-export function P3_TOC({ datasetName, generatedAt }: Props) {
-  const sections = [
-    { num: 1, title: "Cover Page", desc: "Dataset identification, classification, and generation metadata" },
-    { num: 2, title: "Executive Briefing & Summary", desc: "Business health gauge, top signals, primary opportunities, and risk profiles" },
-    { num: 3, title: "Table of Contents", desc: "Systematic index of report chapters and technical exhibits" },
-    { num: 4, title: "Performance KPI Dashboard", desc: "Detailed breakdown of financial, operational, and customer performance metrics" },
-    { num: 5, title: "Data Quality Posture", desc: "Completeness audits, missing records analysis, column decisions, and duplicates" },
-    { num: 6, title: "Historical Trend Analysis", desc: "Time-series decomposition, moving averages, and seasonality charts" },
-    { num: 7, title: "Attribute Correlation Matrix", desc: "Pearson coefficients, driver strengths, and AI relationship interpretations" },
-    { num: 8, title: "Anomaly & Outlier Detection", desc: "Z-score deviations, outlier tables, severities, and remediation plans" },
-    { num: 9, title: "Time-Series Demand Forecasting", desc: "Seasonally backtested forecasts, projections, and predictive upper/lower bounds" },
-    { num: 10, title: "Prescriptive Recommendations", desc: "Strategic prioritization cards, business value matrices, timelines, and impact scores" },
-    { num: 11, title: "Technical Appendix", desc: "Statistical profiles, p-value tests, metadata registers, and analytical assumptions" },
-  ];
+function kpiIcon(index: number): string {
+  return ["UP", "OR", "CU", "$", "GR", "%"][index % 6];
+}
+
+export function P3_TOC({ datasetName, generatedAt, executiveData, performanceData }: Props) {
+  const topKpis = executiveData?.topKpis?.slice(0, 6) ?? [];
+  const recommendations = executiveData?.topRecommendations?.slice(0, 4) ?? [];
+  const primaryChart = performanceData?.primaryCharts?.[0];
 
   return (
     <ReportPage
       pageNumber={3}
       totalPages={11}
-      title="Table of Contents"
-      subtitle="Structured report index and guide to analytical exhibits"
+      title="Executive Summary (Cont.)"
+      subtitle="Top performance indicators, priority recommendations, and first-look trend exhibit"
       datasetName={datasetName}
       generatedAt={generatedAt}
     >
-      <div style={{ padding: "10px 0" }}>
-        <ReportSection title="Report Sections Index">
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {sections.map((s) => (
-              <div
-                key={s.num}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "36px 1fr auto",
-                  gap: 16,
-                  alignItems: "center",
-                  borderBottom: "1px solid var(--rpt-border-light)",
-                  paddingBottom: 10,
-                }}
-              >
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+          <ReportSection title="Top KPIs">
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {topKpis.map((kpi, index) => (
                 <div
+                  key={kpi.id || index}
+                  className="rpt-mini-metric"
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 6,
-                    background: "var(--rpt-surface2)",
-                    border: "1px solid var(--rpt-border)",
-                    color: "var(--rpt-brand)",
-                    display: "flex",
+                    display: "grid",
+                    gridTemplateColumns: "34px 1fr auto",
                     alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 14,
-                    fontWeight: 850,
+                    gap: 10,
+                    padding: "9px 10px",
                   }}
                 >
-                  {s.num.toString().padStart(2, "0")}
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--rpt-brand-dark)", marginBottom: 2 }}>
-                    {s.title}
-                  </div>
-                  <div style={{ fontSize: 10, color: "var(--rpt-text-muted)" }}>
-                    {s.desc}
-                  </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  {/* Visual dots leader line in TOC */}
-                  <span
+                  <div
                     style={{
-                      fontFamily: "var(--rpt-font-mono)",
-                      fontSize: 12,
-                      fontWeight: 800,
-                      color: "var(--rpt-brand-dark)",
+                      width: 30,
+                      height: 30,
+                      borderRadius: 8,
                       background: "var(--rpt-brand-soft)",
-                      padding: "4px 10px",
-                      borderRadius: 4,
+                      color: "var(--rpt-brand)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 8,
+                      fontWeight: 900,
                     }}
                   >
-                    Page {s.num}
-                  </span>
+                    {kpiIcon(index)}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="rpt-mini-metric-label">{kpi.label}</div>
+                    <div style={{ fontSize: 8.5, color: "var(--rpt-text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {kpi.rationale}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: "var(--rpt-brand-dark)", fontVariantNumeric: "tabular-nums" }}>
+                    {kpi.formattedValue}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </ReportSection>
-        
-        {/* McKinsey Style Sidebar Note */}
-        <div
-          style={{
-            marginTop: 26,
-            background: "var(--rpt-surface2)",
-            borderLeft: "4px solid var(--rpt-accent)",
-            padding: 16,
-            borderRadius: "0 6px 6px 0",
-          }}
-        >
-          <div style={{ fontSize: 10.5, fontWeight: 800, color: "var(--rpt-accent)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Reading Guide
-          </div>
-          <p style={{ fontSize: 9.8, color: "var(--rpt-text-muted)", lineHeight: 1.5, margin: 0 }}>
-            This report starts with a high-level executive briefing before progressing into detailed, component-level analysis dashboards (KPIs, Quality, Trends). For deep methodological references, p-value matrices, or specific data schemas, refer to the technical appendix on page 11.
-          </p>
+              ))}
+              {topKpis.length === 0 && (
+                <div className="rpt-card-sm" style={{ color: "var(--rpt-text-muted)", fontSize: 10 }}>
+                  No KPI records were available for this dataset.
+                </div>
+              )}
+            </div>
+          </ReportSection>
+
+          <ReportSection title="Top Recommendations">
+            <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+              {recommendations.map((rec, index) => (
+                <div key={`${rec.title}-${index}`} className="rpt-numbered-action">
+                  <div className="rpt-numbered-action-index">{index + 1}</div>
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 850, color: "var(--rpt-brand-dark)", marginBottom: 3 }}>
+                      {rec.title}
+                    </div>
+                    <p style={{ margin: 0, fontSize: 8.8, lineHeight: 1.42, color: "var(--rpt-text-muted)" }}>
+                      {rec.summary}
+                    </p>
+                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                      <ReportBadge label={`${rec.priority} impact`} variant={rec.priority} />
+                      <ReportBadge label={`${rec.effort} effort`} variant="neutral" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {recommendations.length === 0 && (
+                <div className="rpt-card-sm" style={{ color: "var(--rpt-text-muted)", fontSize: 10 }}>
+                  Recommendation generation did not return prioritized actions.
+                </div>
+              )}
+            </div>
+          </ReportSection>
         </div>
+
+        {primaryChart && (
+          <ReportSection title={`Key Chart: ${primaryChart.title}`}>
+            <div className="rpt-card" style={{ padding: 14 }}>
+              <div className="rpt-chart-panel">
+                <ReportChart spec={primaryChart} height={260} />
+              </div>
+              {primaryChart.description && (
+                <div style={{ marginTop: 7, fontSize: 8.8, color: "var(--rpt-text-muted)" }}>
+                  Source: {primaryChart.description}
+                </div>
+              )}
+            </div>
+          </ReportSection>
+        )}
+
+        {executiveData && (
+          <div className="rpt-exec-insight">
+            <div className="rpt-exec-insight-label">Key takeaway</div>
+            <p>{executiveData.scqa.recommendedAction || executiveData.executiveSummary}</p>
+          </div>
+        )}
       </div>
     </ReportPage>
   );

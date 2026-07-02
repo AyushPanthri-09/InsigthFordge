@@ -29,7 +29,7 @@ export function HtmlReportDocument({ doc }: Props) {
     <div className="rpt-document">
       <P1_Cover data={doc.p1} {...shared} />
       <P2_ExecutiveSummary data={doc.p1} {...shared} />
-      <P3_TOC {...shared} />
+      <P3_TOC executiveData={doc.p1} performanceData={doc.p2} {...shared} />
       <P4_KPIDashboard
         data={doc.p2}
         {...shared}

@@ -1,11 +1,15 @@
 import React from "react";
 import type { P3TrendsData } from "../types";
 import { ReportPage } from "../primitives/ReportPage";
-import { ReportSection } from "../primitives/ReportSection";
-import { ReportBlock } from "../primitives/ReportBlock";
-import { ReportBadge } from "../primitives/ReportBadge";
 import { ReportChart } from "../primitives/ReportChart";
+import { ReportExecutiveInsight } from "../primitives/ReportExecutiveInsight";
+import { ReportSummaryTile } from "../primitives/ReportSummaryTile";
+import { ReportInsightCard } from "../primitives/ReportInsightCard";
+import { ReportSectionHeader } from "../primitives/ReportSectionHeader";
+import { ReportEvidencePanel } from "../primitives/ReportEvidencePanel";
+import { ReportSection } from "../primitives/ReportSection";
 import { ReportCallout } from "../primitives/ReportCallout";
+import { ReportBadge } from "../primitives/ReportBadge";
 
 interface Props {
   data: P3TrendsData;
@@ -95,6 +99,14 @@ export function P6_Trends({ data, datasetName, generatedAt }: Props) {
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {primary && (
+          <>
+          <div className="rpt-exec-insight">
+            <div className="rpt-exec-insight-label">Executive Insight</div>
+            <p>
+              {primary.narrative ||
+                `The monitored measure shows a ${primary.overallTrend} trend with ${primary.totalGrowthPct.toFixed(1)}% total growth across the available periods.`}
+            </p>
+          </div>
           <div
             style={{
               background: "var(--rpt-surface2)",
@@ -129,6 +141,7 @@ export function P6_Trends({ data, datasetName, generatedAt }: Props) {
               </div>
             </div>
           </div>
+          </>
         )}
 
         {data.trendCharts.length > 0 && (

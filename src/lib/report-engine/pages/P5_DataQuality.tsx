@@ -1,9 +1,12 @@
 import React from "react";
 import type { P4DataQualityData } from "../types";
 import { ReportPage } from "../primitives/ReportPage";
-import { ReportSection } from "../primitives/ReportSection";
+import { ReportExecutiveInsight } from "../primitives/ReportExecutiveInsight";
+import { ReportHeroMetric } from "../primitives/ReportHeroMetric";
+import { ReportSummaryTile } from "../primitives/ReportSummaryTile";
+import { ReportSectionHeader } from "../primitives/ReportSectionHeader";
 import { ReportTable } from "../primitives/ReportTable";
-import { ReportBadge } from "../primitives/ReportBadge";
+import { ReportInsightCard } from "../primitives/ReportInsightCard";
 import { ReportChart } from "../primitives/ReportChart";
 
 interface Props {
@@ -13,13 +16,17 @@ interface Props {
 }
 
 export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
-  const { issues = [], daieDecisions = [] } = data;
+  const qualityScore = Number(data.qualityScore ?? 0);
+  const status: "success" | "warning" | "critical" =
+    qualityScore >= 80 ? "success" : qualityScore >= 60 ? "warning" : "critical";
 
-  const criticalIssues = issues.filter((i) => i.severity === "critical");
-  const warningIssues = issues.filter((i) => i.severity === "warning");
-  const infoIssues = issues.filter((i) => i.severity === "info");
+  const issues = data.issues ?? [];
+  const hasIssues = issues.length > 0;
 
-  // Donut chart representation data
+  const critical = issues.filter((i) => i.severity === "critical");
+  const warning = issues.filter((i) => i.severity === "warning");
+  const info = issues.filter((i) => i.severity === "info");
+
   const pieSpec = {
     id: "quality_pie",
     type: "pie" as const,
@@ -28,19 +35,76 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
     xKey: "name",
     yKeys: ["value"],
     data: [
-      { name: "Critical", value: criticalIssues.length || 0, color: "var(--rpt-critical)" },
-      { name: "Warning", value: warningIssues.length || 0, color: "var(--rpt-warning)" },
-      { name: "Info / Clean", value: Math.max(1, infoIssues.length) || 1, color: "var(--rpt-success)" },
+      {
+        name: "Critical",
+        value: critical.length,
+        color: "var(--rpt-critical)",
+      },
+      {
+        name: "Warning",
+        value: warning.length,
+        color: "var(--rpt-warning)",
+      },
+      {
+        name: "Info / Clean",
+        value: Math.max(1, info.length),
+        color: "var(--rpt-success)",
+      },
     ],
   };
 
-  const decisionRows = daieDecisions.map((d, i) => ({
-    id: i,
+  const decisionRows = (data.daieDecisions ?? []).map((d, idx) => ({
+    id: String(idx),
     column: d.column,
     decision: d.decision,
-    nullPct: `${(d.nullPct * 100).toFixed(1)}%`,
+    nullPct: `${(Number(d.nullPct) * 100).toFixed(1)}%`,
     status: d.severity,
   }));
+
+  const decisionColumns = [
+    { key: "column", header: "Column Label", mono: true },
+    { key: "decision", header: "Decision Applied" },
+    { key: "nullPct", header: "Nulls Rate", align: "right" },
+    {
+      key: "status",
+      header: "Status Guard",
+      render: (row: (typeof decisionRows)[number]) => (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: "var(--rpt-font-caption)",
+            color:
+              row.status === "critical"
+                ? "var(--rpt-critical)"
+                : row.status === "warning"
+                  ? "var(--rpt-warning)"
+                  : "var(--rpt-success)",
+            fontWeight: 800,
+          }}
+        >
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: 999,
+              background:
+                row.status === "critical"
+                  ? "var(--rpt-critical)"
+                  : row.status === "warning"
+                    ? "var(--rpt-warning)"
+                    : "var(--rpt-success)",
+              display: "inline-block",
+            }}
+          />
+          {row.status}
+        </span>
+      ),
+    },
+  ];
+
+  const issuesForCards = issues.slice(0, 3);
 
   return (
     <ReportPage
@@ -51,136 +115,117 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
       datasetName={datasetName}
       generatedAt={generatedAt}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        
-        {/* Metric tiles and chart layout */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.25fr 0.75fr", gap: 14 }}>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {/* Top row mini stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-              {[
-                { label: "Data Quality Index", value: `${data.qualityScore}%`, color: "var(--rpt-brand)" },
-                { label: "Duplicate Rows Removed", value: String(data.rowsRemoved), color: "var(--rpt-accent)" },
-                { label: "Inspected Columns", value: String(daieDecisions.length), color: "#7c3aed" },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: "var(--rpt-surface2)",
-                    border: "1px solid var(--rpt-border)",
-                    borderRadius: 6,
-                    padding: "12px 10px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    minHeight: 64,
-                  }}
-                >
-                  <span style={{ fontSize: 8.5, fontWeight: 800, textTransform: "uppercase", color: "var(--rpt-text-muted)", letterSpacing: "0.08em" }}>
-                    {stat.label}
-                  </span>
-                  <span style={{ fontSize: 18, fontWeight: 850, color: stat.color, marginTop: 4 }}>
-                    {stat.value}
-                  </span>
-                </div>
-              ))}
-            </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--rpt-space-xl, 32px)" }}>
+        {/* Row 1 */}
+        <ReportExecutiveInsight
+          insight={`Dataset meets governance standards with ${qualityScore}% completeness.`}
+          impact="High reliability for executive decision-making."
+          confidence={qualityScore / 100}
+          status={status}
+        />
 
-            {/* Structured callout block */}
+        {/* Row 2 */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "var(--rpt-space-xl)" }}>
+          <div>
+            <ReportHeroMetric
+              label="Data Quality Index"
+              value={`${qualityScore}%`}
+              variant={status === "success" ? "success" : "warning"}
+            />
+
             <div
               style={{
-                background: "var(--rpt-surface2)",
-                border: "1px solid var(--rpt-border)",
-                borderRadius: 6,
-                padding: 12,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "var(--rpt-space-md)",
+                marginTop: "var(--rpt-space-md)",
               }}
             >
-              <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--rpt-brand-dark)", marginBottom: 4 }}>
-                Cleaning Posture Summary
-              </div>
-              <p style={{ fontSize: 9.8, color: "var(--rpt-text-muted)", lineHeight: 1.45, margin: 0 }}>
-                {data.notes || "The dataset was audited for null thresholds and structural constraints. Outlier values were checked and duplicates were resolved."}
-              </p>
+              <ReportSummaryTile label="Rows Removed" value={data.rowsRemoved} />
+              <ReportSummaryTile label="Columns Inspected" value={data.daieDecisions?.length || 0} />
             </div>
           </div>
 
-          {/* Donut chart for severities */}
-          <div className="rpt-card" style={{ padding: 12, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--rpt-brand-dark)", marginBottom: 6 }}>
-              {pieSpec.title}
-            </div>
-            <div className="rpt-chart-panel" style={{ height: 110 }}>
-              <ReportChart spec={pieSpec} height={110} />
+          <div>
+            <ReportChart spec={pieSpec} height={180} />
+            <div
+              style={{
+                fontSize: "var(--rpt-font-caption)",
+                color: "var(--rpt-text-muted)",
+                marginTop: "var(--rpt-space-sm)",
+              }}
+            >
+              {critical.length > 0
+                ? `${critical.length} critical issue${critical.length > 1 ? "s" : ""} require attention.`
+                : "No critical issues detected."}
             </div>
           </div>
-
         </div>
 
-        {/* Column Decisions Table */}
-        {decisionRows.length > 0 && (
-          <ReportSection title="Metadata Column Decisions">
-            <ReportTable
-              columns={[
-                { key: "column", header: "Column Label", mono: true },
-                { key: "decision", header: "Decision Applied" },
-                { key: "nullPct", header: "Nulls Rate", align: "right" },
-                {
-                  key: "status",
-                  header: "Status Guard",
-                  render: (row) => (
-                    <ReportBadge
-                      label={row.status}
-                      variant={
-                        row.status === "critical"
-                          ? "critical"
-                          : row.status === "warning"
-                            ? "warning"
-                            : "success"
-                      }
-                      dot
-                    />
-                  ),
-                },
-              ]}
-              rows={decisionRows}
-              maxRows={6}
-            />
-          </ReportSection>
-        )}
+        {/* Row 3 */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "var(--rpt-space-lg, 24px)",
+            marginTop: "var(--rpt-space-lg, 24px)",
+          }}
+        >
+          <div>
+            <ReportSectionHeader title="Column Decisions" />
+            {decisionRows.length > 0 ? (
+              <ReportTable
+                columns={decisionColumns as any}
+                rows={decisionRows}
+                maxRows={6}
+                striped
+                rowTone={(row) =>
+                  row.status === "critical" ? "critical" : row.status === "warning" ? "warning" : undefined
+                }
+              />
+            ) : (
+              <div
+                style={{
+                  marginTop: "var(--rpt-space-md)",
+                  background: "var(--rpt-surface2)",
+                  border: "1px solid var(--rpt-border-light)",
+                  borderRadius: 6,
+                  padding: 12,
+                  color: "var(--rpt-text-muted)",
+                  fontSize: "var(--rpt-font-body)",
+                }}
+              >
+                No column decisions available.
+              </div>
+            )}
+          </div>
 
-        {/* Cleaning Issues Callout List */}
-        {issues.length > 0 && (
-          <ReportSection title="Data Quality Alerts">
-            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-              {issues.slice(0, 3).map((issue) => (
-                <div
-                  key={issue.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "90px 1fr auto",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "8px 12px",
-                    background: "var(--rpt-surface2)",
-                    borderRadius: 6,
-                    border: "1px solid var(--rpt-border-light)",
-                  }}
-                >
-                  <ReportBadge label={issue.severity} variant={issue.severity} dot />
-                  <span style={{ fontSize: 10, color: "var(--rpt-ink)", fontWeight: 700 }}>
-                    {issue.affectedColumns && issue.affectedColumns.length > 0 ? `[${issue.affectedColumns.join(", ")}] ` : ""}{issue.description}
-                  </span>
-                  <span style={{ fontSize: 9.5, color: "var(--rpt-text-muted)", fontFamily: "var(--rpt-font-mono)" }}>
+          <div>
+            <ReportSectionHeader title="Quality Alerts" />
+            {hasIssues ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--rpt-space-sm)" }}>
+                {issuesForCards.map((issue) => (
+                  <ReportInsightCard
+                    key={issue.id}
+                    title={issue.description}
+                    badge={issue.severity}
+                  >
                     {issue.action}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </ReportSection>
-        )}
-
+                  </ReportInsightCard>
+                ))}
+              </div>
+            ) : (
+              <ReportExecutiveInsight
+                insight="No data quality issues were detected in this dataset."
+                impact="Dataset readiness is high with no critical remediation required."
+                confidence={1}
+                status="success"
+              />
+            )}
+          </div>
+        </div>
       </div>
     </ReportPage>
   );
 }
+

@@ -14,19 +14,30 @@ interface ReportTableProps<T> {
   rows: T[];
   maxRows?: number;
   className?: string;
+  striped?: boolean;
+  /** New API: preferred */
+  rowTone?: (row: T) => "critical" | "warning" | "success" | undefined;
+  /** Back-compat: older prop name */
+  getRowTone?: (row: T) => "critical" | "warning" | "success" | "info" | "neutral" | undefined;
 }
+
 
 export function ReportTable<T extends object>({
   columns,
   rows,
   maxRows,
   className = "",
+  striped = false,
+  rowTone,
+  getRowTone,
 }: ReportTableProps<T>) {
+  const toneFn = rowTone ?? getRowTone;
+
   const visible = maxRows ? rows.slice(0, maxRows) : rows;
 
   return (
     <div className="rpt-table-wrap">
-      <table className={`rpt-table ${className}`}>
+      <table className={`rpt-table ${striped ? "rpt-table-striped" : ""} ${className}`}>
         <thead>
           <tr>
             {columns.map((col) => (
@@ -44,7 +55,10 @@ export function ReportTable<T extends object>({
         </thead>
         <tbody>
           {visible.map((row, ri) => (
-            <tr key={ri}>
+            <tr
+              key={ri}
+              className={toneFn ? `rpt-table-row-${toneFn(row) ?? "neutral"}` : undefined}
+            >
               {columns.map((col) => (
                 <td
                   key={String(col.key)}

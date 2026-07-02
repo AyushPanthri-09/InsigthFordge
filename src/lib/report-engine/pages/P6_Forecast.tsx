@@ -81,6 +81,16 @@ export function P6_Forecast({ data, datasetName, generatedAt }: Props) {
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {primary && (
+          <div className="rpt-exec-insight">
+            <div className="rpt-exec-insight-label">Executive Insight</div>
+            <p>
+              Forecasting is expected to grow steadily over the next modeled periods with {primary.confidence >= 0.9 ? "high" : "moderate"} confidence.
+              The model projects a {primary.totalGrowthPct >= 0 ? "positive" : "negative"} growth outlook of {primary.totalGrowthPct.toFixed(1)}%.
+            </p>
+          </div>
+        )}
+
+        {primary && (
           <ReportSection title={`Forecast Target Exhibit: ${primary.measureColumn}`}>
             <div className="rpt-card" style={{ padding: 14 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1.3fr 0.7fr", gap: 16 }}>
