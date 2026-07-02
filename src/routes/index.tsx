@@ -125,7 +125,7 @@ function Landing() {
             className="hidden md:block"
           >
             <Link
-              to="/workspace"
+              to="/dashboard"
               className="btn-glow inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
             >
               Launch Workspace <ArrowRight className="h-3.5 w-3.5" />
@@ -157,7 +157,7 @@ function Landing() {
               <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
               <a href="#why" className="text-sm text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Live Demo</a>
               <Link
-                to="/workspace"
+                to="/dashboard"
                 className="inline-flex w-fit items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -232,7 +232,7 @@ function Landing() {
             >
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }}>
                 <Link
-                  to="/workspace"
+                  to="/dashboard"
                   className="btn-glow inline-flex items-center gap-2.5 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground"
                 >
                   <Upload className="h-4 w-4" />

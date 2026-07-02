@@ -22,6 +22,9 @@ import { downloadExecutivePdf } from "@/lib/report-engine/render";
 import { buildReportDocument } from "@/lib/report-engine/builder";
 import { HtmlReportDocument } from "@/lib/report-engine/HtmlReportDocument";
 import { cn } from "@/lib/utils";
+import { PredictiveSandbox } from "@/components/insightforge/PredictiveSandbox";
+import { DataWorkspace } from "@/components/insightforge/DataWorkspace";
+import { AiCopilot } from "@/components/insightforge/AiCopilot";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
@@ -38,7 +41,14 @@ export const Route = createFileRoute("/workspace")({
 });
 
 type Tab =
-  "overview" | "understanding" | "cleaning" | "eda" | "analytics" | "report";
+  | "overview" 
+  | "understanding" 
+  | "cleaning" 
+  | "eda" 
+  | "analytics" 
+  | "sandbox"
+  | "data"
+  | "report";
 
 function Workspace() {
   const [notes, setNotes] = useState("");
@@ -140,6 +150,9 @@ function Workspace() {
           />
         )}
       </main>
+      {analysis && (
+        <AiCopilot dataset={analysis.dataset} understanding={analysis.understanding} />
+      )}
       <Footer />
     </div>
   );
@@ -222,6 +235,8 @@ function Dashboard({
           analysis.analytics.predictive.length +
           analysis.analytics.prescriptive.length,
       },
+      { id: "sandbox", label: "Predictive Sandbox" },
+      { id: "data", label: "Data Workspace" },
       { id: "report", label: "Report" },
     ],
     [analysis],
@@ -299,6 +314,8 @@ function Dashboard({
           )}
           {tab === "eda" && <EDATab analysis={analysis} />}
           {tab === "analytics" && <AnalyticsTab analysis={analysis} />}
+          {tab === "sandbox" && <PredictiveSandbox dataset={analysis.dataset} />}
+          {tab === "data" && <DataWorkspace dataset={analysis.dataset} understanding={analysis.understanding} />}
           {tab === "report" && <ReportTab analysis={analysis} />}
         </motion.div>
       </AnimatePresence>
