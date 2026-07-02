@@ -615,88 +615,184 @@ function Landing() {
 /* ── Never Principles Banner ─────────────────────────────────── */
 function NeverPrinciplesBanner() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.25 });
+  const isInView = useInView(ref, { once: true, amount: 0.15 });
 
   return (
     <section
       ref={ref}
       aria-label="Core principles"
-      className="relative w-full overflow-hidden py-24"
-      style={{ background: "#0F172A" }}
+      className="relative w-full overflow-hidden py-20"
+      style={{
+        background:
+          "linear-gradient(180deg, oklch(0.11 0.012 250) 0%, #0F172A 30%, #0F172A 70%, oklch(0.11 0.012 250) 100%)",
+      }}
     >
-      {/* Ambient gradient overlays */}
+      {/* ── Rich radial ambient backdrop ── */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background:
-            "radial-gradient(ellipse 800px 400px at 20% 50%, oklch(0.55 0.18 15 / 8%) 0%, transparent 60%), radial-gradient(ellipse 600px 400px at 80% 50%, oklch(0.45 0.12 0 / 6%) 0%, transparent 60%)",
+          background: [
+            "radial-gradient(ellipse 900px 500px at 50% 0%,   oklch(0.55 0.20 15 / 10%) 0%, transparent 65%)",
+            "radial-gradient(ellipse 600px 400px at 10% 60%,  oklch(0.68 0.22 290 / 6%) 0%, transparent 55%)",
+            "radial-gradient(ellipse 600px 400px at 90% 60%,  oklch(0.68 0.22 290 / 5%) 0%, transparent 55%)",
+            "radial-gradient(ellipse 400px 300px at 50% 110%, oklch(0.55 0.18 15 / 8%) 0%, transparent 60%)",
+          ].join(", "),
         }}
       />
-      {/* Top/bottom border lines */}
+      {/* Subtle dot-grid texture */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.018]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, oklch(1 0 0) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      {/* Top accent line */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{
           background:
-            "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 15 / 35%) 30%, oklch(0.60 0.18 0 / 30%) 70%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 15 / 40%) 30%, oklch(0.60 0.18 0 / 35%) 70%, transparent 100%)",
         }}
       />
+      {/* Bottom accent line */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
         style={{
           background:
-            "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 15 / 25%) 30%, oklch(0.60 0.18 0 / 20%) 70%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, oklch(0.68 0.22 290 / 22%) 40%, oklch(0.68 0.22 290 / 18%) 60%, transparent 100%)",
         }}
       />
 
-      <div className="relative mx-auto max-w-5xl px-6">
-        {/* Section label */}
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, ease: EASE_OUT }}
-          className="mb-10 text-center text-[10px] font-bold uppercase tracking-[0.18em]"
-          style={{ color: "oklch(0.60 0.18 15)" }}
-        >
-          Core Philosophy
-        </motion.p>
+      <div className="relative mx-auto max-w-4xl px-6">
 
-        <div className="space-y-5">
+        {/* ── Section header ── */}
+        <div className="mb-12 text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.45, ease: EASE_OUT }}
+            className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em]"
+            style={{
+              background: "oklch(0.60 0.22 15 / 10%)",
+              border: "1px solid oklch(0.60 0.22 15 / 25%)",
+              color: "oklch(0.68 0.20 15)",
+            }}
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ background: "oklch(0.68 0.22 15)" }}
+            />
+            Core Philosophy
+          </motion.p>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, ease: EASE_OUT, delay: 0.07 }}
+            className="font-display text-3xl font-bold tracking-[-0.028em] text-foreground md:text-4xl"
+          >
+            The Principles Behind{" "}
+            <span className="gradient-text">Every AI Decision</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.14 }}
+            className="mx-auto mt-4 max-w-lg text-base text-muted-foreground"
+          >
+            InsightForge never generates conclusions without understanding,
+            evidence and reasoning.
+          </motion.p>
+        </div>
+
+        {/* ── Principle cards ── */}
+        <div className="space-y-4">
           {NEVER_PRINCIPLES.map((principle, i) => (
             <motion.div
               key={principle}
-              initial={{ opacity: 0, x: -24 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.55, ease: EASE_OUT, delay: 0.12 + i * 0.12 }}
-              className="group flex items-center gap-5 rounded-2xl px-7 py-5 transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.52, ease: EASE_OUT, delay: 0.22 + i * 0.12 }}
+              whileHover={{ y: -6 }}
+              className="group relative flex items-center gap-5 overflow-hidden rounded-2xl px-6 py-5 transition-shadow duration-300"
               style={{
-                background: "oklch(1 0 0 / 2.5%)",
-                border: "1px solid oklch(1 0 0 / 5%)",
-                backdropFilter: "blur(8px)",
+                background: "oklch(0.155 0.022 270 / 55%)",
+                border: "1px solid oklch(1 0 0 / 7%)",
+                backdropFilter: "blur(18px) saturate(140%)",
+                WebkitBackdropFilter: "blur(18px) saturate(140%)",
+                boxShadow:
+                  "0 2px 16px oklch(0 0 0 / 28%), 0 1px 0 oklch(1 0 0 / 5%) inset",
               }}
             >
-              {/* Cross icon */}
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-lg font-black transition-all duration-300 group-hover:scale-110"
+              {/* Hover: purple border glow (CSS transition via ::before pseudo is hard in inline, so use a layered div) */}
+              <div
+                className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 style={{
-                  background: "oklch(0.60 0.22 15 / 15%)",
-                  border: "1px solid oklch(0.60 0.22 15 / 30%)",
-                  color: "oklch(0.72 0.22 15)",
-                  lineHeight: 1,
+                  boxShadow:
+                    "0 0 0 1px oklch(0.68 0.22 290 / 35%), 0 8px 32px oklch(0.68 0.22 290 / 18%), 0 0 0 1px oklch(0.60 0.22 15 / 15%)",
+                  background:
+                    "radial-gradient(ellipse 260px 120px at 50% 0%, oklch(0.55 0.18 15 / 10%) 0%, transparent 70%)",
                 }}
-                aria-hidden="true"
-              >
-                ✕
-              </span>
+              />
+              {/* Hover: top gradient border line */}
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, oklch(0.60 0.22 15 / 55%) 30%, oklch(0.68 0.22 290 / 45%) 70%, transparent 100%)",
+                }}
+              />
 
+              {/* ── Red X icon container ── */}
+              <div
+                className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110"
+                style={{
+                  background:
+                    "linear-gradient(135deg, oklch(0.55 0.24 15 / 22%), oklch(0.50 0.22 10 / 16%))",
+                  border: "1px solid oklch(0.60 0.22 15 / 35%)",
+                  boxShadow:
+                    "0 0 0 1px oklch(0.60 0.22 15 / 12%), 0 4px 16px oklch(0.55 0.22 15 / 20%)",
+                }}
+              >
+                {/* Glow on hover */}
+                <div
+                  className="absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{
+                    boxShadow: "0 0 20px oklch(0.65 0.24 15 / 50%)",
+                    background: "oklch(0.60 0.22 15 / 8%)",
+                  }}
+                />
+                <span
+                  className="relative z-10 select-none text-xl font-black leading-none transition-all duration-300 group-hover:scale-110"
+                  style={{ color: "oklch(0.72 0.24 15)" }}
+                  aria-hidden="true"
+                >
+                  ❌
+                </span>
+              </div>
+
+              {/* ── Principle text ── */}
               <p
-                className="font-display text-xl font-semibold tracking-[-0.02em] transition-colors duration-300 sm:text-2xl md:text-3xl"
-                style={{ color: "oklch(0.88 0.005 250)" }}
+                className="relative z-10 font-display text-lg font-semibold tracking-[-0.022em] transition-colors duration-300 group-hover:text-foreground sm:text-xl md:text-2xl"
+                style={{ color: "oklch(0.84 0.008 250)" }}
               >
                 {principle}
               </p>
+
+              {/* Subtle right-side number watermark */}
+              <span
+                className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 select-none font-display text-6xl font-black opacity-[0.03] transition-opacity duration-300 group-hover:opacity-[0.055]"
+                aria-hidden="true"
+              >
+                {i + 1}
+              </span>
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   );
