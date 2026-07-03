@@ -126,7 +126,9 @@ const CATEGORY_SIGNALS: Array<{
     schemaRole: "fact_measure",
   },
   // Time dimensions
+  
   {
+    
     pattern:
       /\b(date|datetime|timestamp|time|created_at|updated_at|modified)\b/i,
     category: "time_dimension",

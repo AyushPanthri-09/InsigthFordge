@@ -290,6 +290,46 @@ export function profileDataset(
 
   // Step 3 — Column intelligence (semantic analysis per column)
   const intelligence = analyseAllColumns(profiles, domainResult.domain);
+    // --- POST-PROCESS: Override name-based semantics with value sampling ---
+  // This fixes the "phone numbers in date column" type of bug generically
+  // We need to import sampleMatches from column-intelligence.ts (add import at top)
+  for (const p of profiles) {
+    const intel = intelligence[p.name];
+    if (!intel) continue;
+    
+    // If it was classified as a time dimension, check if values actually look like dates
+    if (intel.businessCategory === "time_dimension") {
+      let dateCount = 0;
+      let phoneCount = 0;
+      let checked = 0;
+      for (const row of rows.slice(0, 50)) {
+        const val = row[p.name];
+        if (val === null || val === undefined || val === "") continue;
+        const str = String(val);
+        // Try to parse as date
+        const d = new Date(str);
+        const isDate = !isNaN(d.getTime()) && d.getFullYear() > 1900 && d.getFullYear() < 2100;
+        // Check if it looks like a phone number (digits + + - ( ) )
+        const isPhone = /^[\d+\-() ]{7,15}$/.test(str.replace(/\s/g, ''));
+        if (isDate) dateCount++;
+        if (isPhone) phoneCount++;
+        checked++;
+        if (checked >= 30) break;
+      }
+      // If >50% of samples look like phone numbers, override
+      if (checked > 5 && phoneCount / checked > 0.5 && dateCount / checked < 0.3) {
+        intel.businessCategory = "descriptor";
+        intel.schemaRole = "dimension_attribute";
+        intel.businessTags = ["free_text", "non_aggregatable"];
+        intel.confidence = Math.min(intel.confidence, 0.6);
+        intel.businessMeaning = `${p.name}: Value sampling indicates this is a phone/contact field, not a date.`;
+        intel.rationale = `Overridden: name suggested date, but samples matched phone number patterns (${phoneCount}/${checked}).`;
+        // Update the profile's business meaning for UI
+        p.businessMeaning = intel.businessMeaning;
+        p.intelligence = intel;
+      }
+    }
+  }
 
   // Attach intelligence back to profiles so it travels downstream
   for (const p of profiles) {
