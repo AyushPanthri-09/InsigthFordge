@@ -1,4 +1,6 @@
 /* InsightForge premium report design system */
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap");
+
 :root {
   --rpt-navy: #0a1628;
   --rpt-navy-light: #1a2a4a;
@@ -37,7 +39,7 @@
   --rpt-p-high: #c026d3;
   --rpt-p-medium: #b7791f;
   --rpt-p-low: #047857;
-  --rpt-font: "Aptos", "Segoe UI", "Inter", system-ui, sans-serif;
+  --rpt-font: "Inter", "Aptos", "Segoe UI", system-ui, sans-serif;
   --rpt-font-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
   --rpt-page-pad: 42px;
   --rpt-section-gap: 18px;
