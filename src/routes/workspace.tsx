@@ -588,7 +588,7 @@ function ReportTab({ analysis }: { analysis: FullAnalysis }) {
         <div>
           <h2 className="text-base font-semibold">Enterprise Report Preview</h2>
           <p className="text-xs text-muted-foreground">
-            Live preview of the full 13-page PDF report
+            Live preview of the 6-page executive PDF report
           </p>
         </div>
         <button

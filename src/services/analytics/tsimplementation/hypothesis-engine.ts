@@ -239,9 +239,8 @@ export function evaluateHypothesis(
 
   // Standard evaluation: match questions to hypothesis columns
   for (const q of questions) {
-    const isRelated =
-      hyp.relatedColumns.includes(q.targetColumn) ||
-      hyp.relatedColumns.length === 0;
+      const isRelated =
+    hyp.relatedColumns.includes(q.targetColumn);
 
     if (!isRelated && q.analysisType !== "distribution_shift") continue;
 

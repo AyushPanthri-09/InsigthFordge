@@ -4,6 +4,7 @@ import type { FullAnalysis } from "@/services/analytics/types";
 import { buildReportDocument } from "./builder";
 import { HtmlReportDocument } from "./HtmlReportDocument";
 import reportTokens from "./report-tokens.css?raw";
+import aaTheme from "./aa-theme.css?raw";
 import printCss from "./print.css?raw";
 import { renderReportPdfServer } from "./playwright";
 import {
@@ -36,7 +37,36 @@ async function renderReportDom(
   const root = createRoot(wrapper);
   root.render(React.createElement(HtmlReportDocument, { doc }));
 
+  // Wait for initial paint
   await waitForReportPaint(wrapper);
+
+  // Wait for Recharts SVGs to render
+  await new Promise<void>((resolve) => {
+    let attempts = 0;
+    const maxAttempts = 50;
+    const interval = setInterval(() => {
+      const svgs = wrapper.querySelectorAll(".recharts-surface");
+      const hasCharts = svgs.length > 0;
+      const hasPlaceholders = wrapper.innerHTML.includes("image[[");
+
+      if ((hasCharts && !hasPlaceholders) || attempts > maxAttempts) {
+        clearInterval(interval);
+        resolve();
+      }
+      attempts++;
+    }, 100);
+  });
+
+  // ✅ ONLY remove specific placeholder patterns, NOT ALL HTML tags
+  let html = wrapper.innerHTML;
+
+  // Remove image[[...]] placeholders (any numbers inside)
+  html = html.replace(/image\[\[[^\]]*\]\]/g, "");
+
+  // Remove [object Object] artifacts
+  html = html.replace(/\[object Object\]/g, "");
+  
+  wrapper.innerHTML = html;
 
   return {
     wrapper,
@@ -46,7 +76,6 @@ async function renderReportDom(
     },
   };
 }
-
 function buildPrintHtml(reportMarkup: string): string {
   return [
     "<!doctype html>",
@@ -56,6 +85,7 @@ function buildPrintHtml(reportMarkup: string): string {
     '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     "<title>InsightForge Executive Report</title>",
     `<style>${reportTokens}</style>`,
+    `<style>${aaTheme}</style>`,
     `<style>${printCss}</style>`,
     "</head>",
     "<body>",
@@ -71,7 +101,23 @@ export async function createPrintableReportHtml(
   const rendered = await renderReportDom(analysis);
 
   try {
-    return buildPrintHtml(rendered.wrapper.innerHTML);
+    // Get the HTML
+    let html = rendered.wrapper.innerHTML;
+    
+    // FINAL SANITIZATION PASS — removes any remaining placeholder artifacts
+    html = html.replace(/image\[\[[^\]]*\]\]/g, "");
+    html = html.replace(/\[object Object\]/g, "");
+    
+    // ✅ DEBUG: Check if image[[ still exists after sanitization
+    if (html.includes("image[[")) {
+      console.log("🚨 WARNING: image[[ STILL PRESENT after sanitization!");
+      const match = html.match(/image\[\[[^\]]*\]\]/);
+      console.log("Example:", match?.[0]);
+    } else {
+      console.log("✅ image[[ successfully removed from HTML.");
+    }
+    
+    return buildPrintHtml(html);
   } finally {
     rendered.cleanup();
   }

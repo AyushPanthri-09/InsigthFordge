@@ -1,3 +1,4 @@
+export { P0_OnePageExecutiveTemplate } from "./P0_OnePageExecutiveTemplate";
 export { P1_Cover } from "./P1_Cover";
 export { P2_ExecutiveSummary } from "./P2_ExecutiveSummary";
 export { P3_TOC } from "./P3_TOC";

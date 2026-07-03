@@ -26,13 +26,16 @@ export function ReportPage({
 }: ReportPageProps) {
   return (
     <div className={`rpt-page ${className}`} data-page={pageNumber}>
-      <div className="rpt-watermark">InsightForge</div>
+      <div className="rpt-watermark">INSIGHTFORGE AI</div>
       <div className="rpt-corner-page">{pageNumber}</div>
 
       {!isCover && (
         <>
           <div className="rpt-page-header">
-            <div className="rpt-page-header-brand">InsightForge AI</div>
+            <div className="rpt-page-header-brand">
+              <span className="rpt-page-header-logo">IF</span>
+              InsightForge AI
+            </div>
             <div className="rpt-page-header-meta">
               {datasetName && (
                 <div style={{ fontWeight: 700, color: "var(--rpt-ink)" }}>

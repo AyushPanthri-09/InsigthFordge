@@ -17,6 +17,10 @@ import {
   Legend,
 } from "recharts";
 import type { ChartSpec } from "@/services/analytics/types";
+import {
+  sanitizeReportText,
+  sanitizeReportValue,
+} from "../report-sanitizer";
 
 const PALETTE = [
   "var(--rpt-c1)",
@@ -61,8 +65,24 @@ interface ReportChartProps {
 }
 
 export function ReportChart({ spec, height = 200 }: ReportChartProps) {
-  const data = spec.data as Record<string, unknown>[];
-  if (!data?.length) {
+  const cleanedTitle = sanitizeReportText(spec.title);
+  const cleanedDescription = sanitizeReportText(spec.description ?? "");
+  const rawData = spec.data as Record<string, unknown>[];
+  const data = (Array.isArray(rawData)
+    ? rawData.map((row) => sanitizeReportValue(row as unknown as Record<string, unknown>))
+    : []) as Record<string, unknown>[];
+
+  const yKeys = spec.yKeys ?? [spec.yKeys?.[0] ?? "value"];
+  const validData = data.filter((row) =>
+    yKeys.some((key) => {
+      const value = row[key];
+      if (typeof value === "number") return Number.isFinite(value);
+      if (typeof value === "string") return sanitizeReportText(value) !== "";
+      return value != null;
+    }),
+  );
+
+  if (!validData.length) {
     return (
       <div
         className="rpt-stat-tile"
@@ -76,22 +96,27 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
           textAlign: "center",
         }}
       >
-        Chart readiness gated until the source query returns plottable rows.
+        Chart unavailable: source values are missing or contain unsupported placeholders.
       </div>
     );
   }
 
-  const yKeys = spec.yKeys ?? [spec.yKeys?.[0] ?? "value"];
+  const chartSpec = {
+    ...spec,
+    title: cleanedTitle,
+    description: cleanedDescription,
+    data: validData,
+  } as ChartSpec;
 
-  if (spec.type === "pie") {
+  if (chartSpec.type === "pie") {
     const key = yKeys[0] ?? "value";
     return (
       <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie
-            data={data}
+            data={chartSpec.data as Record<string, unknown>[]}
             dataKey={key}
-            nameKey={spec.xKey ?? "name"}
+            nameKey={chartSpec.xKey ?? "name"}
             cx="50%"
             cy="50%"
             innerRadius={0}
@@ -112,11 +137,11 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
     );
   }
 
-  if (spec.type === "bar") {
+  if (chartSpec.type === "bar") {
     return (
       <ResponsiveContainer width="100%" height={height}>
         <BarChart
-          data={data}
+          data={chartSpec.data as Record<string, unknown>[]}
           layout="horizontal"
           margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
         >
@@ -127,7 +152,7 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
           />
           <>
             <XAxis
-              dataKey={spec.xKey}
+              dataKey={chartSpec.xKey}
               tick={TICK_STYLE}
               axisLine={false}
               tickLine={false}
@@ -155,18 +180,18 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
     );
   }
 
-  if (spec.type === "area") {
+  if (chartSpec.type === "area") {
     return (
       <ResponsiveContainer width="100%" height={height}>
         <AreaChart
-          data={data}
+          data={chartSpec.data as Record<string, unknown>[]}
           margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
         >
           <defs>
             {yKeys.map((k, i) => (
               <linearGradient
                 key={k}
-                id={`grad_${safeChartId(`${spec.id}_${k}`)}`}
+                id={`grad_${safeChartId(`${chartSpec.id}_${k}`)}`}
                 x1="0"
                 y1="0"
                 x2="0"
@@ -191,7 +216,7 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
             vertical={false}
           />
           <XAxis
-            dataKey={spec.xKey}
+            dataKey={chartSpec.xKey}
             tick={TICK_STYLE}
             axisLine={false}
             tickLine={false}
@@ -211,7 +236,7 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
               dataKey={k}
               stroke={PALETTE[i % PALETTE.length]}
               strokeWidth={2}
-              fill={`url(#grad_${safeChartId(`${spec.id}_${k}`)})`}
+              fill={`url(#grad_${safeChartId(`${chartSpec.id}_${k}`)})`}
               dot={false}
               connectNulls
             />
@@ -224,14 +249,14 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
   // Default: line
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
+      <LineChart data={chartSpec.data as Record<string, unknown>[]} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
         <CartesianGrid
           strokeDasharray="3 3"
           stroke="var(--rpt-border-light)"
           vertical={false}
         />
         <XAxis
-          dataKey={spec.xKey}
+          dataKey={chartSpec.xKey}
           tick={TICK_STYLE}
           axisLine={false}
           tickLine={false}

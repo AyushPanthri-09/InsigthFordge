@@ -28,6 +28,40 @@ import type {
 } from "./types";
 import { sanitizeReportValue } from "./report-sanitizer";
 
+// ─── Aggressive Data Sanitizer ──────────────────────────────────────────────
+
+function deepSanitizeStrings<T>(value: T): T {
+  if (typeof value === "string") {
+    // Remove ALL image[[ tags
+    let sanitized = value.replace(/image\[\[[^\]]*\]\]/g, "");
+    // Remove ALL table tags
+    sanitized = sanitized.replace(/<table[\s\S]*?<\/table>/g, "");
+    // Remove [object Object]
+    sanitized = sanitized.replace(/\[object Object\]/g, "");
+    // Remove any remaining HTML-like tags
+    sanitized = sanitized.replace(/<[^>]*>/g, "");
+    // Clean up whitespace
+    sanitized = sanitized.replace(/\s+/g, " ").trim();
+    return sanitized as T;
+  }
+  
+  if (Array.isArray(value)) {
+    return value.map((item) => deepSanitizeStrings(item)) as T;
+  }
+  
+  if (value && typeof value === "object") {
+    const result: Record<string, unknown> = {};
+    for (const key in value) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        result[key] = deepSanitizeStrings((value as Record<string, unknown>)[key]);
+      }
+    }
+    return result as T;
+  }
+  
+  return value;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function generateReportId(seed: string): string {
@@ -202,7 +236,6 @@ function buildP1(analysis: FullAnalysis, generatedAt: string): P1ExecutiveData {
   const topInvestigation = analysis.eda.investigations?.[0];
   const narrative = topInvestigation?.executiveNarrative;
 
-  // Synthesise SCQA from available data
   const scqa = narrative
     ? {
         situation: narrative.situation,
@@ -260,9 +293,18 @@ function buildP1(analysis: FullAnalysis, generatedAt: string): P1ExecutiveData {
 }
 
 function buildP2(analysis: FullAnalysis): P2PerformanceData {
+  // Sanitize charts to remove image[[ placeholders
+  const charts = analysis.eda.charts.slice(0, 4).map((chart) => {
+    const data = (chart as any).data;
+    if (typeof data === "string" && data.includes("image[[")) {
+      return { ...chart, data: [] };
+    }
+    return chart;
+  });
+
   return {
     kpis: analysis.eda.kpis,
-    primaryCharts: analysis.eda.charts.slice(0, 4),
+    primaryCharts: charts,
     correlations: analysis.eda.correlations,
     descriptiveInsights: analysis.analytics.descriptive,
     domain: domainLabel(analysis.understanding.domain),
@@ -270,9 +312,15 @@ function buildP2(analysis: FullAnalysis): P2PerformanceData {
 }
 
 function buildP3(analysis: FullAnalysis): P3TrendsData {
-  const trendCharts = analysis.eda.charts.filter(
-    (c) => c.type === "area" || c.type === "line",
-  );
+  const trendCharts = analysis.eda.charts
+    .filter((c) => c.type === "area" || c.type === "line")
+    .map((chart) => {
+      const data = (chart as any).data;
+      if (typeof data === "string" && data.includes("image[[")) {
+        return { ...chart, data: [] };
+      }
+      return chart;
+    });
 
   return {
     timeSeriesAnalysis: analysis.eda.timeSeriesAnalysis ?? [],
@@ -407,31 +455,53 @@ function buildAppendix(analysis: FullAnalysis): AppendixData {
 
 // ─── Main builder ─────────────────────────────────────────────────────────────
 
-/**
- * Transforms a FullAnalysis into a typed ReportDocument.
- * This is the single entry point for the report data layer.
- * Pure function — no side effects.
- */
 export function buildReportDocument(analysis: FullAnalysis): ReportDocument {
+  // ✅ Step 1: Sanitize the entire input analysis object
+  const sanitizedAnalysis = deepSanitizeStrings(analysis);
+  
   const now = new Date();
   const generatedAt = formatDateTime(now);
   const reportId = generateReportId(
-    `${analysis.dataset.datasetId}|${analysis.dataset.fileName}|${analysis.dataset.rowCount}|${analysis.dataset.columnCount}`,
+    `${sanitizedAnalysis.dataset.datasetId}|${sanitizedAnalysis.dataset.fileName}|${sanitizedAnalysis.dataset.rowCount}|${sanitizedAnalysis.dataset.columnCount}`,
   );
 
-  return sanitizeReportValue({
+  const rawReport = {
     reportId,
     generatedAt,
-    datasetName: analysis.dataset.fileName.replace(/\.[^.]+$/, ""),
-    fileName: analysis.dataset.fileName,
+    datasetName: sanitizedAnalysis.dataset.fileName.replace(/\.[^.]+$/, ""),
+    fileName: sanitizedAnalysis.dataset.fileName,
 
-    p1: buildP1(analysis, generatedAt),
-    p2: buildP2(analysis),
-    p3: buildP3(analysis),
-    p4: buildP4(analysis),
-    p5: buildP5(analysis),
-    p6: buildP6(analysis),
-    p7: buildP7(analysis),
-    appendix: buildAppendix(analysis),
-  });
+    p1: buildP1(sanitizedAnalysis, generatedAt),
+    p2: buildP2(sanitizedAnalysis),
+    p3: buildP3(sanitizedAnalysis),
+    p4: buildP4(sanitizedAnalysis),
+    p5: buildP5(sanitizedAnalysis),
+    p6: buildP6(sanitizedAnalysis),
+    p7: buildP7(sanitizedAnalysis),
+    appendix: buildAppendix(sanitizedAnalysis),
+  };
+
+  // DEBUG: Find where image[[ is coming from (BEFORE sanitization)
+  const jsonString = JSON.stringify(rawReport);
+  if (jsonString.includes("image[[")) {
+    console.log("=== FOUND image[[ in data (BEFORE sanitization) ===");
+    const matches = jsonString.match(/[^{,]*image\[\[[^\]]*\]\][^,}]*/g);
+    console.log("Occurrences:", matches);
+  }
+
+  // Step 2: Sanitize again for safety (using the same deep sanitizer)
+  const sanitized = deepSanitizeStrings(rawReport);
+  const fullySanitized = sanitizeReportValue(sanitized);
+
+  // DEBUG: After sanitization, check if image[[ still exists
+  const sanitizedString = JSON.stringify(sanitized);
+  if (sanitizedString.includes("image[[")) {
+    console.log("=== image[[ STILL PRESENT AFTER sanitization ===");
+    const matches = sanitizedString.match(/[^{,]*image\[\[[^\]]*\]\][^,}]*/g);
+    console.log("Occurrences:", matches);
+  } else {
+    console.log("✅ image[[ removed successfully.");
+  }
+
+  return fullySanitized;
 }
