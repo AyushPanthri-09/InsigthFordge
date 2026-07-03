@@ -26,6 +26,28 @@ import { columnIntelligenceConfidence } from "./shared-confidence";
 // ---------------------------------------------------------------------------
 // Signal maps — ordered from most specific to most general
 // ---------------------------------------------------------------------------
+/**
+ * Samples up to 50 non-null values from a column and checks if they match
+ * a given regex pattern. Returns true if >80% of sampled values match.
+ */
+function sampleMatches(
+  rows: Record<string, unknown>[],
+  colName: string,
+  regex: RegExp,
+  sampleSize = 50
+): boolean {
+  let matched = 0;
+  let checked = 0;
+  for (const row of rows) {
+    const val = row[colName];
+    if (val === null || val === undefined || val === "") continue;
+    const str = String(val);
+    if (regex.test(str)) matched++;
+    checked++;
+    if (checked >= sampleSize) break;
+  }
+  return checked > 0 && matched / checked > 0.8;
+}
 
 /** Maps column name patterns to a BusinessColumnCategory. */
 const CATEGORY_SIGNALS: Array<{
