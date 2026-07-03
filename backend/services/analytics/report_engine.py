@@ -29,15 +29,36 @@ class ExecutiveReportEngine:
         """
         start_time = time.time()
         
-        # --- 1. Validation Phase ---
-        val_report = DatasetValidationEngine.run_validation(df)
+        # --- Run AI Orchestrator workflow engine ---
+        from backend.services.orchestrator.orchestrator import AIOrchestrator
+        orchestrator_result = AIOrchestrator.run(dataset_id=dataset_id, df=df)
         
-        # --- 2. Cleaning Phase ---
-        cleaned_df, cleaning_log = DatasetCleaningEngine.clean_dataset(df)
+        cleaned_df = orchestrator_result.dataframe
+        val_report = orchestrator_result.validation_report
+        cleaning_log = orchestrator_result.cleaning_log
         
-        # If dataset becomes empty or cleaning fails, fall back to original
+        # If dataset becomes empty, fall back to original
         if cleaned_df.empty:
             cleaned_df = df.copy()
+
+        analyst_result = orchestrator_result.analyst_result
+        business_analyst_result = orchestrator_result.business_result
+        strategy_result = orchestrator_result.strategy_result
+        executive_result = orchestrator_result.executive_result
+
+        # --- Run AI Platform Intelligence Supervisor ---
+        from backend.services.platform_intelligence.supervisor import AIPlatformSupervisor
+        platform_result = AIPlatformSupervisor.supervise(
+            dataset_id=dataset_id,
+            orchestrator_result=orchestrator_result
+        )
+
+        # --- Run AI Platform Operations ---
+        from backend.services.platform_operations.operations import AIPlatformOperations
+        operations_result = AIPlatformOperations.run(
+            dataset_id=dataset_id,
+            platform_result=platform_result
+        )
 
         # --- 3. Profiling Phase ---
         profile_report = DatasetProfilingEngine.profile_dataset(cleaned_df)
