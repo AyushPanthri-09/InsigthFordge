@@ -1,16 +1,8 @@
-const ARTIFACT_REPLACEMENTS: Array<[RegExp, string]> = [
-  [
-    /<table[\s\S]*?<\/table>/gi,
-    "Structured table rendered in the evidence section.",
-  ],
-  [/<thead[\s\S]*?<\/thead>/gi, " "],
-  [/<tbody[\s\S]*?<\/tbody>/gi, " "],
-  [/<tr[\s\S]*?<\/tr>/gi, " "],
+const PLACEHOLDER_PATTERNS: Array<[RegExp, string]> = [
   [/image\[\[[^\]]*\]\]/gi, ""],
-  [
-    /<\/?(table|thead|tbody|tr|th|td|div|span|p|br|strong|em|ul|ol|li|h[1-6])[^>]*>/gi,
-    " ",
-  ],
+  [/<table[\s\S]*?<\/table>/gi, ""],
+  [/<\/?.*?>/gi, " "],
+  [/\[object Object\]/g, ""],
   [/```[\s\S]*?```/g, " "],
   [/`([^`]+)`/g, "$1"],
   [/\*\*([^*]+)\*\*/g, "$1"],
@@ -46,9 +38,9 @@ const BLOCKED_PHRASES: Array<[RegExp, string]> = [
 ];
 
 export function sanitizeReportText(value: string): string {
-  let text = value;
+  let text = value ?? "";
 
-  for (const [pattern, replacement] of ARTIFACT_REPLACEMENTS) {
+  for (const [pattern, replacement] of PLACEHOLDER_PATTERNS) {
     text = text.replace(pattern, replacement);
   }
 
@@ -77,4 +69,18 @@ export function sanitizeReportValue<T>(value: T): T {
   }
 
   return value;
+}
+
+export function sanitizeReportString<T extends string | number | boolean | null | undefined>(
+  value: T,
+): string {
+  if (typeof value === "string") {
+    return sanitizeReportText(value);
+  }
+
+  if (value == null) {
+    return "";
+  }
+
+  return sanitizeReportText(String(value));
 }

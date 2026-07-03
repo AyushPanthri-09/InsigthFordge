@@ -1,4 +1,5 @@
 import React from "react";
+import { sanitizeReportString, sanitizeReportValue } from "../report-sanitizer";
 
 export interface TableColumn<T> {
   key: keyof T | string;
@@ -33,8 +34,8 @@ export function ReportTable<T extends object>({
   getRowTone,
 }: ReportTableProps<T>) {
   const toneFn = rowTone ?? getRowTone;
-
-  const visible = maxRows ? rows.slice(0, maxRows) : rows;
+  const sanitizedRows = rows.map((row) => sanitizeReportValue(row));
+  const visible = maxRows ? sanitizedRows.slice(0, maxRows) : sanitizedRows;
 
   return (
     <div className="rpt-table-wrap">
@@ -64,19 +65,31 @@ export function ReportTable<T extends object>({
                 toneFn ? `rpt-table-row-${toneFn(row) ?? "neutral"}` : undefined
               }
             >
-              {columns.map((col) => (
-                <td
-                  key={String(col.key)}
-                  className={col.mono ? "rpt-table-mono" : ""}
-                  style={{ textAlign: col.align ?? "left" }}
-                >
-                  {col.render
-                    ? col.render(row)
-                    : String(
-                        (row as Record<string, unknown>)[String(col.key)] ?? "",
-                      )}
-                </td>
-              ))}
+              {columns.map((col) => {
+                const cellValue = col.render
+                  ? col.render(row)
+                  : (row as Record<string, unknown>)[String(col.key)];
+                const safeValue =
+                  typeof cellValue === "string"
+                    ? sanitizeReportString(cellValue)
+                    : typeof cellValue === "number" || typeof cellValue === "boolean"
+                    ? sanitizeReportString(cellValue)
+                    : React.isValidElement(cellValue)
+                    ? cellValue
+                    : cellValue == null
+                    ? ""
+                    : sanitizeReportString(String(cellValue));
+
+                return (
+                  <td
+                    key={String(col.key)}
+                    className={col.mono ? "rpt-table-mono" : ""}
+                    style={{ textAlign: col.align ?? "left" }}
+                  >
+                    {safeValue}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
