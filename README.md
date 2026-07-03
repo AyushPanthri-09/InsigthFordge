@@ -182,11 +182,6 @@ Future Enhancements
 
 Contributors
 
-- Ayush Panthrim
-- Additional contributors
+-Team Cybermind
 
 ---
-
-License
-
-This project is intended for educational and research purposes. Please refer to the repository license for detailed usage terms.
