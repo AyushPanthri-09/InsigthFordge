@@ -35,17 +35,14 @@ export function calculateDataQuality(
         validity: 0,
         typeAlignment: 0,
       },
-      recommendations: [
-        "Ensure the dataset file contains valid headers and row records.",
-      ],
+      recommendations: ["Ensure the dataset file contains valid headers and row records."],
     };
   }
 
   // 1. Completeness Score (Missing values)
   const totalCells = rows.length * profiles.length;
   const nullCount = profiles.reduce((sum, p) => sum + p.nullCount, 0);
-  const completeness =
-    totalCells > 0 ? ((totalCells - nullCount) / totalCells) * 100 : 100;
+  const completeness = totalCells > 0 ? ((totalCells - nullCount) / totalCells) * 100 : 100;
 
   if (completeness < 95) {
     recommendations.push(
@@ -55,9 +52,7 @@ export function calculateDataQuality(
 
   // 2. Uniqueness Score (Duplicates)
   const uniqueness =
-    rows.length > 0
-      ? ((rows.length - duplicateRowCount) / rows.length) * 100
-      : 100;
+    rows.length > 0 ? ((rows.length - duplicateRowCount) / rows.length) * 100 : 100;
   if (duplicateRowCount > 0) {
     recommendations.push(
       `Remove ${duplicateRowCount} duplicate rows to ensure exact uniqueness representation.`,
@@ -76,9 +71,7 @@ export function calculateDataQuality(
 
   const totalNumericCells = rows.length * Math.max(1, numericColumnsCount);
   const consistency =
-    totalNumericCells > 0
-      ? Math.max(0, (1 - totalOutlierCount / totalNumericCells) * 100)
-      : 100;
+    totalNumericCells > 0 ? Math.max(0, (1 - totalOutlierCount / totalNumericCells) * 100) : 100;
   if (totalOutlierCount > 0) {
     recommendations.push(
       `Investigate ${totalOutlierCount} statistical outliers found in numerical measures.`,
@@ -106,18 +99,11 @@ export function calculateDataQuality(
   let mismatchCount = 0;
   for (const p of profiles) {
     // Basic check: if profile role is measure but stats has zero valid values, or has text values
-    if (
-      p.inferredRole === "measure" &&
-      p.nonNullCount > 0 &&
-      (!p.stats || isNaN(p.stats.mean))
-    ) {
+    if (p.inferredRole === "measure" && p.nonNullCount > 0 && (!p.stats || isNaN(p.stats.mean))) {
       mismatchCount++;
     }
   }
-  const typeAlignment = Math.max(
-    0,
-    ((profiles.length - mismatchCount) / profiles.length) * 100,
-  );
+  const typeAlignment = Math.max(0, ((profiles.length - mismatchCount) / profiles.length) * 100);
   if (mismatchCount > 0) {
     recommendations.push(
       `Re-align data types for ${mismatchCount} columns containing non-numeric values in numeric measures.`,
@@ -135,9 +121,7 @@ export function calculateDataQuality(
 
   // If data is in perfect shape
   if (recommendations.length === 0) {
-    recommendations.push(
-      "Data quality is excellent. No cleaning interventions recommended.",
-    );
+    recommendations.push("Data quality is excellent. No cleaning interventions recommended.");
   }
 
   return {

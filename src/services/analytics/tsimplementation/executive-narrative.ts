@@ -48,40 +48,19 @@ export function buildExecutiveNarrative(
   const absPct = Math.abs(deviationPct).toFixed(1);
 
   // ── Situation: what happened, factually ──────────────────────────────────
-  const situation = buildSituation(
-    metric,
-    observedValue,
-    baselineValue,
-    deviationPct,
-    drivers,
-  );
+  const situation = buildSituation(metric, observedValue, baselineValue, deviationPct, drivers);
 
   // ── Complication: why it matters / what's unusual ───────────────────────
-  const complication = buildComplication(
-    metric,
-    deviationPct,
-    leadingHypotheses,
-    domain,
-  );
+  const complication = buildComplication(metric, deviationPct, leadingHypotheses, domain);
 
   // ── Question: the key business question this raises ──────────────────────
   const question = buildQuestion(metric, isPositive, leadingHypotheses, domain);
 
   // ── Answer: evidence-backed explanation ─────────────────────────────────
-  const answer = buildAnswer(
-    metric,
-    leadingHypotheses,
-    rejectedHypotheses,
-    drivers,
-  );
+  const answer = buildAnswer(metric, leadingHypotheses, rejectedHypotheses, drivers);
 
   // ── Outlook: what's likely next, from forecast ───────────────────────────
-  const outlook = buildOutlook(
-    metric,
-    forecast,
-    deviationPct,
-    leadingHypotheses,
-  );
+  const outlook = buildOutlook(metric, forecast, deviationPct, leadingHypotheses);
 
   // ── Recommended action ───────────────────────────────────────────────────
   const recommendedAction = buildRecommendedAction(
@@ -93,12 +72,7 @@ export function buildExecutiveNarrative(
   );
 
   // ── Headline: one-sentence board-slide summary ───────────────────────────
-  const headline = buildHeadline(
-    metric,
-    deviationPct,
-    leadingHypotheses,
-    isPositive,
-  );
+  const headline = buildHeadline(metric, deviationPct, leadingHypotheses, isPositive);
 
   return {
     situation,
@@ -148,8 +122,7 @@ function buildComplication(
 
   if (isPositive) {
     const isEventDriven = leadingHypotheses.some(
-      (h) =>
-        h.id === "h_seasonal" || h.id === "h_discount" || h.id === "h_campaign",
+      (h) => h.id === "h_seasonal" || h.id === "h_discount" || h.id === "h_campaign",
     );
     if (isEventDriven) {
       return (
@@ -311,9 +284,7 @@ function buildRecommendedAction(
   }
 
   if (topH.id === "h_geographic" && topH.verdict === "supported") {
-    const geoDriver = drivers.find((d) =>
-      /region|country|state|city/i.test(d.column),
-    );
+    const geoDriver = drivers.find((d) => /region|country|state|city/i.test(d.column));
     return geoDriver
       ? `Focus investigation on ${geoDriver.label} specifically. Deploy targeted resources (sales coverage, logistics, marketing) to ${isPositive ? "amplify" : "address"} the geographic driver before investing broadly.`
       : `Geographic concentration confirmed. Review regional strategy and resource allocation.`;

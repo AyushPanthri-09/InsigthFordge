@@ -44,9 +44,7 @@ export function computeSingleKPI(
 
   if (kpiMap.aggregation === "count") {
     // Unique count for IDs / Keys, non-null count for others
-    const nonNulls = values.filter(
-      (v) => v !== null && v !== undefined && v !== "",
-    );
+    const nonNulls = values.filter((v) => v !== null && v !== undefined && v !== "");
     const isIdOrKey =
       colName.toLowerCase().includes("id") ||
       colName.toLowerCase().includes("number") ||
@@ -86,7 +84,9 @@ export function computeSingleKPI(
       rationale = `Calculated average of '${colName}' across ${numericValues.length} rows.`;
     } else if (kpiMap.aggregation === "rate") {
       // For rates, check if the column contains raw percentages or is boolean
-      const isBooleanLike = numericValues.every((v) => v === 0 || v === 1);
+      const isBooleanLike = numericValues.every(
+        (v) => Math.abs(v) < 1e-9 || Math.abs(v - 1) < 1e-9,
+      );
       if (isBooleanLike) {
         const trues = numericValues.filter((v) => v === 1).length;
         calculatedValue = (trues / numericValues.length) * 100;
@@ -95,8 +95,7 @@ export function computeSingleKPI(
         // Average rate representation
         const meanVal = ss.mean(numericValues);
         // If mean is between 0 and 1, represent as percentage 0-100
-        calculatedValue =
-          meanVal <= 1 && meanVal >= 0 ? meanVal * 100 : meanVal;
+        calculatedValue = meanVal <= 1 && meanVal >= 0 ? meanVal * 100 : meanVal;
         rationale = `Calculated average rate in '${colName}' across ${numericValues.length} rows.`;
       }
     }

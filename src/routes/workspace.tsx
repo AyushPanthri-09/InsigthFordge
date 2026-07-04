@@ -2,13 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  ArrowLeft,
-  Download,
-  Sparkles,
-  RefreshCw,
-  BarChart3,
-} from "lucide-react";
+import { ArrowLeft, Download, Sparkles, RefreshCw, BarChart3 } from "lucide-react";
 import { Brand } from "@/components/insightforge/Brand";
 import { Footer } from "@/components/insightforge/Footer";
 import { UploadDropzone } from "@/components/insightforge/UploadDropzone";
@@ -38,8 +32,7 @@ export const Route = createFileRoute("/workspace")({
       { title: "Workspace · InsightForge AI" },
       {
         name: "description",
-        content:
-          "Upload a dataset and let InsightForge AI run the complete analyst workflow.",
+        content: "Upload a dataset and let InsightForge AI run the complete analyst workflow.",
       },
     ],
   }),
@@ -47,14 +40,7 @@ export const Route = createFileRoute("/workspace")({
 });
 
 type Tab =
-  | "overview"
-  | "understanding"
-  | "cleaning"
-  | "eda"
-  | "analytics"
-  | "sandbox"
-  | "data"
-  | "report";
+  "overview" | "understanding" | "cleaning" | "eda" | "analytics" | "sandbox" | "data" | "report";
 
 function Workspace() {
   const [notes, setNotes] = useState("");
@@ -145,12 +131,7 @@ function Workspace() {
       {/* ── Main ───────────────────────────────────────────── */}
       <main className="mx-auto max-w-[1400px] px-6 py-10">
         {!analysis ? (
-          <UploadState
-            notes={notes}
-            setNotes={setNotes}
-            run={run}
-            busy={busy}
-          />
+          <UploadState notes={notes} setNotes={setNotes} run={run} busy={busy} />
         ) : (
           <Dashboard
             analysis={analysis}
@@ -161,12 +142,7 @@ function Workspace() {
           />
         )}
       </main>
-      {analysis && (
-        <AiCopilot
-          dataset={analysis.dataset}
-          understanding={analysis.understanding}
-        />
-      )}
+      {analysis && <AiCopilot dataset={analysis.dataset} understanding={analysis.understanding} />}
       <Footer />
     </div>
   );
@@ -197,17 +173,16 @@ function UploadState({
             Begin a new analysis
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Drop a CSV or XLSX. InsightForge AI will understand its business
-            context, justify every cleaning decision, run EDA, and produce four
-            levels of analytics.
+            Drop a CSV or XLSX. InsightForge AI will understand its business context, justify every
+            cleaning decision, run EDA, and produce four levels of analytics.
           </p>
         </div>
         <UploadDropzone onFile={run} disabled={busy} />
         <div className="flex items-start gap-2 rounded-xl border border-border/60 bg-background/30 p-3.5 text-xs text-muted-foreground">
           <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
           <span>
-            Your file is processed entirely in your session. Sensitive data
-            never leaves the analysis context.
+            Your file is processed entirely in your session. Sensitive data never leaves the
+            analysis context.
           </span>
         </div>
       </div>
@@ -265,15 +240,9 @@ function Dashboard({
             {analysis.dataset.fileName}
           </h1>
           <p className="mt-1 text-xs text-muted-foreground">
-            <span className="tabular-nums">
-              {analysis.dataset.rowCount.toLocaleString()}
-            </span>{" "}
-            rows ×{" "}
-            <span className="tabular-nums">{analysis.dataset.columnCount}</span>{" "}
-            columns · Domain:{" "}
-            <span className="font-medium text-foreground/90">
-              {analysis.understanding.domain}
-            </span>
+            <span className="tabular-nums">{analysis.dataset.rowCount.toLocaleString()}</span> rows
+            × <span className="tabular-nums">{analysis.dataset.columnCount}</span> columns · Domain:{" "}
+            <span className="font-medium text-foreground/90">{analysis.understanding.domain}</span>
           </p>
         </div>
       </div>
@@ -296,9 +265,7 @@ function Dashboard({
               <span
                 className={cn(
                   "ml-2 inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1 text-[10px] tabular-nums font-semibold",
-                  tab === t.id
-                    ? "bg-primary/20 text-primary"
-                    : "bg-muted/70 text-muted-foreground",
+                  tab === t.id ? "bg-primary/20 text-primary" : "bg-muted/70 text-muted-foreground",
                 )}
               >
                 {t.count}
@@ -318,28 +285,15 @@ function Dashboard({
           transition={{ duration: 0.16, ease: "easeOut" }}
         >
           {tab === "overview" && (
-            <OverviewTab
-              analysis={analysis}
-              notes={notes}
-              onNotesChange={onNotesChange}
-            />
+            <OverviewTab analysis={analysis} notes={notes} onNotesChange={onNotesChange} />
           )}
-          {tab === "understanding" && (
-            <DatasetUnderstandingView data={analysis.understanding} />
-          )}
-          {tab === "cleaning" && (
-            <CleaningReportView report={analysis.cleaning} />
-          )}
+          {tab === "understanding" && <DatasetUnderstandingView data={analysis.understanding} />}
+          {tab === "cleaning" && <CleaningReportView report={analysis.cleaning} />}
           {tab === "eda" && <EDATab analysis={analysis} />}
           {tab === "analytics" && <AnalyticsTab analysis={analysis} />}
-          {tab === "sandbox" && (
-            <PredictiveSandbox dataset={analysis.dataset} />
-          )}
+          {tab === "sandbox" && <PredictiveSandbox dataset={analysis.dataset} />}
           {tab === "data" && (
-            <DataWorkspace
-              dataset={analysis.dataset}
-              understanding={analysis.understanding}
-            />
+            <DataWorkspace dataset={analysis.dataset} understanding={analysis.understanding} />
           )}
           {tab === "report" && <ReportTab analysis={analysis} />}
         </motion.div>
@@ -387,10 +341,7 @@ function OverviewTab({
         {/* Top insights */}
         {topInsights.length > 0 && (
           <div>
-            <SectionHeader
-              title="Top AI Insights"
-              subtitle="Click any card to expand evidence"
-            />
+            <SectionHeader title="Top AI Insights" subtitle="Click any card to expand evidence" />
             <div className="mt-3 space-y-3">
               {topInsights.map((i) => (
                 <InsightCard key={i.id} insight={i} />
@@ -426,10 +377,7 @@ function EDATab({ analysis }: { analysis: FullAnalysis }) {
       {/* Charts */}
       {analysis.eda.charts.length > 0 && (
         <div>
-          <SectionHeader
-            title="Visualizations"
-            count={analysis.eda.charts.length}
-          />
+          <SectionHeader title="Visualizations" count={analysis.eda.charts.length} />
           <div className="mt-3 grid gap-4 lg:grid-cols-2">
             {analysis.eda.charts.map((c) => (
               <ChartCard key={c.id} spec={c} />
@@ -635,14 +583,10 @@ function SectionHeader({
     <div className="flex items-baseline justify-between gap-3">
       <div>
         <h2 className="text-sm font-semibold">{title}</h2>
-        {subtitle && (
-          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
-        )}
+        {subtitle && <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>}
       </div>
       {count !== undefined && (
-        <span className="text-xs tabular-nums text-muted-foreground">
-          {count}
-        </span>
+        <span className="text-xs tabular-nums text-muted-foreground">{count}</span>
       )}
     </div>
   );

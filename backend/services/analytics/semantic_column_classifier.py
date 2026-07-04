@@ -212,7 +212,7 @@ def _geographic_value_evidence(series: pd.Series) -> float:
     # Strong gating to avoid classifying small-range numerics as geographic.
     # Coordinates typically have decimals (not guaranteed) and cover a wider numeric spread.
     spread = float(v.max() - v.min()) if len(v) > 1 else 0.0
-    has_decimals = float((np.mod(v.to_numpy(), 1) != 0).mean()) if len(v) > 0 else 0.0
+    has_decimals = float((np.abs(np.mod(v.to_numpy(), 1)) > 1e-9).mean()) if len(v) > 0 else 0.0
 
     # Hard gate: avoid classifying small-range integers (e.g., age) as coordinates.
     # Coordinates typically have decimals OR a larger spread than simple ordinal counts.

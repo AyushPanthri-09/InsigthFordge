@@ -21,7 +21,7 @@ function fmt(v: number | string): string {
   if (!isFinite(n)) return String(v);
   if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (Math.abs(n) >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n % 1 === 0 ? String(n) : n.toFixed(2);
+  return Number.isInteger(n) ? String(n) : n.toFixed(2);
 }
 
 export function P4_KPIDashboard({
@@ -33,13 +33,10 @@ export function P4_KPIDashboard({
 }: Props) {
   const { kpis } = data;
 
-  const isNumericKPI = (kpi: (typeof kpis)[number]) =>
-    Number.isFinite(Number(kpi.value));
+  const isNumericKPI = (kpi: (typeof kpis)[number]) => Number.isFinite(Number(kpi.value));
   const labelIs = (kpi: (typeof kpis)[number], labels: string[]) =>
     labels.some(
-      (label) =>
-        kpi.label.trim().toLowerCase() === label ||
-        kpi.id.trim().toLowerCase() === label,
+      (label) => kpi.label.trim().toLowerCase() === label || kpi.id.trim().toLowerCase() === label,
     );
   const labelIncludes = (kpi: (typeof kpis)[number], terms: string[]) => {
     const text = `${kpi.label} ${kpi.id}`.toLowerCase();
@@ -47,8 +44,7 @@ export function P4_KPIDashboard({
   };
 
   const exactRevenue = kpis.find(
-    (kpi) =>
-      labelIs(kpi, ["revenue", "total revenue", "sales"]) && isNumericKPI(kpi),
+    (kpi) => labelIs(kpi, ["revenue", "total revenue", "sales"]) && isNumericKPI(kpi),
   );
   const exactProfit = kpis.find(
     (kpi) => labelIs(kpi, ["profit", "net income"]) && isNumericKPI(kpi),
@@ -80,10 +76,7 @@ export function P4_KPIDashboard({
   const supportFromLabels = preferredSupport
     .map((candidate) => {
       const match = kpis.find(
-        (kpi) =>
-          !usedIds.has(kpi.id) &&
-          isNumericKPI(kpi) &&
-          labelIncludes(kpi, candidate.terms),
+        (kpi) => !usedIds.has(kpi.id) && isNumericKPI(kpi) && labelIncludes(kpi, candidate.terms),
       );
       if (match) usedIds.add(match.id);
       return match
@@ -109,10 +102,7 @@ export function P4_KPIDashboard({
       caption: kpi.rationale,
     }));
 
-  const supportingMetrics = [...supportFromLabels, ...remainingNumeric].slice(
-    0,
-    4,
-  );
+  const supportingMetrics = [...supportFromLabels, ...remainingNumeric].slice(0, 4);
   if (supportingMetrics.length < 4) {
     supportingMetrics.push(
       {
@@ -157,10 +147,7 @@ export function P4_KPIDashboard({
 
         <ReportExecutiveInsight
           insight={executiveInsight}
-          impact={
-            heroMetric.caption ||
-            "Primary indicators are ready for executive review."
-          }
+          impact={heroMetric.caption || "Primary indicators are ready for executive review."}
           confidence={businessHealthScore}
           status={
             businessHealthScore >= 80
@@ -234,8 +221,7 @@ export function P4_KPIDashboard({
               badge="AI Insight"
             >
               <p style={{ margin: 0 }}>
-                {primaryInsight?.summary ||
-                  "No narrative insight was generated for this KPI set."}
+                {primaryInsight?.summary || "No narrative insight was generated for this KPI set."}
               </p>
             </ReportInsightCard>
           </div>

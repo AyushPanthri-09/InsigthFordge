@@ -43,14 +43,10 @@ export function detectAnomalies(
     (c) => c.toLowerCase().includes("date") || c.toLowerCase().includes("time"),
   );
   const amtCol = numericColumns.find((c) =>
-    ["revenue", "sales", "amount", "price", "total", "grand_total"].includes(
-      c.toLowerCase(),
-    ),
+    ["revenue", "sales", "amount", "price", "total", "grand_total"].includes(c.toLowerCase()),
   );
   const custCol = columns.find((c) =>
-    ["customer_id", "user_id", "email", "card", "account"].some((k) =>
-      c.toLowerCase().includes(k),
-    ),
+    ["customer_id", "user_id", "email", "card", "account"].some((k) => c.toLowerCase().includes(k)),
   );
 
   if (dateCol && amtCol) {
@@ -78,8 +74,7 @@ export function detectAnomalies(
         severity: duplicateCount > rows.length * 0.05 ? "HIGH" : "MEDIUM",
         description: `Detected ${duplicateCount} duplicate transactions having identical identifiers, date/timestamps, and financial amounts.`,
         affectedRowCount: duplicateCount,
-        remedy:
-          "Filter out exact duplicates or review logs for payment gateway double-triggers.",
+        remedy: "Filter out exact duplicates or review logs for payment gateway double-triggers.",
       });
     }
   }
@@ -94,14 +89,9 @@ export function detectAnomalies(
       "quantity",
       "qty",
     ].some((k) => col.toLowerCase().includes(k));
-    const isRevenue = [
-      "revenue",
-      "sales",
-      "price",
-      "amount",
-      "total",
-      "grand_total",
-    ].some((k) => col.toLowerCase().includes(k));
+    const isRevenue = ["revenue", "sales", "price", "amount", "total", "grand_total"].some((k) =>
+      col.toLowerCase().includes(k),
+    );
 
     if (isInventory || isRevenue) {
       const negativeRows = rows.filter((r) => {
@@ -114,8 +104,7 @@ export function detectAnomalies(
           id: nextId(),
           type: isInventory ? "negative_inventory" : "negative_revenue",
           column: col,
-          severity:
-            negativeRows.length > rows.length * 0.01 ? "CRITICAL" : "HIGH",
+          severity: negativeRows.length > rows.length * 0.01 ? "CRITICAL" : "HIGH",
           description: `Column '${prettify(col)}' contains ${negativeRows.length} negative values. Negative ${isInventory ? "inventory quantities" : "revenue amounts"} represent physical or accounting errors.`,
           affectedRowCount: negativeRows.length,
           remedy: isInventory
@@ -128,18 +117,14 @@ export function detectAnomalies(
 
   // 3. Statistical Outliers via Z-score
   for (const col of numericColumns) {
-    const vals = rows
-      .map((r) => Number(r[col]))
-      .filter((v) => Number.isFinite(v));
+    const vals = rows.map((r) => Number(r[col])).filter((v) => Number.isFinite(v));
 
     if (vals.length >= 10) {
       const meanVal = ss.mean(vals);
       const stdevVal = ss.standardDeviation(vals);
 
       if (stdevVal > 0) {
-        const outliers = vals.filter(
-          (v) => Math.abs((v - meanVal) / stdevVal) > 3.0,
-        );
+        const outliers = vals.filter((v) => Math.abs((v - meanVal) / stdevVal) > 3.0);
         if (outliers.length > 0) {
           const isHighSeverity = outliers.length > vals.length * 0.03;
           anomalies.push({
@@ -190,8 +175,7 @@ export function detectAnomalies(
           column: ts.dateColumn,
           severity: "MEDIUM",
           description: `Timeline gaps detected in date column '${prettify(ts.dateColumn)}' relative to expected ${ts.granularity}ly intervals.`,
-          remedy:
-            "Fill missing date intervals with zero or carry-forward imputations.",
+          remedy: "Fill missing date intervals with zero or carry-forward imputations.",
         });
       }
     }

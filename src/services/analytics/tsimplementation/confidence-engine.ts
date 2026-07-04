@@ -44,13 +44,9 @@ export interface ConfidenceInputs {
  * then wraps the result in the ConfidenceBreakdown structure expected
  * by the EDA report and AI prompt builder.
  */
-export function computeConfidenceBreakdown(
-  inputs: ConfidenceInputs,
-): ConfidenceBreakdown {
+export function computeConfidenceBreakdown(inputs: ConfidenceInputs): ConfidenceBreakdown {
   // ── Factor 1: Data Completeness ────────────────────────────────────────
-  const relevantProfiles = inputs.profiles.filter((p) =>
-    inputs.relatedColumns.includes(p.name),
-  );
+  const relevantProfiles = inputs.profiles.filter((p) => inputs.relatedColumns.includes(p.name));
   const avgNullRate =
     relevantProfiles.length > 0
       ? relevantProfiles.reduce((sum, p) => {
@@ -155,22 +151,16 @@ function buildExplanation(
 
   const weakFactors: string[] = [];
   if (completeness < 0.6)
-    weakFactors.push(
-      `data completeness is low (${(avgNullRate * 100).toFixed(0)}% null rate)`,
-    );
-  if (sampleSizeScore < 0.5)
-    weakFactors.push(`sample size is small (${rawSampleSize} rows)`);
-  if (significance < 0.5)
-    weakFactors.push("statistical significance could not be confirmed");
-  if (quality < 0.6)
-    weakFactors.push("data quality issues were detected during cleaning");
+    weakFactors.push(`data completeness is low (${(avgNullRate * 100).toFixed(0)}% null rate)`);
+  if (sampleSizeScore < 0.5) weakFactors.push(`sample size is small (${rawSampleSize} rows)`);
+  if (significance < 0.5) weakFactors.push("statistical significance could not be confirmed");
+  if (quality < 0.6) weakFactors.push("data quality issues were detected during cleaning");
   if (consistency < 0.5) weakFactors.push("evidence signals are inconsistent");
 
   let explanation = `${level} confidence (${(overall * 100).toFixed(0)}%). `;
 
   if (weakFactors.length === 0) {
-    explanation +=
-      "All confidence factors are strong — this finding is well-supported.";
+    explanation += "All confidence factors are strong — this finding is well-supported.";
   } else {
     explanation += `Limiting factors: ${weakFactors.join("; ")}. Treat this finding with proportional caution.`;
   }

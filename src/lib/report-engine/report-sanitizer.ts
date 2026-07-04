@@ -61,19 +61,16 @@ export function sanitizeReportValue<T>(value: T): T {
   }
 
   if (value && typeof value === "object") {
-    const entries = Object.entries(value).map(([key, entry]) => [
-      key,
-      sanitizeReportValue(entry),
-    ]);
+    const entries = Object.entries(value).map(([key, entry]) => [key, sanitizeReportValue(entry)]);
     return Object.fromEntries(entries) as T;
   }
 
   return value;
 }
 
-export function sanitizeReportString<
-  T extends string | number | boolean | null | undefined,
->(value: T): string {
+export function sanitizeReportString<T extends string | number | boolean | null | undefined>(
+  value: T,
+): string {
   if (typeof value === "string") {
     return sanitizeReportText(value);
   }

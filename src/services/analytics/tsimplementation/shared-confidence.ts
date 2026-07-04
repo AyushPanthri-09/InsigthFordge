@@ -152,16 +152,9 @@ export function investigationConfidence(
   qualityScore: number,
   deviationPct: number,
 ): number {
-  const evidenceStrength = Math.min(
-    1,
-    strongQuestions * 0.25 + moderateQuestions * 0.1,
-  );
+  const evidenceStrength = Math.min(1, strongQuestions * 0.25 + moderateQuestions * 0.1);
   const hypothesisClarity =
-    supportedCount >= 1 && rejectedCount >= 1
-      ? 1.0
-      : supportedCount >= 1
-        ? 0.7
-        : 0.3;
+    supportedCount >= 1 && rejectedCount >= 1 ? 1.0 : supportedCount >= 1 ? 0.7 : 0.3;
   const sampleStrength = totalRows >= 1000 ? 1.0 : totalRows >= 100 ? 0.6 : 0.3;
   const deviationStrength = Math.min(1, Math.abs(deviationPct) / 75);
 

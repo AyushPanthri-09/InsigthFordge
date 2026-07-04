@@ -1,22 +1,7 @@
 import { useState, useMemo } from "react";
-import {
-  Search,
-  Table,
-  Database,
-  BarChart,
-  Tag,
-  Hash,
-  Eye,
-  Settings,
-} from "lucide-react";
+import { Search, Table, Database, BarChart, Tag, Hash, Eye, Settings } from "lucide-react";
 
-export function DataWorkspace({
-  dataset,
-  understanding,
-}: {
-  dataset: any;
-  understanding: any;
-}) {
+export function DataWorkspace({ dataset, understanding }: { dataset: any; understanding: any }) {
   const [query, setQuery] = useState("");
 
   // Filter preview data by query
@@ -75,9 +60,7 @@ export function DataWorkspace({
         <div className="card-elevated p-6 space-y-4">
           <div className="flex items-center gap-2">
             <Settings className="h-5 w-5 text-primary" />
-            <h2 className="font-display text-base font-bold tracking-tight">
-              Columns profile
-            </h2>
+            <h2 className="font-display text-base font-bold tracking-tight">Columns profile</h2>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Technical metadata schema inferred by the FastAPI parser engine.
@@ -90,9 +73,7 @@ export function DataWorkspace({
                 className="rounded-xl border border-white/5 bg-background/40 p-3.5 flex items-center justify-between"
               >
                 <div className="space-y-1 min-w-0 pr-2">
-                  <div className="text-xs font-bold truncate tracking-tight">
-                    {col.name}
-                  </div>
+                  <div className="text-xs font-bold truncate tracking-tight">{col.name}</div>
                   <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase font-semibold">
                     {col.inferredRole === "measure" ? (
                       <Hash className="h-3 w-3 text-info" />
@@ -122,9 +103,7 @@ export function DataWorkspace({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Eye className="h-5 w-5 text-primary" />
-              <h2 className="font-display text-base font-bold tracking-tight">
-                Dataset view
-              </h2>
+              <h2 className="font-display text-base font-bold tracking-tight">Dataset view</h2>
             </div>
 
             {/* Search Input */}
@@ -148,10 +127,7 @@ export function DataWorkspace({
               <thead>
                 <tr className="border-b border-white/5 bg-white/5 text-muted-foreground font-semibold">
                   {dataset?.columns?.map((header: string) => (
-                    <th
-                      key={header}
-                      className="px-4 py-3 font-semibold whitespace-nowrap"
-                    >
+                    <th key={header} className="px-4 py-3 font-semibold whitespace-nowrap">
                       {header}
                     </th>
                   ))}
@@ -189,8 +165,7 @@ export function DataWorkspace({
 
           <div className="flex items-center justify-between text-[10px] text-muted-foreground/60 mt-1">
             <span>
-              Showing top {Math.min(15, filteredRows.length)} of{" "}
-              {filteredRows.length} rows
+              Showing top {Math.min(15, filteredRows.length)} of {filteredRows.length} rows
             </span>
             <span>Pagination limited in preview sandbox</span>
           </div>

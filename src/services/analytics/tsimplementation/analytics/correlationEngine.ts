@@ -7,11 +7,7 @@ export interface CorrelationResult {
   b: string;
   r: number;
   strength:
-    | "strong_positive"
-    | "strong_negative"
-    | "moderate_positive"
-    | "moderate_negative"
-    | "weak";
+    "strong_positive" | "strong_negative" | "moderate_positive" | "moderate_negative" | "weak";
   explanation: string;
 }
 

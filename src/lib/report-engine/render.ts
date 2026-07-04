@@ -95,9 +95,7 @@ function buildPrintHtml(reportMarkup: string): string {
   ].join("");
 }
 
-export async function createPrintableReportHtml(
-  analysis: FullAnalysis,
-): Promise<string> {
+export async function createPrintableReportHtml(analysis: FullAnalysis): Promise<string> {
   const rendered = await renderReportDom(analysis);
 
   try {
@@ -123,19 +121,14 @@ export async function createPrintableReportHtml(
   }
 }
 
-export async function renderExecutivePdf(
-  analysis: FullAnalysis,
-): Promise<GeneratedPdf> {
+export async function renderExecutivePdf(analysis: FullAnalysis): Promise<GeneratedPdf> {
   const html = await createPrintableReportHtml(analysis);
   const sourceFileName = analysis.dataset.fileName;
 
   try {
     return await renderReportPdfServer({ data: { html, sourceFileName } });
   } catch (error) {
-    console.warn(
-      "Chromium PDF generation failed; falling back to browser print.",
-      error,
-    );
+    console.warn("Chromium PDF generation failed; falling back to browser print.", error);
     openBrowserPrintFallback(html);
     return {
       base64: "",
@@ -145,9 +138,7 @@ export async function renderExecutivePdf(
   }
 }
 
-export async function downloadExecutivePdf(
-  analysis: FullAnalysis,
-): Promise<void> {
+export async function downloadExecutivePdf(analysis: FullAnalysis): Promise<void> {
   const pdf = await renderExecutivePdf(analysis);
   if (pdf.renderer !== "browser-print") {
     downloadBase64Pdf(pdf);

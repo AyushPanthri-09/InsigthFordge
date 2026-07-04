@@ -44,18 +44,9 @@ type RunAnalyticsInternal = (
   notes?: AnalystNotes,
   precomputedEda?: EDAReport,
 ) => Promise<AnalyticsReport>;
-import {
-  applyIssues,
-  buildReport,
-  detectIssues,
-  enforceDAIEGovernance,
-} from "./cleaner";
+import { applyIssues, buildReport, detectIssues, enforceDAIEGovernance } from "./cleaner";
 import { buildEDA, type EDAContext } from "./eda";
-import {
-  profileAll,
-  profileDataset,
-  type EnrichedProfileResult,
-} from "./profiler";
+import { profileAll, profileDataset, type EnrichedProfileResult } from "./profiler";
 
 import { parseFile, type InternalDataset } from "./parser";
 import {
@@ -75,10 +66,7 @@ import {
 import { generateRecommendations } from "./analytics/recommendationEngine";
 import { calculateDataQuality } from "./analytics/qualityScore";
 import { generateStructuredInsights } from "./analytics/insightEngine";
-import {
-  generateSCQANarrative,
-  compileSCQANarrativeText,
-} from "./analytics/narrativeEngine";
+import { generateSCQANarrative, compileSCQANarrativeText } from "./analytics/narrativeEngine";
 
 // ---------------------------------------------------------------------------
 // In-process session store
@@ -148,41 +136,32 @@ export const tsAnalyticsService: AnalyticsService = {
           domainRationale: enriched.domain.rationale,
           processName: enriched.domain.processName,
           kpiHints: enriched.domain.kpiHints,
-          columnIntelligenceSummary: Object.entries(enriched.intelligence).map(
-            ([col, intel]) => ({
-              column: col,
-              businessCategory: intel.businessCategory,
-              schemaRole: intel.schemaRole,
-              businessTags: intel.businessTags,
-              isKpiCandidate: intel.isKpiCandidate,
-              isForecastCandidate: intel.isForecastCandidate,
-              confidence: intel.confidence,
-            }),
-          ),
-          detectedRelationships: enriched.relationships
-            .slice(0, 12)
-            .map((r) => ({
-              from: r.fromColumn,
-              to: r.toColumn,
-              type: r.relationshipType,
-              confidence: r.confidence,
-              rationale: r.rationale,
-            })),
+          columnIntelligenceSummary: Object.entries(enriched.intelligence).map(([col, intel]) => ({
+            column: col,
+            businessCategory: intel.businessCategory,
+            schemaRole: intel.schemaRole,
+            businessTags: intel.businessTags,
+            isKpiCandidate: intel.isKpiCandidate,
+            isForecastCandidate: intel.isForecastCandidate,
+            confidence: intel.confidence,
+          })),
+          detectedRelationships: enriched.relationships.slice(0, 12).map((r) => ({
+            from: r.fromColumn,
+            to: r.toColumn,
+            type: r.relationshipType,
+            confidence: r.confidence,
+            rationale: r.rationale,
+          })),
           timeIntelligence: enriched.timeIntelligence ?? undefined,
         },
       });
     } catch (e) {
-      console.warn(
-        "AI understanding failed, using enriched heuristics only:",
-        e,
-      );
+      console.warn("AI understanding failed, using enriched heuristics only:", e);
     }
 
     // ── Step 4: Merge AI output with heuristic intelligence ───────────
     // AI meaning overrides heuristic meaning; heuristic fills gaps.
-    const meaningByCol = new Map(
-      (aiOut?.columnMeanings ?? []).map((m) => [m.column, m]),
-    );
+    const meaningByCol = new Map((aiOut?.columnMeanings ?? []).map((m) => [m.column, m]));
 
     for (const p of enriched.profiles) {
       const aiMeaning = meaningByCol.get(p.name);
@@ -251,19 +230,11 @@ export const tsAnalyticsService: AnalyticsService = {
     // Duplicate count for AI context — read from the dup_ issue already produced
     // by detectIssues() above. That issue carries affectedRows which IS the
     // duplicate count, so we avoid a second O(n) JSON.stringify pass.
-    const dupCount =
-      heuristicIssues.find((i) => i.id.startsWith("dup_"))?.affectedRows ?? 0;
+    const dupCount = heuristicIssues.find((i) => i.id.startsWith("dup_"))?.affectedRows ?? 0;
 
-    const numericCols = profiles
-      .filter((p) => p.inferredRole === "measure")
-      .map((p) => p.name);
+    const numericCols = profiles.filter((p) => p.inferredRole === "measure").map((p) => p.name);
     const anomalies = detectAnomalies(ds.rows, ds.columns, numericCols, []);
-    const quality = calculateDataQuality(
-      ds.rows,
-      profiles,
-      anomalies,
-      dupCount,
-    );
+    const quality = calculateDataQuality(ds.rows, profiles, anomalies, dupCount);
 
     try {
       const ai = await reasonCleaningIssues({
@@ -275,18 +246,14 @@ export const tsAnalyticsService: AnalyticsService = {
           // Pass enriched column context to AI (Phase 1 upgrade)
           columnSummaries: profiles.map((p) => {
             const intel = intelligence[p.name];
-            const heuristicIssue = heuristicIssues.find((i) =>
-              i.affectedColumns?.includes(p.name),
-            );
+            const heuristicIssue = heuristicIssues.find((i) => i.affectedColumns?.includes(p.name));
             return {
               column: p.name,
               inferredType: p.inferredType,
               nullPct: p.nullCount / Math.max(1, ds.rowCount),
               uniquePct: p.uniqueCount / Math.max(1, ds.rowCount),
               sampleValues: p.sampleValues,
-              outlierPct: p.stats
-                ? p.stats.outlierCount / Math.max(1, ds.rowCount)
-                : undefined,
+              outlierPct: p.stats ? p.stats.outlierCount / Math.max(1, ds.rowCount) : undefined,
               // Phase 1 enrichment
               businessCategory: intel?.businessCategory,
               schemaRole: intel?.schemaRole,
@@ -308,8 +275,7 @@ export const tsAnalyticsService: AnalyticsService = {
         confidence: it.confidence ?? 0.85,
         affectedColumns: it.affectedColumns ?? [],
         businessImpact:
-          it.businessImpact ??
-          "Potential analysis skew or inconsistencies if uncorrected.",
+          it.businessImpact ?? "Potential analysis skew or inconsistencies if uncorrected.",
         requiresApproval: it.requiresApproval ?? true,
         applied: false,
       }));
@@ -317,9 +283,7 @@ export const tsAnalyticsService: AnalyticsService = {
       // Merge: AI issues first (more specific), heuristic issues fill gaps.
       // Governance filter: AI issues are downgraded to flag_only; only DAIE-backed
       // heuristic issues may carry executable actions.
-      const merged = [...aiIssues, ...heuristicIssues].map(
-        enforceDAIEGovernance,
-      );
+      const merged = [...aiIssues, ...heuristicIssues].map(enforceDAIEGovernance);
 
       const report = buildReport(
         datasetId,
@@ -331,10 +295,7 @@ export const tsAnalyticsService: AnalyticsService = {
       report.qualityScore = quality.overallScore;
       return report;
     } catch (e) {
-      console.warn(
-        "AI cleaning reasoning failed; using Data Quality Intelligence issues only.",
-        e,
-      );
+      console.warn("AI cleaning reasoning failed; using Data Quality Intelligence issues only.", e);
       const report = buildReport(
         datasetId,
         heuristicIssues,
@@ -357,8 +318,7 @@ export const tsAnalyticsService: AnalyticsService = {
     const all = detectIssues(ds.rows, profiles, enriched.intelligence);
     const hasDupId = issueIds.some((id) => id.startsWith("dup_"));
     const toApply = all.filter(
-      (i) =>
-        issueIds.includes(i.id) || (hasDupId && i.action === "drop_duplicates"),
+      (i) => issueIds.includes(i.id) || (hasDupId && i.action === "drop_duplicates"),
     );
     const { rows } = applyIssues(ds.rows, toApply);
     const before = ds.rowCount;
@@ -461,8 +421,7 @@ export const tsAnalyticsService: AnalyticsService = {
             ? {
                 primaryDateColumn: enriched.timeIntelligence.primaryDateColumn,
                 granularity: enriched.timeIntelligence.granularity,
-                hasSeasonalitySignal:
-                  enriched.timeIntelligence.hasSeasonalitySignal,
+                hasSeasonalitySignal: enriched.timeIntelligence.hasSeasonalitySignal,
                 spanDays: enriched.timeIntelligence.spanDays,
               }
             : undefined,
@@ -471,9 +430,7 @@ export const tsAnalyticsService: AnalyticsService = {
             rationale: k.rationale,
           })),
           // Phase 2: Advanced Analytical Intelligence
-          timeSeriesNarratives: eda.timeSeriesAnalysis?.map(
-            (ts) => ts.narrative,
-          ),
+          timeSeriesNarratives: eda.timeSeriesAnalysis?.map((ts) => ts.narrative),
           // Phase 2.5: Autonomous Investigation Engine results merged into rootCauseSummaries.
           // AnalyticsInput already accepts this field — no schema change needed.
           // Each investigation contributes: its SCQA headline, its conclusion (with rejected
@@ -491,19 +448,14 @@ export const tsAnalyticsService: AnalyticsService = {
                 rejectedCount > 0
                   ? ` Explicitly rejected ${rejectedCount} alternative explanation${rejectedCount > 1 ? "s" : ""}: ${inv.rejectedHypotheses
                       .slice(0, 2)
-                      .map(
-                        (h) =>
-                          `"${h.statement.split(".")[0]}" (${h.rationale})`,
-                      )
+                      .map((h) => `"${h.statement.split(".")[0]}" (${h.rationale})`)
                       .join("; ")}.`
                   : "";
               const driversLabel =
                 inv.driverImportance.length > 0
                   ? ` Top drivers: ${inv.driverImportance
                       .slice(0, 3)
-                      .map(
-                        (d) => `${d.label} (${d.contributionPct.toFixed(0)}%)`,
-                      )
+                      .map((d) => `${d.label} (${d.contributionPct.toFixed(0)}%)`)
                       .join(", ")}.`
                   : "";
               return (
@@ -517,10 +469,7 @@ export const tsAnalyticsService: AnalyticsService = {
           ].filter(Boolean),
           distributionInsights: eda.extendedStats
             ? Object.entries(eda.extendedStats)
-                .filter(
-                  ([, ext]) =>
-                    ext.distributionShape !== "normal" || ext.anomalyCount > 0,
-                )
+                .filter(([, ext]) => ext.distributionShape !== "normal" || ext.anomalyCount > 0)
                 .slice(0, 4)
                 .map(([col, ext]) => ({
                   column: col,
@@ -552,24 +501,16 @@ export const tsAnalyticsService: AnalyticsService = {
         },
       });
 
-      const wrap =
-        (lvl: AIInsight["level"]) =>
-        (arr: Array<Omit<AIInsight, "id" | "level">>) =>
-          arr.map((x, i) => ({ id: `${lvl}_${i}`, level: lvl, ...x }));
+      const wrap = (lvl: AIInsight["level"]) => (arr: Array<Omit<AIInsight, "id" | "level">>) =>
+        arr.map((x, i) => ({ id: `${lvl}_${i}`, level: lvl, ...x }));
 
       return {
         datasetId,
         executiveSummary: ai.executiveSummary,
         businessHealthScore: ai.businessHealthScore,
-        descriptive: wrap("descriptive")(
-          ai.descriptive as Array<Omit<AIInsight, "id" | "level">>,
-        ),
-        diagnostic: wrap("diagnostic")(
-          ai.diagnostic as Array<Omit<AIInsight, "id" | "level">>,
-        ),
-        predictive: wrap("predictive")(
-          ai.predictive as Array<Omit<AIInsight, "id" | "level">>,
-        ),
+        descriptive: wrap("descriptive")(ai.descriptive as Array<Omit<AIInsight, "id" | "level">>),
+        diagnostic: wrap("diagnostic")(ai.diagnostic as Array<Omit<AIInsight, "id" | "level">>),
+        predictive: wrap("predictive")(ai.predictive as Array<Omit<AIInsight, "id" | "level">>),
         prescriptive: wrap("prescriptive")(
           ai.prescriptive as Array<Omit<AIInsight, "id" | "level">>,
         ),
@@ -593,11 +534,7 @@ export const tsAnalyticsService: AnalyticsService = {
   // ── analyzeAll ───────────────────────────────────────────────────────────
   async analyzeAll(file, options): Promise<FullAnalysis> {
     const log: ReasoningStep[] = [];
-    const step = (
-      phase: ReasoningStep["phase"],
-      message: string,
-      detail?: string,
-    ) => {
+    const step = (phase: ReasoningStep["phase"], message: string, detail?: string) => {
       const s: ReasoningStep = {
         timestamp: Date.now(),
         phase,
@@ -622,10 +559,7 @@ export const tsAnalyticsService: AnalyticsService = {
       "Running Business Context Engine, Column Intelligence Engine, Relationship Discovery Engine",
     );
     const session = getSession(dataset.datasetId);
-    const enriched = profileDataset(
-      session.dataset.rows,
-      session.dataset.columns,
-    );
+    const enriched = profileDataset(session.dataset.rows, session.dataset.columns);
     session.enriched = enriched;
     step(
       "profiling",
@@ -634,14 +568,8 @@ export const tsAnalyticsService: AnalyticsService = {
     );
 
     // ── Understanding (AI validates heuristics) ────────────────────────
-    step(
-      "understanding",
-      "Inferring business domain, column semantics, and KPIs",
-    );
-    const understanding = await this.understandDataset(
-      dataset.datasetId,
-      options?.notes,
-    );
+    step("understanding", "Inferring business domain, column semantics, and KPIs");
+    const understanding = await this.understandDataset(dataset.datasetId, options?.notes);
     step(
       "understanding",
       `Domain: ${understanding.domain} (${Math.round(understanding.domainConfidence * 100)}% confidence) · ${understanding.primaryEntities.length} entities · ${understanding.suggestedKPIs.length} KPIs`,
@@ -649,10 +577,7 @@ export const tsAnalyticsService: AnalyticsService = {
 
     // ── Cleaning (Data Quality Intelligence) ──────────────────────────
     step("cleaning", "Analysing data quality with business context reasoning");
-    const proposedCleaning = await this.proposeCleaning(
-      dataset.datasetId,
-      options?.notes,
-    );
+    const proposedCleaning = await this.proposeCleaning(dataset.datasetId, options?.notes);
     const cleaning =
       proposedCleaning.issues.length > 0
         ? await this.applyCleaning(
@@ -693,10 +618,7 @@ export const tsAnalyticsService: AnalyticsService = {
       options?.notes,
       eda,
     );
-    step(
-      "analytics",
-      `Business health score: ${analytics.businessHealthScore}/100`,
-    );
+    step("analytics", `Business health score: ${analytics.businessHealthScore}/100`);
 
     step("reporting", "Analysis complete");
     return {
@@ -724,20 +646,13 @@ function buildFallbackAnalytics(
 ): AnalyticsReport {
   const prettify = (name: string) =>
     name.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const numericCols = profiles
-    .filter((p) => p.inferredRole === "measure")
-    .map((p) => p.name);
+  const numericCols = profiles.filter((p) => p.inferredRole === "measure").map((p) => p.name);
 
   // 1. Correlation Matrix
   const correlationMatrix = computeCorrelationMatrix(rows, numericCols);
 
   // 2. Anomaly Detection
-  const anomalies = detectAnomalies(
-    rows,
-    columns,
-    numericCols,
-    eda.timeSeriesAnalysis || [],
-  );
+  const anomalies = detectAnomalies(rows, columns, numericCols, eda.timeSeriesAnalysis || []);
 
   // 3. Recommendation Engine
   const recommendations = generateRecommendations(
@@ -787,8 +702,7 @@ function buildFallbackAnalytics(
   // 7. Quality Score calculation for business health reference
   const totalCells = rows.length * profiles.length;
   const nullCount = profiles.reduce((sum, p) => sum + p.nullCount, 0);
-  const completeness =
-    totalCells > 0 ? (totalCells - nullCount) / totalCells : 1;
+  const completeness = totalCells > 0 ? (totalCells - nullCount) / totalCells : 1;
   const healthScore = Math.round(completeness * 100);
 
   return {

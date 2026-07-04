@@ -12,11 +12,7 @@ interface ReportEvidencePanelProps {
   items?: EvidenceItem[];
 }
 
-export function ReportEvidencePanel({
-  title,
-  children,
-  items = [],
-}: ReportEvidencePanelProps) {
+export function ReportEvidencePanel({ title, children, items = [] }: ReportEvidencePanelProps) {
   return (
     <div className="rpt-evidence-panel">
       <div className="rpt-evidence-panel-title">{title}</div>
@@ -25,14 +21,10 @@ export function ReportEvidencePanel({
         <div className="rpt-evidence-list">
           {items.map((item, index) => (
             <div key={`${item.label}-${index}`} className="rpt-evidence-item">
-              <span
-                className={`rpt-evidence-dot rpt-evidence-dot-${item.tone ?? "neutral"}`}
-              />
+              <span className={`rpt-evidence-dot rpt-evidence-dot-${item.tone ?? "neutral"}`} />
               <div>
                 <div className="rpt-evidence-label">{item.label}</div>
-                {item.detail && (
-                  <div className="rpt-evidence-detail">{item.detail}</div>
-                )}
+                {item.detail && <div className="rpt-evidence-detail">{item.detail}</div>}
               </div>
             </div>
           ))}

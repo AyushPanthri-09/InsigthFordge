@@ -49,7 +49,7 @@ function fmt(v: unknown): string {
   if (!isFinite(n)) return String(v ?? "");
   if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (Math.abs(n) >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n % 1 === 0 ? String(n) : n.toFixed(2);
+  return Number.isInteger(n) ? String(n) : n.toFixed(2);
 }
 
 function safeChartId(value: string): string {
@@ -67,9 +67,7 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
   const rawData = spec.data as Record<string, unknown>[];
   const data = (
     Array.isArray(rawData)
-      ? rawData.map((row) =>
-          sanitizeReportValue(row as unknown as Record<string, unknown>),
-        )
+      ? rawData.map((row) => sanitizeReportValue(row as unknown as Record<string, unknown>))
       : []
   ) as Record<string, unknown>[];
 
@@ -97,8 +95,7 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
           textAlign: "center",
         }}
       >
-        Chart unavailable: source values are missing or contain unsupported
-        placeholders.
+        Chart unavailable: source values are missing or contain unsupported placeholders.
       </div>
     );
   }
@@ -130,10 +127,7 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
             ))}
           </Pie>
           <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => fmt(v)} />
-          <Legend
-            iconSize={8}
-            wrapperStyle={{ fontSize: 9, color: "var(--rpt-text-muted)" }}
-          />
+          <Legend iconSize={8} wrapperStyle={{ fontSize: 9, color: "var(--rpt-text-muted)" }} />
         </PieChart>
       </ResponsiveContainer>
     );
@@ -147,18 +141,9 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
           layout="horizontal"
           margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
         >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="var(--rpt-border-light)"
-            vertical={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--rpt-border-light)" vertical={false} />
           <>
-            <XAxis
-              dataKey={chartSpec.xKey}
-              tick={TICK_STYLE}
-              axisLine={false}
-              tickLine={false}
-            />
+            <XAxis dataKey={chartSpec.xKey} tick={TICK_STYLE} axisLine={false} tickLine={false} />
             <YAxis
               tick={TICK_STYLE}
               tickFormatter={fmt}
@@ -199,30 +184,13 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
                 x2="0"
                 y2="1"
               >
-                <stop
-                  offset="5%"
-                  stopColor={PALETTE[i % PALETTE.length]}
-                  stopOpacity={0.3}
-                />
-                <stop
-                  offset="95%"
-                  stopColor={PALETTE[i % PALETTE.length]}
-                  stopOpacity={0}
-                />
+                <stop offset="5%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0} />
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="var(--rpt-border-light)"
-            vertical={false}
-          />
-          <XAxis
-            dataKey={chartSpec.xKey}
-            tick={TICK_STYLE}
-            axisLine={false}
-            tickLine={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--rpt-border-light)" vertical={false} />
+          <XAxis dataKey={chartSpec.xKey} tick={TICK_STYLE} axisLine={false} tickLine={false} />
           <YAxis
             tick={TICK_STYLE}
             tickFormatter={fmt}
@@ -255,24 +223,9 @@ export function ReportChart({ spec, height = 200 }: ReportChartProps) {
         data={chartSpec.data as Record<string, unknown>[]}
         margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
       >
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke="var(--rpt-border-light)"
-          vertical={false}
-        />
-        <XAxis
-          dataKey={chartSpec.xKey}
-          tick={TICK_STYLE}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          tick={TICK_STYLE}
-          tickFormatter={fmt}
-          axisLine={false}
-          tickLine={false}
-          width={40}
-        />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--rpt-border-light)" vertical={false} />
+        <XAxis dataKey={chartSpec.xKey} tick={TICK_STYLE} axisLine={false} tickLine={false} />
+        <YAxis tick={TICK_STYLE} tickFormatter={fmt} axisLine={false} tickLine={false} width={40} />
         <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => fmt(v)} />
         {yKeys.map((k, i) => (
           <Line

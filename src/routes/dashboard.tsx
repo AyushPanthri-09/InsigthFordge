@@ -117,10 +117,9 @@ function Dashboard() {
               Hello, <span className="gradient-text">{user.role}</span>
             </h1>
             <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
-              Welcome to the **InsightForge AI Platform**. The analytical
-              workspace is fully operational. You have access permissions to
-              upload datasets, analyze quality issues, customize scenario
-              forecasting modules, and run explainable AI queries.
+              Welcome to the **InsightForge AI Platform**. The analytical workspace is fully
+              operational. You have access permissions to upload datasets, analyze quality issues,
+              customize scenario forecasting modules, and run explainable AI queries.
             </p>
             <div className="pt-2">
               <Link
@@ -185,17 +184,13 @@ function Dashboard() {
                 </div>
               </div>
               <div>
-                <div
-                  className={`text-2xl font-bold ${stat.color} tracking-tight`}
-                >
+                <div className={`text-2xl font-bold ${stat.color} tracking-tight`}>
                   {stat.value === "ONLINE" && (
                     <span className="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-success animate-ping" />
                   )}
                   {stat.value}
                 </div>
-                <p className="mt-1 text-[11px] text-muted-foreground/80">
-                  {stat.detail}
-                </p>
+                <p className="mt-1 text-[11px] text-muted-foreground/80">{stat.detail}</p>
               </div>
             </motion.div>
           ))}
@@ -207,24 +202,20 @@ function Dashboard() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <FileSpreadsheet className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-lg font-bold tracking-tight">
-                  Active Datasets
-                </h2>
+                <h2 className="font-display text-lg font-bold tracking-tight">Active Datasets</h2>
               </div>
               <p className="text-xs text-muted-foreground">
-                Quickly parse a new dataset. Staged files are processed under
-                sandbox security rules.
+                Quickly parse a new dataset. Staged files are processed under sandbox security
+                rules.
               </p>
             </div>
 
             <div className="rounded-xl border-2 border-dashed border-white/8 bg-background/30 p-8 text-center flex flex-col items-center justify-center gap-3">
               <Upload className="h-8 w-8 text-muted-foreground" />
-              <div className="text-sm font-semibold">
-                Ready to launch workflow
-              </div>
+              <div className="text-sm font-semibold">Ready to launch workflow</div>
               <p className="text-xs text-muted-foreground max-w-xs">
-                Launch the workspace to upload datasets and generate four levels
-                of evidence-backed reports.
+                Launch the workspace to upload datasets and generate four levels of evidence-backed
+                reports.
               </p>
               <Link
                 to="/workspace"
@@ -240,9 +231,7 @@ function Dashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Terminal className="h-5 w-5 text-warning" />
-                <h2 className="font-display text-lg font-bold tracking-tight">
-                  Audit Console
-                </h2>
+                <h2 className="font-display text-lg font-bold tracking-tight">Audit Console</h2>
               </div>
               <History className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -258,9 +247,7 @@ function Dashboard() {
                       {log.action}
                     </p>
                     <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                      <span className="font-medium text-warning">
-                        {log.user}
-                      </span>
+                      <span className="font-medium text-warning">{log.user}</span>
                       <span>•</span>
                       <span>{log.time}</span>
                     </div>
@@ -274,10 +261,7 @@ function Dashboard() {
 
       {/* ── FOOTER ─────────────────────────────────────────── */}
       <footer className="border-t border-white/5 py-6 px-6 text-center text-xs text-muted-foreground">
-        <p>
-          © 2026 InsightForge AI Corp. Platform licensed to Seat #
-          {user.id.slice(0, 8)}.
-        </p>
+        <p>© 2026 InsightForge AI Corp. Platform licensed to Seat #{user.id.slice(0, 8)}.</p>
       </footer>
     </div>
   );

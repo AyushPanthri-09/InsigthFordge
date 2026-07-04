@@ -141,8 +141,7 @@ export function P10_RootCause({ data, datasetName, generatedAt }: Props) {
                     padding: "20px 0",
                   }}
                 >
-                  No categorical drivers with significant contribution
-                  coefficients were detected.
+                  No categorical drivers with significant contribution coefficients were detected.
                 </div>
               )}
             </div>
@@ -232,8 +231,7 @@ export function P10_RootCause({ data, datasetName, generatedAt }: Props) {
                       margin: 0,
                     }}
                   >
-                    {rejected[0].statement} (
-                    <em>Rationale: {rejected[0].rationale}</em>)
+                    {rejected[0].statement} (<em>Rationale: {rejected[0].rationale}</em>)
                   </p>
                 </div>
               )}

@@ -77,12 +77,7 @@ export function runAutonomousInvestigation(
 ): InvestigationResult[] {
   const results: InvestigationResult[] = [];
 
-  const findingPool = buildFindingPool(
-    rows,
-    profiles,
-    timeSeriesArr,
-    extendedStats,
-  );
+  const findingPool = buildFindingPool(rows, profiles, timeSeriesArr, extendedStats);
 
   for (const finding of findingPool.slice(0, maxInvestigations)) {
     const result = investigateFinding(
@@ -131,7 +126,7 @@ function buildFindingPool(
     let baseline: number;
     if (extendedStats?.[ts.measureColumn]) {
       const ext = extendedStats[ts.measureColumn];
-      if (ext.mean === 0) continue;
+      if (Math.abs(ext.mean) < 1e-9) continue;
       baseline = ext.mean;
     } else {
       const metricValues = rows
@@ -139,15 +134,14 @@ function buildFindingPool(
         .filter((n) => Number.isFinite(n));
       if (metricValues.length < 5) continue;
       baseline = ss.median(metricValues);
-      if (baseline === 0) continue;
+      if (Math.abs(baseline) < 1e-9) continue;
     }
 
     // Find the peak period's aggregated value
     const peakPeriodData = ts.periods.find((p) => p.period === ts.peakPeriod);
     if (!peakPeriodData) continue;
 
-    let deviationPct =
-      ((peakPeriodData.value - baseline) / Math.abs(baseline)) * 100;
+    let deviationPct = ((peakPeriodData.value - baseline) / Math.abs(baseline)) * 100;
     // Cap extreme deviations to prevent statistical hallucinations
     if (deviationPct > 1000) deviationPct = 1000;
     if (deviationPct < -1000) deviationPct = -1000;
@@ -167,8 +161,7 @@ function buildFindingPool(
     for (const period of ts.periods
       .filter((p) => p.isAnomaly && p.period !== ts.peakPeriod)
       .slice(0, 1)) {
-      const anomalyDeviation =
-        ((period.value - baseline) / Math.abs(baseline)) * 100;
+      const anomalyDeviation = ((period.value - baseline) / Math.abs(baseline)) * 100;
       if (Math.abs(anomalyDeviation) < 20) continue;
       pool.push({
         finding: `Statistical anomaly detected in ${ts.measureColumn} during ${period.period} (z-score: ${(period.zScore ?? 0).toFixed(2)}).`,
@@ -184,9 +177,7 @@ function buildFindingPool(
 
   // 2. Cross-sectional findings — top metric value in dataset (no time series)
   if (timeSeriesArr.length === 0) {
-    const measures = profiles.filter(
-      (p) => p.inferredRole === "measure" && p.stats,
-    );
+    const measures = profiles.filter((p) => p.inferredRole === "measure" && p.stats);
     for (const m of measures.slice(0, 2)) {
       // Use pre-computed mean and p90 from extendedStats when available.
       // Fall back to a full row scan if the column is not in extendedStats.
@@ -197,15 +188,12 @@ function buildFindingPool(
         baseline = ext.mean;
         p90 = ext.percentiles["p90"] ?? ext.max;
       } else {
-        const metricValues = rows
-          .map((r) => Number(r[m.name]))
-          .filter((n) => Number.isFinite(n));
+        const metricValues = rows.map((r) => Number(r[m.name])).filter((n) => Number.isFinite(n));
         if (metricValues.length < 10) continue;
         baseline = ss.mean(metricValues);
         p90 = ss.quantile(metricValues, 0.9);
       }
-      const deviationPct =
-        baseline > 0 ? ((p90 - baseline) / baseline) * 100 : 0;
+      const deviationPct = baseline > 0 ? ((p90 - baseline) / baseline) * 100 : 0;
 
       if (deviationPct < 20) continue;
 
@@ -271,9 +259,7 @@ function investigateFinding(
     .filter((h) => h.verdict !== "rejected" && h.rank !== null)
     .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
 
-  const rejectedHypotheses = testedHypotheses.filter(
-    (h) => h.verdict === "rejected",
-  );
+  const rejectedHypotheses = testedHypotheses.filter((h) => h.verdict === "rejected");
 
   // Step 5: Build driver importance matrix
   const driverImportance = buildDriverImportance(questions, profiles);
@@ -391,18 +377,10 @@ function computeInvestigationConfidence(
   qualityScore: number,
   deviationPct: number,
 ): number {
-  const strongQ = questions.filter(
-    (q) => q.evidenceStrength === "strong",
-  ).length;
-  const moderateQ = questions.filter(
-    (q) => q.evidenceStrength === "moderate",
-  ).length;
-  const supportedCount = hypotheses.filter(
-    (h) => h.verdict === "supported",
-  ).length;
-  const rejectedCount = hypotheses.filter(
-    (h) => h.verdict === "rejected",
-  ).length;
+  const strongQ = questions.filter((q) => q.evidenceStrength === "strong").length;
+  const moderateQ = questions.filter((q) => q.evidenceStrength === "moderate").length;
+  const supportedCount = hypotheses.filter((h) => h.verdict === "supported").length;
+  const rejectedCount = hypotheses.filter((h) => h.verdict === "rejected").length;
 
   return investigationConfidence(
     strongQ,

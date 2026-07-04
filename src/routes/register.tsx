@@ -2,14 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "motion/react";
-import {
-  KeyRound,
-  Mail,
-  Sparkles,
-  ArrowRight,
-  Shield,
-  UserCircle2,
-} from "lucide-react";
+import { KeyRound, Mail, Sparkles, ArrowRight, Shield, UserCircle2 } from "lucide-react";
 import { Brand } from "@/components/insightforge/Brand";
 import { authService } from "@/services/auth";
 import { Toaster } from "@/components/ui/sonner";
@@ -38,8 +31,7 @@ function Register() {
     try {
       await authService.register(email, password, role);
       toast.success("Account registered!", {
-        description:
-          "Your user profile was successfully created. Logging in...",
+        description: "Your user profile was successfully created. Logging in...",
       });
 
       // Auto login after register
@@ -88,9 +80,7 @@ function Register() {
           }}
         >
           <div className="mb-6 space-y-1.5">
-            <h1 className="font-display text-2xl font-bold tracking-tight">
-              Create account
-            </h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight">Create account</h1>
             <p className="text-sm text-muted-foreground">
               Register a new seat in the tenant environment
             </p>

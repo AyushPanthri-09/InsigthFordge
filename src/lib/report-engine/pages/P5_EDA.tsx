@@ -17,7 +17,7 @@ function fmt(v: number): string {
   if (!isFinite(v)) return "-";
   if (Math.abs(v) >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
   if (Math.abs(v) >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
-  return v % 1 === 0 ? String(v) : v.toFixed(2);
+  return Number.isInteger(v) ? String(v) : v.toFixed(2);
 }
 
 export function P5_EDA({
@@ -33,8 +33,7 @@ export function P5_EDA({
   // Formulate data rows for key descriptive metrics
   const edaRows = profiles.slice(0, 8).map((p, idx) => {
     const stat = extendedStats[p.name];
-    const nullPct =
-      (p.nullCount / Math.max(1, p.nullCount + p.nonNullCount)) * 100;
+    const nullPct = (p.nullCount / Math.max(1, p.nullCount + p.nonNullCount)) * 100;
     return {
       id: String(idx),
       name: p.name,
@@ -96,10 +95,9 @@ export function P5_EDA({
               margin: 0,
             }}
           >
-            Exploratory profiling was performed across the dataset's features.
-            We analyzed columns to identify key measures, dimensions, null
-            patterns, and dispersion metrics. Category splits indicate balanced
-            coverage across core business segments.
+            Exploratory profiling was performed across the dataset's features. We analyzed columns
+            to identify key measures, dimensions, null patterns, and dispersion metrics. Category
+            splits indicate balanced coverage across core business segments.
           </p>
         </div>
 
@@ -121,9 +119,7 @@ export function P5_EDA({
           <ReportSection title="Feature Composition & Cardinality">
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {profiles.slice(0, 4).map((p, idx) => {
-                const nullPct =
-                  (p.nullCount / Math.max(1, p.nullCount + p.nonNullCount)) *
-                  100;
+                const nullPct = (p.nullCount / Math.max(1, p.nullCount + p.nonNullCount)) * 100;
                 return (
                   <div
                     key={idx}
@@ -155,16 +151,13 @@ export function P5_EDA({
                           marginTop: 2,
                         }}
                       >
-                        {p.businessMeaning ||
-                          `Contains ${p.inferredRole} mappings.`}
+                        {p.businessMeaning || `Contains ${p.inferredRole} mappings.`}
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
                       <ReportBadge
                         label={p.inferredRole}
-                        variant={
-                          p.inferredRole === "measure" ? "brand" : "neutral"
-                        }
+                        variant={p.inferredRole === "measure" ? "brand" : "neutral"}
                       />
                       <ReportBadge
                         label={`${nullPct.toFixed(0)}% nulls`}
@@ -208,18 +201,16 @@ export function P5_EDA({
                 }}
               >
                 <li style={{ marginBottom: 6 }}>
-                  <strong>Distribution Profiles:</strong> Key measures reveal
-                  mostly skewed or log-normal spreads, indicating high segment
-                  concentration.
+                  <strong>Distribution Profiles:</strong> Key measures reveal mostly skewed or
+                  log-normal spreads, indicating high segment concentration.
                 </li>
                 <li style={{ marginBottom: 6 }}>
-                  <strong>Data Integrity:</strong> Missing value scans show high
-                  column completeness, minimizing modeling distortions.
+                  <strong>Data Integrity:</strong> Missing value scans show high column
+                  completeness, minimizing modeling distortions.
                 </li>
                 <li>
-                  <strong>Target Measures:</strong> Core business processes are
-                  successfully mapped to target variables with low null
-                  variance.
+                  <strong>Target Measures:</strong> Core business processes are successfully mapped
+                  to target variables with low null variance.
                 </li>
               </ul>
             </div>

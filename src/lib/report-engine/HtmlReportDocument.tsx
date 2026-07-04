@@ -17,7 +17,7 @@ function fmt(value: number | string | undefined): string {
   if (Math.abs(n) >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
   if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (Math.abs(n) >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n % 1 === 0 ? n.toLocaleString() : n.toFixed(2);
+  return Number.isInteger(n) ? n.toLocaleString() : n.toFixed(2);
 }
 
 function pct(value: number | undefined): string {
@@ -26,20 +26,14 @@ function pct(value: number | undefined): string {
   return `${Math.round(normalized)}%`;
 }
 
-function short(
-  text: string | undefined,
-  fallback: string,
-  limit = 210,
-): string {
+function short(text: string | undefined, fallback: string, limit = 210): string {
   const value = (text || fallback).replace(/\s+/g, " ").trim();
   return value.length > limit ? `${value.slice(0, limit - 3)}...` : value;
 }
 
 function primaryKpi(doc: ReportDocument): KPI | undefined {
   const revenue = (doc.p2?.kpis ?? []).find((kpi) =>
-    /revenue|sales|amount|profit|orders|quantity/i.test(
-      `${kpi.label} ${kpi.id}`,
-    ),
+    /revenue|sales|amount|profit|orders|quantity/i.test(`${kpi.label} ${kpi.id}`),
   );
   return revenue ?? doc.p2?.kpis?.[0];
 }
@@ -104,13 +98,7 @@ function PageLead({
   );
 }
 
-function NoteBox({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function NoteBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="aa-note">
       <strong>{title}</strong>
@@ -192,9 +180,7 @@ function InsightTriplet({ doc }: { doc: ReportDocument }) {
 
 function Heatmap({ doc }: { doc: ReportDocument }) {
   const correlations = doc.p2.correlations ?? [];
-  const cols = Array.from(
-    new Set(correlations.flatMap((c) => [c.a, c.b])),
-  ).slice(0, 5);
+  const cols = Array.from(new Set(correlations.flatMap((c) => [c.a, c.b]))).slice(0, 5);
 
   if (cols.length < 2) {
     return (
@@ -220,15 +206,12 @@ function Heatmap({ doc }: { doc: ReportDocument }) {
           <div className="aa-heatmap-row">{row}</div>
           {cols.map((col) => {
             const pair = correlations.find(
-              (c) =>
-                (c.a === row && c.b === col) || (c.a === col && c.b === row),
+              (c) => (c.a === row && c.b === col) || (c.a === col && c.b === row),
             );
             const value = row === col ? 1 : (pair?.r ?? 0);
             const alpha = Math.max(0.12, Math.min(0.88, Math.abs(value)));
             const background =
-              value < 0
-                ? `rgba(139, 28, 28, ${alpha})`
-                : `rgba(0, 153, 168, ${alpha})`;
+              value < 0 ? `rgba(139, 28, 28, ${alpha})` : `rgba(0, 153, 168, ${alpha})`;
             return (
               <div
                 className="aa-heatmap-cell"
@@ -252,9 +235,7 @@ export function HtmlReportDocument({ doc }: Props) {
   const shared = { datasetName: doc.datasetName, generatedAt: doc.generatedAt };
   const mainChart = doc.p2?.primaryCharts?.[0] ?? doc.p3?.trendCharts?.[0];
   const secondChart =
-    doc.p2?.primaryCharts?.[1] ??
-    doc.p3?.trendCharts?.[1] ??
-    doc.p2?.primaryCharts?.[0];
+    doc.p2?.primaryCharts?.[1] ?? doc.p3?.trendCharts?.[1] ?? doc.p2?.primaryCharts?.[0];
   const forecast = doc.p6?.forecasts?.[0];
   const anomalyChart: ChartSpec | undefined = doc.p5?.anomalyColumns?.length
     ? {
@@ -270,10 +251,7 @@ export function HtmlReportDocument({ doc }: Props) {
         })),
       }
     : undefined;
-  const sortedRecommendations = [...(doc.p7?.recommendations ?? [])].slice(
-    0,
-    5,
-  );
+  const sortedRecommendations = [...(doc.p7?.recommendations ?? [])].slice(0, 5);
 
   return (
     <div className="rpt-document aa-report">
@@ -296,18 +274,14 @@ export function HtmlReportDocument({ doc }: Props) {
           <div className="aa-purpose">
             <strong>Purpose</strong>
             <p>
-              To turn raw performance data into a clear client-friendly story:
-              what happened, why it happened, and what should happen next.
+              To turn raw performance data into a clear client-friendly story: what happened, why it
+              happened, and what should happen next.
             </p>
           </div>
 
           <KpiGrid items={kpiTiles(doc, 6)} columns={3} />
           <div className="aa-two">
-            <ChartBox
-              spec={mainChart}
-              title="Primary Performance Trend"
-              height={230}
-            />
+            <ChartBox spec={mainChart} title="Primary Performance Trend" height={230} />
             <div className="aa-panel aa-summary-panel">
               <div className="aa-panel-head">
                 <strong>Quick Summary</strong>
@@ -347,11 +321,7 @@ export function HtmlReportDocument({ doc }: Props) {
           />
           <div className="aa-two aa-two-even">
             <ChartBox spec={mainChart} title="Performance Trend" height={250} />
-            <ChartBox
-              spec={secondChart}
-              title="Secondary Performance View"
-              height={250}
-            />
+            <ChartBox spec={secondChart} title="Secondary Performance View" height={250} />
           </div>
           <KpiGrid items={kpiTiles(doc, 8)} columns={4} />
           <ReportTable
@@ -364,11 +334,7 @@ export function HtmlReportDocument({ doc }: Props) {
             rows={kpiTiles(doc, 6).map((item) => ({
               metric: item.label,
               value: item.value,
-              interpretation: short(
-                item.note,
-                "KPI generated from uploaded data.",
-                110,
-              ),
+              interpretation: short(item.note, "KPI generated from uploaded data.", 110),
             }))}
           />
         </div>
@@ -448,11 +414,7 @@ export function HtmlReportDocument({ doc }: Props) {
             purpose="Before acting on insights, review data quality, outliers, and statistical flags."
           />
           <div className="aa-two">
-            <ChartBox
-              spec={anomalyChart}
-              title="Outliers by Column"
-              height={225}
-            />
+            <ChartBox spec={anomalyChart} title="Outliers by Column" height={225} />
             <KpiGrid
               items={[
                 {
@@ -536,11 +498,7 @@ export function HtmlReportDocument({ doc }: Props) {
             title="What comes next?"
             purpose="Use forecast direction as planning guidance, then validate it against current risk signals."
           />
-          <ChartBox
-            spec={forecast?.chartSpec}
-            title="Forecast Trend"
-            height={330}
-          />
+          <ChartBox spec={forecast?.chartSpec} title="Forecast Trend" height={330} />
           <KpiGrid
             items={[
               {
@@ -555,9 +513,7 @@ export function HtmlReportDocument({ doc }: Props) {
               },
               {
                 label: "Growth",
-                value: forecast
-                  ? `${forecast.totalGrowthPct.toFixed(1)}%`
-                  : "N/A",
+                value: forecast ? `${forecast.totalGrowthPct.toFixed(1)}%` : "N/A",
                 note: forecast?.overallTrend || "Trend direction.",
               },
               {
@@ -637,8 +593,7 @@ export function HtmlReportDocument({ doc }: Props) {
                         item.priority === "critical" || item.priority === "high"
                           ? "High"
                           : "Medium",
-                      timeHorizon:
-                        item.effort === "low" ? "30 days" : "60-90 days",
+                      timeHorizon: item.effort === "low" ? "30 days" : "60-90 days",
                       confidence: 0.82,
                     }) as (typeof sortedRecommendations)[number],
                 )
@@ -662,9 +617,8 @@ export function HtmlReportDocument({ doc }: Props) {
             </NoteBox>
             <NoteBox title="Technical appendix">
               Dataset: {(doc.appendix?.rowCount ?? 0).toLocaleString()} rows,{" "}
-              {doc.appendix?.columnCount ?? 0} features. Domain:{" "}
-              {doc.appendix?.domain ?? "generic"}. Methods include KPI
-              profiling, visual EDA, Pearson correlations, anomaly detection,
+              {doc.appendix?.columnCount ?? 0} features. Domain: {doc.appendix?.domain ?? "generic"}
+              . Methods include KPI profiling, visual EDA, Pearson correlations, anomaly detection,
               and forecasting where supported.
             </NoteBox>
           </div>

@@ -52,9 +52,7 @@ const URL_RE = /^https?:\/\//i;
 const ID_HINT = /(^id$|_id$|^uuid$|guid|code|sku|order(_)?number)/i;
 
 export function inferType(values: unknown[]): ColumnSemanticType {
-  const nonNull = values.filter(
-    (v) => v !== null && v !== undefined && v !== "",
-  );
+  const nonNull = values.filter((v) => v !== null && v !== undefined && v !== "");
   return inferTypeFromNonNull(nonNull);
 }
 
@@ -74,20 +72,13 @@ function inferTypeFromNonNull(nonNull: unknown[]): ColumnSemanticType {
 
   for (const v of sample) {
     const stringValue = String(v);
-    if (
-      typeof v === "number" ||
-      (!isNaN(parseFloat(stringValue)) && isFinite(Number(v)))
-    ) {
+    if (typeof v === "number" || (!isNaN(parseFloat(stringValue)) && isFinite(Number(v)))) {
       numericCount++;
     }
     if (v instanceof Date || (typeof v === "string" && DATE_RE.test(v))) {
       dateCount++;
     }
-    if (
-      v === true ||
-      v === false ||
-      /^(true|false|yes|no|y|n)$/i.test(stringValue)
-    ) {
+    if (v === true || v === false || /^(true|false|yes|no|y|n)$/i.test(stringValue)) {
       boolCount++;
     }
     if (typeof v === "string" && EMAIL_RE.test(v)) {
@@ -110,20 +101,12 @@ function inferTypeFromNonNull(nonNull: unknown[]): ColumnSemanticType {
 // Column profiler (public API preserved, ColumnIntelligence added as optional)
 // ---------------------------------------------------------------------------
 
-export function profileColumn(
-  name: string,
-  values: unknown[],
-  totalRows: number,
-): ColumnProfile {
-  const nonNull = values.filter(
-    (v) => v !== null && v !== undefined && v !== "",
-  );
+export function profileColumn(name: string, values: unknown[], totalRows: number): ColumnProfile {
+  const nonNull = values.filter((v) => v !== null && v !== undefined && v !== "");
   const unique = new Set(nonNull.map((v) => String(v)));
   // Reuse the already-computed nonNull array — avoids a second O(n) filter inside inferType().
   const inferredType = inferTypeFromNonNull(nonNull);
-  const isLikelyId =
-    ID_HINT.test(name) ||
-    (unique.size === nonNull.length && nonNull.length > 5);
+  const isLikelyId = ID_HINT.test(name) || (unique.size === nonNull.length && nonNull.length > 5);
 
   let role: ColumnProfile["inferredRole"] = "dimension";
   if (inferredType === "datetime" || inferredType === "date") role = "date";
@@ -178,10 +161,7 @@ export function profileColumn(
 }
 
 /** Profiles every column — public API unchanged. */
-export function profileAll(
-  rows: Record<string, unknown>[],
-  columns: string[],
-): ColumnProfile[] {
+export function profileAll(rows: Record<string, unknown>[], columns: string[]): ColumnProfile[] {
   return columns.map((col) =>
     profileColumn(
       col,
@@ -308,10 +288,7 @@ export function profileDataset(
         const str = String(val);
         // Try to parse as date
         const d = new Date(str);
-        const isDate =
-          !isNaN(d.getTime()) &&
-          d.getFullYear() > 1900 &&
-          d.getFullYear() < 2100;
+        const isDate = !isNaN(d.getTime()) && d.getFullYear() > 1900 && d.getFullYear() < 2100;
         // Check if it looks like a phone number (digits + + - ( ) )
         const isPhone = /^[\d+\-() ]{7,15}$/.test(str.replace(/\s/g, ""));
         if (isDate) dateCount++;
@@ -320,11 +297,7 @@ export function profileDataset(
         if (checked >= 30) break;
       }
       // If >50% of samples look like phone numbers, override
-      if (
-        checked > 5 &&
-        phoneCount / checked > 0.5 &&
-        dateCount / checked < 0.3
-      ) {
+      if (checked > 5 && phoneCount / checked > 0.5 && dateCount / checked < 0.3) {
         intel.businessCategory = "descriptor";
         intel.schemaRole = "dimension_attribute";
         intel.businessTags = ["free_text", "non_aggregatable"];
@@ -361,19 +334,13 @@ export function profileDataset(
   const factDimensionMap = buildFactDimensionMap(profiles, intelligence);
 
   // Step 6 — Measures and dimensions extraction
-  const { measures, dimensions } = extractMeasuresAndDimensions(
-    profiles,
-    intelligence,
-  );
+  const { measures, dimensions } = extractMeasuresAndDimensions(profiles, intelligence);
 
   // Step 7 — KPI candidate suggestions (computed once here; callers read enriched.suggestedKPIs)
   const suggestedKPIs = suggestKPICandidates(columns, domainResult.domain);
 
   // Step 8 — Business processes and primary entities (computed once here; callers read enriched fields)
-  const businessProcesses = inferBusinessProcesses(
-    columns,
-    domainResult.domain,
-  );
+  const businessProcesses = inferBusinessProcesses(columns, domainResult.domain);
   const primaryEntities = extractPrimaryEntities(columns, domainResult.domain);
 
   return {

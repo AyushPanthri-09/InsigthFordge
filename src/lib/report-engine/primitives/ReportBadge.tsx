@@ -1,8 +1,7 @@
 import React from "react";
 import type { ReportSeverity, PriorityLevel, EffortLevel } from "../types";
 
-type BadgeVariant =
-  ReportSeverity | PriorityLevel | EffortLevel | "brand" | "neutral";
+type BadgeVariant = ReportSeverity | PriorityLevel | EffortLevel | "brand" | "neutral";
 
 interface ReportBadgeProps {
   label: string;
@@ -34,11 +33,7 @@ function variantClass(v: BadgeVariant): string {
   return "rpt-badge-neutral";
 }
 
-export function ReportBadge({
-  label,
-  variant = "neutral",
-  dot = false,
-}: ReportBadgeProps) {
+export function ReportBadge({ label, variant = "neutral", dot = false }: ReportBadgeProps) {
   return (
     <span className={`rpt-badge ${variantClass(variant)}`}>
       {dot && (

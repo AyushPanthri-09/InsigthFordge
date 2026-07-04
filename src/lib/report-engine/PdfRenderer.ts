@@ -1,9 +1,5 @@
 import type { FullAnalysis } from "@/services/analytics/types";
-import {
-  createPrintableReportHtml,
-  downloadExecutivePdf,
-  renderExecutivePdf,
-} from "./render";
+import { createPrintableReportHtml, downloadExecutivePdf, renderExecutivePdf } from "./render";
 
 export class PdfRenderer {
   static createHtml(analysis: FullAnalysis): Promise<string> {

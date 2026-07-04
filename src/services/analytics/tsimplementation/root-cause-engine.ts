@@ -56,7 +56,7 @@ export function analyseRootCause(
   let baseline: number;
   if (extendedStats?.[metricCol]) {
     baseline = extendedStats[metricCol].mean;
-    if (baseline === 0) return null;
+    if (Math.abs(baseline) < 1e-9) return null;
     // Still need the full vector for quantile computation (threshold / anomalyRows filter).
     // Use the pre-computed percentiles to avoid a row scan entirely.
     const ext = extendedStats[metricCol];
@@ -69,8 +69,7 @@ export function analyseRootCause(
     const dimensions = profiles
       .filter(
         (p) =>
-          (p.inferredRole === "dimension" ||
-            p.inferredType === "categorical") &&
+          (p.inferredRole === "dimension" || p.inferredType === "categorical") &&
           p.uniqueCount >= 2 &&
           p.uniqueCount <= 30 &&
           p.name !== metricCol,
@@ -102,14 +101,9 @@ export function analyseRootCause(
     if (rootCauses.length === 0) return null;
 
     rootCauses.sort(
-      (a, b) =>
-        (b.segments[0]?.contribution ?? 0) - (a.segments[0]?.contribution ?? 0),
+      (a, b) => (b.segments[0]?.contribution ?? 0) - (a.segments[0]?.contribution ?? 0),
     );
-    const confidence = computeRCAConfidence(
-      rootCauses,
-      rows.length,
-      Math.abs(deviationPct),
-    );
+    const confidence = computeRCAConfidence(rootCauses, rows.length, Math.abs(deviationPct));
     const conclusion = buildRCAConclusion(
       metricCol,
       anomalyValue,
@@ -133,14 +127,12 @@ export function analyseRootCause(
   }
 
   // Fallback: full row scan (no extendedStats available)
-  const metricValues = rows
-    .map((r) => Number(r[metricCol]))
-    .filter((n) => Number.isFinite(n));
+  const metricValues = rows.map((r) => Number(r[metricCol])).filter((n) => Number.isFinite(n));
 
   if (metricValues.length < 10) return null;
 
   baseline = ss.mean(metricValues);
-  if (baseline === 0) return null;
+  if (Math.abs(baseline) < 1e-9) return null;
 
   const deviation = anomalyValue - baseline;
   const deviationPct = (deviation / Math.abs(baseline)) * 100;
@@ -166,9 +158,7 @@ export function analyseRootCause(
   const anomalyRows =
     deviation > 0
       ? rows.filter((r) => Number(r[metricCol]) >= threshold)
-      : rows.filter(
-          (r) => Number(r[metricCol]) <= ss.quantile(metricValues, 0.1),
-        );
+      : rows.filter((r) => Number(r[metricCol]) <= ss.quantile(metricValues, 0.1));
 
   // Build root cause nodes for top dimensions
   const rootCauses: RootCauseNode[] = [];
@@ -193,15 +183,10 @@ export function analyseRootCause(
 
   // Sort by explanatory power (contribution of top segment)
   rootCauses.sort(
-    (a, b) =>
-      (b.segments[0]?.contribution ?? 0) - (a.segments[0]?.contribution ?? 0),
+    (a, b) => (b.segments[0]?.contribution ?? 0) - (a.segments[0]?.contribution ?? 0),
   );
 
-  const confidence = computeRCAConfidence(
-    rootCauses,
-    rows.length,
-    Math.abs(deviationPct),
-  );
+  const confidence = computeRCAConfidence(rootCauses, rows.length, Math.abs(deviationPct));
 
   const conclusion = buildRCAConclusion(
     metricCol,
@@ -241,12 +226,7 @@ function buildRootCauseNode(
   maxDepth: number,
   allProfiles: ColumnProfile[],
 ): RootCauseNode | null {
-  const segments = computeSegmentBreakdown(
-    anomalyRows,
-    metricCol,
-    dimensionCol,
-    baseline,
-  );
+  const segments = computeSegmentBreakdown(anomalyRows, metricCol, dimensionCol, baseline);
   if (segments.length === 0) return null;
 
   // Map segments to RootCauseNode shape
@@ -276,17 +256,14 @@ function buildRootCauseNode(
   // Recursive drill: filter rows to top segment and go one level deeper
   if (depth < maxDepth - 1 && nodeSegments[0]) {
     const topValue = nodeSegments[0].value;
-    const drillRows = anomalyRows.filter(
-      (r) => String(r[dimensionCol] ?? "Unknown") === topValue,
-    );
+    const drillRows = anomalyRows.filter((r) => String(r[dimensionCol] ?? "Unknown") === topValue);
 
     if (drillRows.length >= 5) {
       const childDimensions = allProfiles.filter(
         (p) =>
           p.name !== dimensionCol &&
           p.name !== metricCol &&
-          (p.inferredRole === "dimension" ||
-            p.inferredType === "categorical") &&
+          (p.inferredRole === "dimension" || p.inferredType === "categorical") &&
           p.uniqueCount >= 2 &&
           p.uniqueCount <= 20,
       );

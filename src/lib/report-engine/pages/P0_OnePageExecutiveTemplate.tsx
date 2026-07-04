@@ -12,10 +12,7 @@ interface Props {
   readonly doc: ReportDocument;
 }
 
-const priorityTone: Record<
-  string,
-  "critical" | "warning" | "success" | "info"
-> = {
+const priorityTone: Record<string, "critical" | "warning" | "success" | "info"> = {
   critical: "critical",
   high: "warning",
   medium: "info",
@@ -23,8 +20,7 @@ const priorityTone: Record<
 };
 
 export function P0_OnePageExecutiveTemplate({ doc }: Props) {
-  const kpis =
-    doc.p1.topKpis.length > 0 ? doc.p1.topKpis : doc.p2.kpis.slice(0, 4);
+  const kpis = doc.p1.topKpis.length > 0 ? doc.p1.topKpis : doc.p2.kpis.slice(0, 4);
   const chartSpec = doc.p2.primaryCharts?.[0];
   const actions = doc.p7.recommendations.slice(0, 3);
   const insights = doc.p2.descriptiveInsights.slice(0, 3);
@@ -94,9 +90,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   >
                     Strategic Snapshot
                   </div>
-                  <h2 style={{ margin: 0, fontSize: 24 }}>
-                    {doc.p1.reportTitle}
-                  </h2>
+                  <h2 style={{ margin: 0, fontSize: 24 }}>{doc.p1.reportTitle}</h2>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div
@@ -108,9 +102,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   >
                     Report date
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>
-                    {doc.generatedAt}
-                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}>{doc.generatedAt}</div>
                 </div>
               </div>
 
@@ -157,9 +149,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   label={kpi.label}
                   value={kpi.formattedValue ?? String(kpi.value)}
                   caption={
-                    kpi.trend
-                      ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%`
-                      : undefined
+                    kpi.trend ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%` : undefined
                   }
                 />
               ))}
@@ -169,9 +159,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   label={kpi.label}
                   value={kpi.formattedValue ?? String(kpi.value)}
                   caption={
-                    kpi.trend
-                      ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%`
-                      : undefined
+                    kpi.trend ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%` : undefined
                   }
                 />
               ))}
@@ -200,9 +188,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
               Top Focus
             </div>
             <h3 style={{ margin: 0, fontSize: 18 }}>{doc.p1.scqa.headline}</h3>
-            <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.6 }}>
-              {doc.p1.executiveSummary}
-            </p>
+            <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.6 }}>{doc.p1.executiveSummary}</p>
             <ReportCallout
               title="Recommended action"
               text={doc.p1.scqa.recommendedAction}
@@ -244,9 +230,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
               >
                 Performance Trend
               </div>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>
-                Key chart snapshot
-              </div>
+              <div style={{ fontSize: 16, fontWeight: 700 }}>Key chart snapshot</div>
             </div>
             <div style={{ padding: 18, minHeight: 280 }}>
               {chartSpec ? (
@@ -382,11 +366,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
               title="Data Quality & Risk"
               description="Key dataset caveats and assumptions for decision-making."
             />
-            <ReportCallout
-              title="Dataset assurance"
-              text={riskNote}
-              severity="warning"
-            />
+            <ReportCallout title="Dataset assurance" text={riskNote} severity="warning" />
           </div>
 
           <div>
@@ -403,9 +383,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   header: "Trend",
                   align: "right",
                   render: (row: any) =>
-                    row.trend
-                      ? `${row.trend.direction} ${row.trend.pct}%`
-                      : "—",
+                    row.trend ? `${row.trend.direction} ${row.trend.pct}%` : "—",
                 },
               ]}
               rows={kpis.map((kpi) => ({

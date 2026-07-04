@@ -38,9 +38,7 @@ export function ReportPage({
             </div>
             <div className="rpt-page-header-meta">
               {datasetName && (
-                <div style={{ fontWeight: 700, color: "var(--rpt-ink)" }}>
-                  {datasetName}
-                </div>
+                <div style={{ fontWeight: 700, color: "var(--rpt-ink)" }}>{datasetName}</div>
               )}
               {generatedAt && <div>{generatedAt}</div>}
             </div>

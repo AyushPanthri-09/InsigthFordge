@@ -7,11 +7,7 @@
  * Every page component receives exactly the data it needs from this builder.
  */
 
-import type {
-  FullAnalysis,
-  AIInsight,
-  ChartSpec,
-} from "@/services/analytics/types";
+import type { FullAnalysis, AIInsight, ChartSpec } from "@/services/analytics/types";
 import type {
   ReportDocument,
   P1ExecutiveData,
@@ -53,9 +49,7 @@ function deepSanitizeStrings<T>(value: T): T {
     const result: Record<string, unknown> = {};
     for (const key in value) {
       if (Object.prototype.hasOwnProperty.call(value, key)) {
-        result[key] = deepSanitizeStrings(
-          (value as Record<string, unknown>)[key],
-        );
+        result[key] = deepSanitizeStrings((value as Record<string, unknown>)[key]);
       }
     }
     return result as T;
@@ -117,11 +111,7 @@ function uniqueStrings(values: string[], limit = values.length): string[] {
   return out;
 }
 
-function uniqueBy<T>(
-  values: T[],
-  keyFn: (value: T) => string,
-  limit = values.length,
-): T[] {
+function uniqueBy<T>(values: T[], keyFn: (value: T) => string, limit = values.length): T[] {
   const seen = new Set<string>();
   const out: T[] = [];
   for (const value of values) {
@@ -150,11 +140,8 @@ type PrescriptiveDetail = {
   timeHorizon?: string;
 };
 
-function getPrescriptiveDetail(
-  insight: AIInsight,
-): PrescriptiveDetail | undefined {
-  return (insight as { prescriptiveDetail?: PrescriptiveDetail })
-    .prescriptiveDetail;
+function getPrescriptiveDetail(insight: AIInsight): PrescriptiveDetail | undefined {
+  return (insight as { prescriptiveDetail?: PrescriptiveDetail }).prescriptiveDetail;
 }
 
 function extractPriority(insight: AIInsight): PriorityLevel {
@@ -194,10 +181,7 @@ function extractTimeHorizon(insight: AIInsight): string {
     medium_term: "Medium-term (3-6 months)",
     long_term: "Long-term (6-12 months)",
   };
-  return (
-    (detail?.timeHorizon ? map[detail.timeHorizon] : undefined) ??
-    "Short-term (1-3 months)"
-  );
+  return (detail?.timeHorizon ? map[detail.timeHorizon] : undefined) ?? "Short-term (1-3 months)";
 }
 
 /** Build a synthetic forecast chart spec from a TimeSeriesAnalysis */
@@ -341,9 +325,7 @@ function buildP4(analysis: FullAnalysis): P4DataQualityData {
       const profile = analysis.understanding.columnProfiles.find(
         (p) => p.name === i.affectedColumns?.[0],
       );
-      const nullPct = profile
-        ? profile.nullCount / Math.max(1, analysis.dataset.rowCount)
-        : 0;
+      const nullPct = profile ? profile.nullCount / Math.max(1, analysis.dataset.rowCount) : 0;
       return {
         column: i.affectedColumns?.[0] ?? i.id,
         decision: i.daieDecision!,

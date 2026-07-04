@@ -60,9 +60,7 @@ export function P6_Trends({ data, datasetName, generatedAt }: Props) {
                   </div>
                 </div>
 
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 10 }}
-                >
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {data.diagnosticInsights.slice(0, 2).map((ins, i) => (
                     <div
                       key={i}
@@ -201,11 +199,9 @@ export function P6_Trends({ data, datasetName, generatedAt }: Props) {
                     margin: 0,
                   }}
                 >
-                  Analysis detects a total growth shift of{" "}
-                  {primary.totalGrowthPct.toFixed(1)}% across monitored periods.
-                  The peak level was reached in {primary.peakPeriod} and the
-                  lowest inflection point was registered in{" "}
-                  {primary.troughPeriod}.
+                  Analysis detects a total growth shift of {primary.totalGrowthPct.toFixed(1)}%
+                  across monitored periods. The peak level was reached in {primary.peakPeriod} and
+                  the lowest inflection point was registered in {primary.troughPeriod}.
                 </p>
               </div>
               <div
@@ -224,14 +220,10 @@ export function P6_Trends({ data, datasetName, generatedAt }: Props) {
                     alignItems: "center",
                   }}
                 >
-                  <span style={{ fontSize: 9, color: "var(--rpt-text-muted)" }}>
-                    Seasonality:
-                  </span>
+                  <span style={{ fontSize: 9, color: "var(--rpt-text-muted)" }}>Seasonality:</span>
                   <ReportBadge
                     label={primary.seasonalityDetected ? "Detected" : "None"}
-                    variant={
-                      primary.seasonalityDetected ? "success" : "neutral"
-                    }
+                    variant={primary.seasonalityDetected ? "success" : "neutral"}
                   />
                 </div>
                 <div
@@ -241,12 +233,8 @@ export function P6_Trends({ data, datasetName, generatedAt }: Props) {
                     alignItems: "center",
                   }}
                 >
-                  <span style={{ fontSize: 9, color: "var(--rpt-text-muted)" }}>
-                    MA Period:
-                  </span>
-                  <span style={{ fontSize: 10, fontWeight: 700 }}>
-                    5-Period
-                  </span>
+                  <span style={{ fontSize: 9, color: "var(--rpt-text-muted)" }}>MA Period:</span>
+                  <span style={{ fontSize: 10, fontWeight: 700 }}>5-Period</span>
                 </div>
               </div>
             </div>
@@ -294,11 +282,7 @@ export function P6_Trends({ data, datasetName, generatedAt }: Props) {
             <ReportSection title="AI Trend Interpretations">
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.diagnosticInsights.slice(0, 3).map((ins) => (
-                  <div
-                    key={ins.id}
-                    className="rpt-ai-block"
-                    style={{ padding: 10 }}
-                  >
+                  <div key={ins.id} className="rpt-ai-block" style={{ padding: 10 }}>
                     <div
                       style={{
                         display: "flex",

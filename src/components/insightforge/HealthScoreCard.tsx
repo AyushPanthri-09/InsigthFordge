@@ -25,19 +25,10 @@ const SCORE_CONFIG = [
 ] as const;
 
 function getConfig(score: number) {
-  return (
-    SCORE_CONFIG.find((c) => score >= c.min) ??
-    SCORE_CONFIG[SCORE_CONFIG.length - 1]
-  );
+  return SCORE_CONFIG.find((c) => score >= c.min) ?? SCORE_CONFIG[SCORE_CONFIG.length - 1];
 }
 
-export function HealthScoreCard({
-  score,
-  summary,
-}: {
-  score: number;
-  summary: string;
-}) {
+export function HealthScoreCard({ score, summary }: { score: number; summary: string }) {
   const cfg = getConfig(score);
 
   return (
@@ -52,12 +43,7 @@ export function HealthScoreCard({
             Business Health Score
           </div>
           <div className="mt-2 flex items-end gap-2">
-            <div
-              className={cn(
-                "font-display text-6xl font-semibold tabular-nums",
-                cfg.color,
-              )}
-            >
+            <div className={cn("font-display text-6xl font-semibold tabular-nums", cfg.color)}>
               {score}
             </div>
             <div className="mb-1.5 text-sm text-muted-foreground">/100</div>
@@ -77,9 +63,7 @@ export function HealthScoreCard({
 
         {/* Summary + bar */}
         <div className="min-w-0 flex-1">
-          <p className="text-sm leading-relaxed text-foreground/85">
-            {summary}
-          </p>
+          <p className="text-sm leading-relaxed text-foreground/85">{summary}</p>
           {/* Progress bar */}
           <div className="mt-4">
             <div className="flex justify-between text-[10px] text-muted-foreground">
@@ -88,10 +72,7 @@ export function HealthScoreCard({
             </div>
             <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted/60">
               <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-700",
-                  cfg.bar,
-                )}
+                className={cn("h-full rounded-full transition-all duration-700", cfg.bar)}
                 style={{ width: `${score}%` }}
               />
             </div>

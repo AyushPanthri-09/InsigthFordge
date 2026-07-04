@@ -23,11 +23,7 @@
  */
 
 import * as ss from "simple-statistics";
-import type {
-  ForecastResult,
-  TimeSeriesAnalysis,
-  TimeSeriesPeriod,
-} from "../types";
+import type { ForecastResult, TimeSeriesAnalysis, TimeSeriesPeriod } from "../types";
 
 // ---------------------------------------------------------------------------
 // Main entry point
@@ -52,13 +48,7 @@ export function analyseTimeSeries(
   parsedDates?: (Date | null)[],
 ): TimeSeriesAnalysis | null {
   // Step 1: Bucket values by period
-  const buckets = buildPeriodBuckets(
-    rows,
-    dateCol,
-    measureCol,
-    granularity,
-    parsedDates,
-  );
+  const buckets = buildPeriodBuckets(rows, dateCol, measureCol, granularity, parsedDates);
   if (buckets.length < 4) return null; // need at least 4 periods
 
   const values = buckets.map((b) => b.value);
@@ -70,7 +60,7 @@ export function analyseTimeSeries(
   const periods: TimeSeriesPeriod[] = buckets.map((b, i) => {
     const prev = i > 0 ? buckets[i - 1].value : null;
     const growthRate =
-      prev !== null && prev !== 0
+      prev !== null && Math.abs(prev) > 1e-9
         ? ((b.value - prev) / Math.abs(prev)) * 100
         : undefined;
     const zScore = stdev > 0 ? (b.value - mean) / stdev : 0;
@@ -88,7 +78,7 @@ export function analyseTimeSeries(
   // Step 3: Overall trend classification
   const overallTrend = classifyTrend(values);
   const totalGrowthPct =
-    values[0] !== 0
+    Math.abs(values[0]) > 1e-9
       ? ((values[values.length - 1] - values[0]) / Math.abs(values[0])) * 100
       : 0;
 
@@ -179,10 +169,7 @@ function buildPeriodBuckets(
     }));
 }
 
-function formatBucket(
-  d: Date,
-  granularity: string,
-): { key: string; index: number } {
+function formatBucket(d: Date, granularity: string): { key: string; index: number } {
   const y = d.getFullYear();
   const m = d.getMonth() + 1;
   switch (granularity) {
@@ -230,7 +217,7 @@ function classifyTrend(values: number[]): TimeSeriesAnalysis["overallTrend"] {
   // Coefficient of variation to detect volatility
   const mean = ss.mean(values);
   const stdev = values.length > 1 ? ss.standardDeviation(values) : 0;
-  const cv = mean !== 0 ? stdev / Math.abs(mean) : 0;
+  const cv = Math.abs(mean) > 1e-9 ? stdev / Math.abs(mean) : 0;
 
   if (cv > 0.5) return "volatile";
   if (slope > mean * 0.02) return "growing"; // slope > 2% of mean per period
@@ -242,10 +229,7 @@ function classifyTrend(values: number[]): TimeSeriesAnalysis["overallTrend"] {
 // Moving average
 // ---------------------------------------------------------------------------
 
-function computeMovingAverage(
-  values: number[],
-  window: number,
-): (number | undefined)[] {
+function computeMovingAverage(values: number[], window: number): (number | undefined)[] {
   const prefixSums: number[] = [0];
   for (const value of values) {
     prefixSums.push(prefixSums[prefixSums.length - 1] + value);
@@ -289,13 +273,10 @@ function detectSeasonality(buckets: PeriodBucket[]): {
   }));
 
   // Seasonal if at least one period is consistently > 130% of the mean
-  const highSeasons = indexAverages
-    .filter((ia) => ia.avg > mean * 1.3)
-    .map((ia) => ia.index);
+  const highSeasons = indexAverages.filter((ia) => ia.avg > mean * 1.3).map((ia) => ia.index);
 
   // Need ≥2 cycles of data and at least one consistent high period
-  const hasCycles =
-    buckets.length >= 12 || (buckets.length >= 8 && byIndex.size >= 4);
+  const hasCycles = buckets.length >= 12 || (buckets.length >= 8 && byIndex.size >= 4);
   const seasonalityDetected = hasCycles && highSeasons.length > 0;
 
   return {
@@ -334,19 +315,16 @@ function movingAverageForecast(
 ): ForecastResult {
   const window = Math.min(6, Math.floor(values.length / 2));
   const recentMean = ss.mean(values.slice(-window));
-  const stdev =
-    values.length > 1 ? ss.standardDeviation(values) : recentMean * 0.1;
+  const stdev = values.length > 1 ? ss.standardDeviation(values) : recentMean * 0.1;
 
-  const nextPeriods = buildNextPeriodLabels(
-    buckets[buckets.length - 1].period,
-    3,
-    granularity,
-  ).map((period) => ({
-    period,
-    predicted: recentMean,
-    lower: recentMean - 1.96 * stdev,
-    upper: recentMean + 1.96 * stdev,
-  }));
+  const nextPeriods = buildNextPeriodLabels(buckets[buckets.length - 1].period, 3, granularity).map(
+    (period) => ({
+      period,
+      predicted: recentMean,
+      lower: recentMean - 1.96 * stdev,
+      upper: recentMean + 1.96 * stdev,
+    }),
+  );
 
   return {
     method: "moving_average",
@@ -374,19 +352,16 @@ function exponentialSmoothingForecast(
   for (let i = 1; i < values.length; i++) {
     smoothed = alpha * values[i] + (1 - alpha) * smoothed;
   }
-  const stdev =
-    values.length > 1 ? ss.standardDeviation(values) : smoothed * 0.1;
+  const stdev = values.length > 1 ? ss.standardDeviation(values) : smoothed * 0.1;
 
-  const nextPeriods = buildNextPeriodLabels(
-    buckets[buckets.length - 1].period,
-    3,
-    granularity,
-  ).map((period, i) => ({
-    period,
-    predicted: smoothed,
-    lower: smoothed - 1.96 * stdev * Math.sqrt(i + 1),
-    upper: smoothed + 1.96 * stdev * Math.sqrt(i + 1),
-  }));
+  const nextPeriods = buildNextPeriodLabels(buckets[buckets.length - 1].period, 3, granularity).map(
+    (period, i) => ({
+      period,
+      predicted: smoothed,
+      lower: smoothed - 1.96 * stdev * Math.sqrt(i + 1),
+      upper: smoothed + 1.96 * stdev * Math.sqrt(i + 1),
+    }),
+  );
 
   return {
     method: "exponential_smoothing",
@@ -421,22 +396,19 @@ function holtTrendForecast(
     trend = beta * (level - prevLevel) + (1 - beta) * trend;
   }
 
-  const stdev =
-    values.length > 1 ? ss.standardDeviation(values) : Math.abs(level) * 0.1;
-  const nextPeriods = buildNextPeriodLabels(
-    buckets[buckets.length - 1].period,
-    3,
-    granularity,
-  ).map((period, i) => {
-    const h = i + 1;
-    const predicted = level + h * trend;
-    return {
-      period,
-      predicted,
-      lower: predicted - 1.96 * stdev * Math.sqrt(h),
-      upper: predicted + 1.96 * stdev * Math.sqrt(h),
-    };
-  });
+  const stdev = values.length > 1 ? ss.standardDeviation(values) : Math.abs(level) * 0.1;
+  const nextPeriods = buildNextPeriodLabels(buckets[buckets.length - 1].period, 3, granularity).map(
+    (period, i) => {
+      const h = i + 1;
+      const predicted = level + h * trend;
+      return {
+        period,
+        predicted,
+        lower: predicted - 1.96 * stdev * Math.sqrt(h),
+        upper: predicted + 1.96 * stdev * Math.sqrt(h),
+      };
+    },
+  );
 
   const trendDir = trend > 0 ? "upward" : "downward";
   return {
@@ -514,20 +486,14 @@ function getISOWeek(d: Date): number {
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  return Math.ceil(
-    ((date.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7,
-  );
+  return Math.ceil(((date.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
 }
 
 /**
  * Generates the next N period labels after the last known period.
  * Handles month, quarter, year, week string formats.
  */
-function buildNextPeriodLabels(
-  lastPeriod: string,
-  n: number,
-  granularity: string,
-): string[] {
+function buildNextPeriodLabels(lastPeriod: string, n: number, granularity: string): string[] {
   const labels: string[] = [];
 
   if (granularity === "month" || !granularity) {

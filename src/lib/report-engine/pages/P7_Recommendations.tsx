@@ -21,8 +21,7 @@ function priorityColor(priority: string): string {
 
 export function P7_Recommendations({ data, datasetName, generatedAt }: Props) {
   const sorted = [...data.recommendations].sort(
-    (a, b) =>
-      (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9),
+    (a, b) => (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9),
   );
 
   const highPriorityCount = sorted.filter(
@@ -166,11 +165,7 @@ export function P7_Recommendations({ data, datasetName, generatedAt }: Props) {
                     </span>
                   </div>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <ReportBadge
-                      label={rec.priority}
-                      variant={rec.priority}
-                      dot
-                    />
+                    <ReportBadge label={rec.priority} variant={rec.priority} dot />
                     <ReportBadge
                       label={`${Math.round(rec.confidence * 100)}% Confidence`}
                       variant="neutral"
@@ -201,25 +196,17 @@ export function P7_Recommendations({ data, datasetName, generatedAt }: Props) {
                   }}
                 >
                   <div>
-                    <span style={{ color: "var(--rpt-text-muted)" }}>
-                      Expected Impact:{" "}
-                    </span>
-                    <strong style={{ color: "var(--rpt-brand-dark)" }}>
-                      {rec.expectedImpact}
-                    </strong>
+                    <span style={{ color: "var(--rpt-text-muted)" }}>Expected Impact: </span>
+                    <strong style={{ color: "var(--rpt-brand-dark)" }}>{rec.expectedImpact}</strong>
                   </div>
                   <div>
-                    <span style={{ color: "var(--rpt-text-muted)" }}>
-                      Timeline:{" "}
-                    </span>
+                    <span style={{ color: "var(--rpt-text-muted)" }}>Timeline: </span>
                     <strong style={{ color: "var(--rpt-brand-dark)" }}>
                       {rec.timeHorizon || "Medium-term"}
                     </strong>
                   </div>
                   <div>
-                    <span style={{ color: "var(--rpt-text-muted)" }}>
-                      Success Metric:{" "}
-                    </span>
+                    <span style={{ color: "var(--rpt-text-muted)" }}>Success Metric: </span>
                     <strong style={{ color: "var(--rpt-brand-dark)" }}>
                       {rec.successMetric || "Operational lift"}
                     </strong>

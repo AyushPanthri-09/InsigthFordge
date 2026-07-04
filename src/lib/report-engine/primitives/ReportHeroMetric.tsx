@@ -25,13 +25,7 @@ export function ReportHeroMetric({
       </div>
       <div className="rpt-hero-metric-value">{value}</div>
       {hasTrend && (
-        <div
-          className={
-            trend >= 0
-              ? "rpt-hero-metric-trend-up"
-              : "rpt-hero-metric-trend-down"
-          }
-        >
+        <div className={trend >= 0 ? "rpt-hero-metric-trend-up" : "rpt-hero-metric-trend-down"}>
           {trend >= 0 ? "+" : ""}
           {trend.toFixed(1)}% vs benchmark
         </div>

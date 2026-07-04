@@ -17,7 +17,7 @@ interface Props {
 function fmt(v: number): string {
   if (Math.abs(v) >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
   if (Math.abs(v) >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
-  return v % 1 === 0 ? String(v) : v.toFixed(2);
+  return Number.isInteger(v) ? String(v) : v.toFixed(2);
 }
 
 export function P6_Forecast({ data, datasetName, generatedAt }: Props) {
@@ -47,11 +47,7 @@ export function P6_Forecast({ data, datasetName, generatedAt }: Props) {
                 }}
               >
                 {data.predictiveInsights.slice(0, 4).map((ins) => (
-                  <div
-                    key={ins.id}
-                    className="rpt-ai-block"
-                    style={{ padding: 10 }}
-                  >
+                  <div key={ins.id} className="rpt-ai-block" style={{ padding: 10 }}>
                     <div
                       style={{
                         display: "flex",
@@ -116,19 +112,16 @@ export function P6_Forecast({ data, datasetName, generatedAt }: Props) {
           <div className="rpt-exec-insight">
             <div className="rpt-exec-insight-label">Executive Insight</div>
             <p>
-              Forecasting is expected to grow steadily over the next modeled
-              periods with {primary.confidence >= 0.9 ? "high" : "moderate"}{" "}
-              confidence. The model projects a{" "}
-              {primary.totalGrowthPct >= 0 ? "positive" : "negative"} growth
-              outlook of {primary.totalGrowthPct.toFixed(1)}%.
+              Forecasting is expected to grow steadily over the next modeled periods with{" "}
+              {primary.confidence >= 0.9 ? "high" : "moderate"} confidence. The model projects a{" "}
+              {primary.totalGrowthPct >= 0 ? "positive" : "negative"} growth outlook of{" "}
+              {primary.totalGrowthPct.toFixed(1)}%.
             </p>
           </div>
         )}
 
         {primary && (
-          <ReportSection
-            title={`Forecast Target Exhibit: ${primary.measureColumn}`}
-          >
+          <ReportSection title={`Forecast Target Exhibit: ${primary.measureColumn}`}>
             <div className="rpt-card" style={{ padding: 14 }}>
               <div
                 style={{
@@ -204,14 +197,11 @@ export function P6_Forecast({ data, datasetName, generatedAt }: Props) {
                         marginBottom: 12,
                       }}
                     >
-                      Growth shift of {primary.totalGrowthPct.toFixed(1)}%
-                      expected.
+                      Growth shift of {primary.totalGrowthPct.toFixed(1)}% expected.
                     </div>
                   </div>
 
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
-                  >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     <div
                       style={{
                         background: "var(--rpt-surface2)",
@@ -229,9 +219,7 @@ export function P6_Forecast({ data, datasetName, generatedAt }: Props) {
                       >
                         Peak Period
                       </span>
-                      <strong style={{ fontSize: 9.5 }}>
-                        {primary.peakPeriod}
-                      </strong>
+                      <strong style={{ fontSize: 9.5 }}>{primary.peakPeriod}</strong>
                     </div>
                     <div
                       style={{
@@ -250,9 +238,7 @@ export function P6_Forecast({ data, datasetName, generatedAt }: Props) {
                       >
                         Trough Period
                       </span>
-                      <strong style={{ fontSize: 9.5 }}>
-                        {primary.troughPeriod}
-                      </strong>
+                      <strong style={{ fontSize: 9.5 }}>{primary.troughPeriod}</strong>
                     </div>
                   </div>
                 </div>

@@ -19,9 +19,7 @@ interface ReportTableProps<T> {
   /** New API: preferred */
   rowTone?: (row: T) => "critical" | "warning" | "success" | undefined;
   /** Back-compat: older prop name */
-  getRowTone?: (
-    row: T,
-  ) => "critical" | "warning" | "success" | "info" | "neutral" | undefined;
+  getRowTone?: (row: T) => "critical" | "warning" | "success" | "info" | "neutral" | undefined;
 }
 
 export function ReportTable<T extends object>({
@@ -39,9 +37,7 @@ export function ReportTable<T extends object>({
 
   return (
     <div className="rpt-table-wrap">
-      <table
-        className={`rpt-table ${striped ? "rpt-table-striped" : ""} ${className}`}
-      >
+      <table className={`rpt-table ${striped ? "rpt-table-striped" : ""} ${className}`}>
         <thead>
           <tr>
             {columns.map((col) => (
@@ -61,9 +57,7 @@ export function ReportTable<T extends object>({
           {visible.map((row, ri) => (
             <tr
               key={ri}
-              className={
-                toneFn ? `rpt-table-row-${toneFn(row) ?? "neutral"}` : undefined
-              }
+              className={toneFn ? `rpt-table-row-${toneFn(row) ?? "neutral"}` : undefined}
             >
               {columns.map((col) => {
                 const cellValue = col.render
@@ -72,8 +66,7 @@ export function ReportTable<T extends object>({
                 const safeValue =
                   typeof cellValue === "string"
                     ? sanitizeReportString(cellValue)
-                    : typeof cellValue === "number" ||
-                        typeof cellValue === "boolean"
+                    : typeof cellValue === "number" || typeof cellValue === "boolean"
                       ? sanitizeReportString(cellValue)
                       : React.isValidElement(cellValue)
                         ? cellValue

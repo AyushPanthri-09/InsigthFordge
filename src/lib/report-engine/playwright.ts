@@ -5,10 +5,7 @@ import { sanitizePdfName, type GeneratedPdf } from "./pdf-utils";
 type ChromiumLike = {
   launch: (options: Record<string, unknown>) => Promise<{
     newPage: (options?: Record<string, unknown>) => Promise<{
-      setContent: (
-        html: string,
-        options?: Record<string, unknown>,
-      ) => Promise<void>;
+      setContent: (html: string, options?: Record<string, unknown>) => Promise<void>;
       emulateMedia: (options: { media: "print" | "screen" }) => Promise<void>;
       pdf: (options: Record<string, unknown>) => Promise<Uint8Array | Buffer>;
     }>;
@@ -23,10 +20,9 @@ const PdfRenderInput = z.object({
 
 async function importOptionalModule<T>(name: string): Promise<T | null> {
   try {
-    const dynamicImport = new Function(
-      "specifier",
-      "return import(specifier)",
-    ) as (specifier: string) => Promise<T>;
+    const dynamicImport = new Function("specifier", "return import(specifier)") as (
+      specifier: string,
+    ) => Promise<T>;
     return await dynamicImport(name);
   } catch {
     return null;
@@ -37,9 +33,7 @@ async function getChromiumRenderer(): Promise<{
   chromium: ChromiumLike;
   renderer: "playwright" | "puppeteer";
 }> {
-  const playwright = await importOptionalModule<{ chromium?: ChromiumLike }>(
-    "playwright",
-  );
+  const playwright = await importOptionalModule<{ chromium?: ChromiumLike }>("playwright");
   if (playwright?.chromium) {
     return { chromium: playwright.chromium, renderer: "playwright" };
   }
@@ -58,9 +52,7 @@ async function getChromiumRenderer(): Promise<{
     };
   }
 
-  throw new Error(
-    "Install Playwright or Puppeteer to enable native Chromium PDF export.",
-  );
+  throw new Error("Install Playwright or Puppeteer to enable native Chromium PDF export.");
 }
 
 export async function renderPdfWithChromium(
@@ -70,11 +62,7 @@ export async function renderPdfWithChromium(
   const { chromium, renderer } = await getChromiumRenderer();
   const browser = await chromium.launch({
     headless: true,
-    args: [
-      "--font-render-hinting=none",
-      "--disable-dev-shm-usage",
-      "--no-sandbox",
-    ],
+    args: ["--font-render-hinting=none", "--disable-dev-shm-usage", "--no-sandbox"],
   });
 
   try {
@@ -110,6 +98,4 @@ export async function renderPdfWithChromium(
 
 export const renderReportPdfServer = createServerFn({ method: "POST" })
   .validator((input: unknown) => PdfRenderInput.parse(input))
-  .handler(async ({ data }) =>
-    renderPdfWithChromium(data.html, data.sourceFileName),
-  );
+  .handler(async ({ data }) => renderPdfWithChromium(data.html, data.sourceFileName));

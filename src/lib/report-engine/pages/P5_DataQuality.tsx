@@ -18,11 +18,7 @@ interface Props {
 export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
   const qualityScore = Number(data.qualityScore ?? 0);
   const status: "success" | "warning" | "critical" =
-    qualityScore >= 80
-      ? "success"
-      : qualityScore >= 60
-        ? "warning"
-        : "critical";
+    qualityScore >= 80 ? "success" : qualityScore >= 60 ? "warning" : "critical";
 
   const issues = data.issues ?? [];
   const hasIssues = issues.length > 0;
@@ -157,10 +153,7 @@ export function P5_DataQuality({ data, datasetName, generatedAt }: Props) {
                 marginTop: "var(--rpt-space-md)",
               }}
             >
-              <ReportSummaryTile
-                label="Rows Removed"
-                value={data.rowsRemoved}
-              />
+              <ReportSummaryTile label="Rows Removed" value={data.rowsRemoved} />
               <ReportSummaryTile
                 label="Columns Inspected"
                 value={data.daieDecisions?.length || 0}

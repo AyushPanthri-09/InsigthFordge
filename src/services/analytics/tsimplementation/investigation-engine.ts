@@ -13,11 +13,7 @@
  *    cache.numericVectors when available, falling back to computeSegmentBreakdown).
  */
 
-import type {
-  ColumnProfile,
-  InvestigativeQuestion,
-  TimeSeriesAnalysis,
-} from "../types";
+import type { ColumnProfile, InvestigativeQuestion, TimeSeriesAnalysis } from "../types";
 import {
   computeCorrelationCached,
   computeDistributionShiftCached,
@@ -99,12 +95,7 @@ export function generateInvestigativeQuestions(
   }
 
   // ── Q-type 4: Distribution shift questions ───────────────────────────────
-  const distributionQuestion = askDistributionShiftQuestion(
-    metricCol,
-    anomalyValue,
-    rows,
-    cache,
-  );
+  const distributionQuestion = askDistributionShiftQuestion(metricCol, anomalyValue, rows, cache);
   if (distributionQuestion) questions.push(distributionQuestion);
 
   return questions;
@@ -123,22 +114,14 @@ function askSegmentQuestion(
   isPositive: boolean,
   cache?: ColumnCache,
 ): InvestigativeQuestion | null {
-  const segments = computeSegmentBreakdownCached(
-    rows,
-    cache,
-    dimensionCol,
-    metricCol,
-    baseline,
-  );
+  const segments = computeSegmentBreakdownCached(rows, cache, dimensionCol, metricCol, baseline);
   if (segments.length < 2) return null;
 
   const top = segments[0];
   const secondBest = segments[1];
 
   const dominanceRatio =
-    secondBest.contribution > 0
-      ? top.contribution / secondBest.contribution
-      : 1;
+    secondBest.contribution > 0 ? top.contribution / secondBest.contribution : 1;
   const evidenceStrength: InvestigativeQuestion["evidenceStrength"] =
     top.contribution > 30 && dominanceRatio > 2
       ? "strong"
@@ -162,12 +145,7 @@ function askSegmentQuestion(
     evidenceValue: top.contribution,
     supportsMainFinding: top.contribution > 10,
     evidenceStrength,
-    confidence:
-      evidenceStrength === "strong"
-        ? 0.8
-        : evidenceStrength === "moderate"
-          ? 0.65
-          : 0.4,
+    confidence: evidenceStrength === "strong" ? 0.8 : evidenceStrength === "moderate" ? 0.65 : 0.4,
   };
 }
 
@@ -182,16 +160,9 @@ function askCorrelationQuestion(
 
   const absR = Math.abs(r);
   const evidenceStrength: InvestigativeQuestion["evidenceStrength"] =
-    absR > 0.7
-      ? "strong"
-      : absR > 0.4
-        ? "moderate"
-        : absR > 0.2
-          ? "weak"
-          : "none";
+    absR > 0.7 ? "strong" : absR > 0.4 ? "moderate" : absR > 0.2 ? "weak" : "none";
 
-  const direction =
-    r > 0.1 ? "positively" : r < -0.1 ? "negatively" : "not meaningfully";
+  const direction = r > 0.1 ? "positively" : r < -0.1 ? "negatively" : "not meaningfully";
   const answer =
     absR > 0.2
       ? `"${otherCol}" is ${direction} correlated with "${metricCol}" (r = ${r.toFixed(3)}). ` +
@@ -207,20 +178,12 @@ function askCorrelationQuestion(
     supportsMainFinding: absR > 0.3 && r > 0,
     evidenceStrength,
     confidence:
-      evidenceStrength === "strong"
-        ? 0.85
-        : evidenceStrength === "moderate"
-          ? 0.65
-          : 0.35,
+      evidenceStrength === "strong" ? 0.85 : evidenceStrength === "moderate" ? 0.65 : 0.35,
   };
 }
 
-function askSeasonalityQuestion(
-  ts: TimeSeriesAnalysis,
-  metricCol: string,
-): InvestigativeQuestion {
-  const supportsMainFinding =
-    ts.seasonalityDetected && ts.highSeasonPeriods.length > 0;
+function askSeasonalityQuestion(ts: TimeSeriesAnalysis, metricCol: string): InvestigativeQuestion {
+  const supportsMainFinding = ts.seasonalityDetected && ts.highSeasonPeriods.length > 0;
   const answer = ts.seasonalityDetected
     ? `Yes — a seasonal pattern is detected in "${metricCol}". Periods ${ts.highSeasonPeriods.join(", ")} ` +
       `consistently exceed the series mean by >30%. The peak in "${ts.peakPeriod}" aligns with these high-season periods.`
@@ -239,12 +202,8 @@ function askSeasonalityQuestion(
   };
 }
 
-function askTrendQuestion(
-  ts: TimeSeriesAnalysis,
-  metricCol: string,
-): InvestigativeQuestion {
-  const isStructural =
-    ts.overallTrend === "growing" || ts.overallTrend === "declining";
+function askTrendQuestion(ts: TimeSeriesAnalysis, metricCol: string): InvestigativeQuestion {
+  const isStructural = ts.overallTrend === "growing" || ts.overallTrend === "declining";
   const answer = isStructural
     ? `"${metricCol}" shows a sustained ${ts.overallTrend} trend (${ts.totalGrowthPct.toFixed(1)}% total). ` +
       `The anomaly at "${ts.peakPeriod}" is the extreme of a structural trend, not a one-time spike.`
@@ -268,9 +227,7 @@ function askAnomalyFrequencyQuestion(
   ts: TimeSeriesAnalysis,
   metricCol: string,
 ): InvestigativeQuestion {
-  const anomalyPeriods = ts.periods
-    .filter((p) => p.isAnomaly)
-    .map((p) => p.period);
+  const anomalyPeriods = ts.periods.filter((p) => p.isAnomaly).map((p) => p.period);
   const isPersistent = anomalyPeriods.length > 1;
 
   const answer = isPersistent
@@ -296,12 +253,7 @@ function askDistributionShiftQuestion(
   rows: Record<string, unknown>[],
   cache?: ColumnCache,
 ): InvestigativeQuestion | null {
-  const shift = computeDistributionShiftCached(
-    rows,
-    cache,
-    metricCol,
-    anomalyValue,
-  );
+  const shift = computeDistributionShiftCached(rows, cache, metricCol, anomalyValue);
   if (!shift) return null;
 
   const { zScore, percentile } = shift;

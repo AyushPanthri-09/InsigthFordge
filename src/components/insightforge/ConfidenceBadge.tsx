@@ -11,13 +11,7 @@ function getTier(pct: number) {
   return TIERS.find((t) => pct >= t.min) ?? TIERS[TIERS.length - 1];
 }
 
-export function ConfidenceBadge({
-  value,
-  className,
-}: {
-  value: number;
-  className?: string;
-}) {
+export function ConfidenceBadge({ value, className }: { value: number; className?: string }) {
   const pct = Math.round(value * 100);
   const tier = getTier(pct);
 

@@ -154,16 +154,13 @@ export function P2_ExecutiveSummary({ data, datasetName, generatedAt }: Props) {
               },
               {
                 title: "2. Key Friction Point",
-                desc:
-                  scqa.complication ||
-                  "System signals anomalous variations requiring cleanup.",
+                desc: scqa.complication || "System signals anomalous variations requiring cleanup.",
                 badge: "Friction",
               },
               {
                 title: "3. Market Outlook",
                 desc:
-                  scqa.outlook ||
-                  "Dynamic projections forecast strong seasonal recovery trends.",
+                  scqa.outlook || "Dynamic projections forecast strong seasonal recovery trends.",
                 badge: "Projection",
               },
             ].map((sig, i) => (
@@ -225,10 +222,7 @@ export function P2_ExecutiveSummary({ data, datasetName, generatedAt }: Props) {
           }}
         >
           <ReportSection title="Strategic Business Opportunity">
-            <ReportBlock
-              title="Primary Strategic Opportunity"
-              variant="default"
-            >
+            <ReportBlock title="Primary Strategic Opportunity" variant="default">
               <div
                 style={{
                   fontSize: 11,
@@ -241,11 +235,7 @@ export function P2_ExecutiveSummary({ data, datasetName, generatedAt }: Props) {
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
                 <ReportBadge label="Impact: High" variant="success" dot />
-                <ReportBadge
-                  label="Priority: Critical"
-                  variant="critical"
-                  dot
-                />
+                <ReportBadge label="Priority: Critical" variant="critical" dot />
               </div>
             </ReportBlock>
           </ReportSection>
@@ -273,9 +263,7 @@ export function P2_ExecutiveSummary({ data, datasetName, generatedAt }: Props) {
         </div>
 
         {/* Why it Matters & Business Impact */}
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <ReportSection title="Why It Matters">
             <div
               style={{

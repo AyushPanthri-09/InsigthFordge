@@ -16,12 +16,7 @@ function kpiIcon(index: number): string {
   return ["UP", "OR", "CU", "$", "GR", "%"][index % 6];
 }
 
-export function P3_TOC({
-  datasetName,
-  generatedAt,
-  executiveData,
-  performanceData,
-}: Props) {
+export function P3_TOC({ datasetName, generatedAt, executiveData, performanceData }: Props) {
   const topKpis = executiveData?.topKpis?.slice(0, 6) ?? [];
   const recommendations = executiveData?.topRecommendations?.slice(0, 4) ?? [];
   const primaryChart = performanceData?.primaryCharts?.[0];
@@ -36,9 +31,7 @@ export function P3_TOC({
       generatedAt={generatedAt}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
           <ReportSection title="Top KPIs">
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topKpis.map((kpi, index) => (
@@ -109,10 +102,7 @@ export function P3_TOC({
           <ReportSection title="Top Recommendations">
             <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
               {recommendations.map((rec, index) => (
-                <div
-                  key={`${rec.title}-${index}`}
-                  className="rpt-numbered-action"
-                >
+                <div key={`${rec.title}-${index}`} className="rpt-numbered-action">
                   <div className="rpt-numbered-action-index">{index + 1}</div>
                   <div>
                     <div
@@ -136,14 +126,8 @@ export function P3_TOC({
                       {rec.summary}
                     </p>
                     <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                      <ReportBadge
-                        label={`${rec.priority} impact`}
-                        variant={rec.priority}
-                      />
-                      <ReportBadge
-                        label={`${rec.effort} effort`}
-                        variant="neutral"
-                      />
+                      <ReportBadge label={`${rec.priority} impact`} variant={rec.priority} />
+                      <ReportBadge label={`${rec.effort} effort`} variant="neutral" />
                     </div>
                   </div>
                 </div>
@@ -184,10 +168,7 @@ export function P3_TOC({
         {executiveData && (
           <div className="rpt-exec-insight">
             <div className="rpt-exec-insight-label">Key takeaway</div>
-            <p>
-              {executiveData.scqa.recommendedAction ||
-                executiveData.executiveSummary}
-            </p>
+            <p>{executiveData.scqa.recommendedAction || executiveData.executiveSummary}</p>
           </div>
         )}
       </div>

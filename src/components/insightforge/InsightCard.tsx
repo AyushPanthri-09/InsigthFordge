@@ -63,9 +63,7 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
         className="flex w-full items-start gap-4 px-5 py-4 text-left transition-colors hover:bg-white/[0.02]"
       >
         {/* Level icon */}
-        <div
-          className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${tone.icon}`}
-        >
+        <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${tone.icon}`}>
           <Icon className="h-4 w-4" />
         </div>
 
@@ -75,12 +73,8 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
             <span className="section-label">{insight.level}</span>
             <ConfidenceBadge value={insight.confidence} />
           </div>
-          <h3 className="text-sm font-semibold leading-snug">
-            {insight.title}
-          </h3>
-          <p className="mt-1.5 text-sm leading-relaxed text-foreground/75">
-            {insight.summary}
-          </p>
+          <h3 className="text-sm font-semibold leading-snug">{insight.title}</h3>
+          <p className="mt-1.5 text-sm leading-relaxed text-foreground/75">{insight.summary}</p>
         </div>
 
         {/* Chevron */}
@@ -125,9 +119,7 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
                     {insight.evidence.map((e, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs">
                         <EvidenceTag type={e.type} />
-                        <span className="text-foreground/80">
-                          {e.description}
-                        </span>
+                        <span className="text-foreground/80">{e.description}</span>
                       </li>
                     ))}
                   </ul>
@@ -136,11 +128,7 @@ export function InsightCard({ insight }: { insight: AIInsight }) {
 
               {/* Conclusion */}
               {insight.conclusion && (
-                <InfoPanel
-                  icon={CheckCircle2}
-                  label="Conclusion"
-                  tone="primary"
-                >
+                <InfoPanel icon={CheckCircle2} label="Conclusion" tone="primary">
                   {insight.conclusion}
                   <div className="mt-2">
                     <ConfidenceBadge value={insight.confidence} />
@@ -205,9 +193,7 @@ function InfoPanel({
     <div
       className={`rounded-xl border p-3.5 ${TONE_STYLES[tone].split(" ").slice(0, 2).join(" ")}`}
     >
-      <div
-        className={`flex items-center gap-1.5 ${TONE_STYLES[tone].split(" ")[2]}`}
-      >
+      <div className={`flex items-center gap-1.5 ${TONE_STYLES[tone].split(" ")[2]}`}>
         <Icon className="h-3 w-3" />
         <span className="section-label">{label}</span>
       </div>
@@ -220,13 +206,7 @@ const FieldLabel = ({ children }: { children: React.ReactNode }) => (
   <div className="field-label">{children}</div>
 );
 
-const Field = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div>
     <FieldLabel>{label}</FieldLabel>
     <div className="mt-1.5 text-sm text-foreground/80">{children}</div>
@@ -252,9 +232,7 @@ function HypothesesBlock({ hypotheses }: { hypotheses: Hypothesis[] }) {
   const surviving = hypotheses
     .filter((h) => h.verdict !== "rejected")
     .slice()
-    .sort(
-      (a, b) => (a.rank ?? 99) - (b.rank ?? 99) || b.confidence - a.confidence,
-    );
+    .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || b.confidence - a.confidence);
   const rejected = hypotheses.filter((h) => h.verdict === "rejected");
 
   return (
@@ -304,9 +282,7 @@ function HypothesisCard({ h, rank }: { h: Hypothesis; rank?: number }) {
               {rank}
             </span>
           )}
-          <span
-            className={`text-sm ${h.verdict === "rejected" ? "line-through opacity-60" : ""}`}
-          >
+          <span className={`text-sm ${h.verdict === "rejected" ? "line-through opacity-60" : ""}`}>
             {h.statement}
           </span>
         </div>
@@ -317,25 +293,15 @@ function HypothesisCard({ h, rank }: { h: Hypothesis; rank?: number }) {
         </span>
       </div>
 
-      {h.rationale && (
-        <p className="mt-2 text-xs italic text-foreground/65">{h.rationale}</p>
-      )}
+      {h.rationale && <p className="mt-2 text-xs italic text-foreground/65">{h.rationale}</p>}
 
       {(h.supportingEvidence?.length > 0 || h.opposingEvidence?.length > 0) && (
         <div className="mt-3 grid gap-2 md:grid-cols-2">
           {h.supportingEvidence?.length > 0 && (
-            <EvidenceList
-              title="Supporting"
-              tone="success"
-              items={h.supportingEvidence}
-            />
+            <EvidenceList title="Supporting" tone="success" items={h.supportingEvidence} />
           )}
           {h.opposingEvidence?.length > 0 && (
-            <EvidenceList
-              title="Opposing"
-              tone="destructive"
-              items={h.opposingEvidence}
-            />
+            <EvidenceList title="Opposing" tone="destructive" items={h.opposingEvidence} />
           )}
         </div>
       )}

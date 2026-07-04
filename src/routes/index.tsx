@@ -35,13 +35,7 @@ const fadeUp = (delay = 0) => ({
 });
 
 /* ── Nav link ───────────────────────────────────────────────── */
-function NavLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
@@ -61,8 +55,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title:
-          "InsightForge AI — Autonomous AI Data Scientist & Business Consultant",
+        title: "InsightForge AI — Autonomous AI Data Scientist & Business Consultant",
       },
       {
         name: "description",
@@ -109,10 +102,7 @@ function Landing() {
           <Brand />
 
           {/* Desktop nav */}
-          <nav
-            className="hidden items-center gap-8 text-sm md:flex"
-            aria-label="Main navigation"
-          >
+          <nav className="hidden items-center gap-8 text-sm md:flex" aria-label="Main navigation">
             <NavMegaMenu />
             <NavLink href="#workflow">Workflow</NavLink>
             <NavLink href="#pricing">Pricing</NavLink>
@@ -139,11 +129,7 @@ function Landing() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? (
-              <X className="h-4 w-4" />
-            ) : (
-              <Menu className="h-4 w-4" />
-            )}
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
 
@@ -233,8 +219,7 @@ function Landing() {
               transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.08 }}
               className="font-display text-5xl font-bold leading-[1.04] tracking-[-0.03em] sm:text-6xl lg:text-7xl xl:text-8xl"
             >
-              Never analyze before{" "}
-              <span className="gradient-text">understanding</span>.
+              Never analyze before <span className="gradient-text">understanding</span>.
             </motion.h1>
 
             {/* Subheading */}
@@ -244,10 +229,9 @@ function Landing() {
               transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.18 }}
               className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg sm:leading-relaxed"
             >
-              InsightForge AI reads your dataset the way a senior data scientist
-              would. It identifies the business context, justifies every
-              cleaning decision, runs four levels of analytics, and delivers
-              evidence-backed recommendations — not just statistics.
+              InsightForge AI reads your dataset the way a senior data scientist would. It
+              identifies the business context, justifies every cleaning decision, runs four levels
+              of analytics, and delivers evidence-backed recommendations — not just statistics.
             </motion.p>
 
             {/* CTAs */}
@@ -257,10 +241,7 @@ function Landing() {
               transition={{ duration: 0.55, ease: EASE_OUT, delay: 0.28 }}
               className="mt-10 flex flex-wrap items-center justify-center gap-4"
             >
-              <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.96 }}
-              >
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }}>
                 <Link
                   to="/dashboard"
                   className="btn-glow inline-flex items-center gap-2.5 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground"
@@ -306,8 +287,7 @@ function Landing() {
           <div
             className="pointer-events-none absolute bottom-0 inset-x-0 h-32"
             style={{
-              background:
-                "linear-gradient(to top, var(--color-background) 0%, transparent 100%)",
+              background: "linear-gradient(to top, var(--color-background) 0%, transparent 100%)",
             }}
           />
         </section>
@@ -317,8 +297,7 @@ function Landing() {
           <motion.div className="text-center" {...fadeUp()}>
             <p className="section-label mb-3">Capabilities</p>
             <h2 className="font-display text-3xl font-bold tracking-[-0.025em] md:text-4xl">
-              Four levels of analytics,{" "}
-              <span className="gradient-text">fully explained</span>
+              Four levels of analytics, <span className="gradient-text">fully explained</span>
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
               Every insight tagged with source and confidence score.
@@ -341,12 +320,8 @@ function Landing() {
                 >
                   <c.Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-6 text-base font-semibold tracking-[-0.015em]">
-                  {c.title}
-                </h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-                  {c.desc}
-                </p>
+                <h3 className="mt-6 text-base font-semibold tracking-[-0.015em]">{c.title}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
                 <div className="mt-5 flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                   Learn more <ChevronRight className="h-3 w-3" />
                 </div>
@@ -370,12 +345,10 @@ function Landing() {
             <motion.div className="text-center" {...fadeUp()}>
               <p className="section-label mb-3">How it works</p>
               <h2 className="font-display text-3xl font-bold tracking-[-0.025em] md:text-4xl">
-                From raw file to{" "}
-                <span className="gradient-text">trusted decision</span>
+                From raw file to <span className="gradient-text">trusted decision</span>
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-                Five stages. Every decision logged. Every conclusion backed by
-                evidence.
+                Five stages. Every decision logged. Every conclusion backed by evidence.
               </p>
             </motion.div>
 
@@ -429,12 +402,8 @@ function Landing() {
                       <span className="mt-1 text-[10px] font-bold uppercase tracking-widest text-primary/60">
                         Step {i + 1}
                       </span>
-                      <h3 className="mt-3 text-sm font-semibold tracking-[-0.01em]">
-                        {s.title}
-                      </h3>
-                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                        {s.desc}
-                      </p>
+                      <h3 className="mt-3 text-sm font-semibold tracking-[-0.01em]">{s.title}</h3>
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{s.desc}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -478,9 +447,7 @@ function Landing() {
                     </div>
                     <span className="section-label">Step {i + 1}</span>
                     <h3 className="mt-1.5 text-sm font-semibold">{s.title}</h3>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {s.desc}
-                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{s.desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -493,12 +460,11 @@ function Landing() {
           <motion.div className="mb-14 text-center" {...fadeUp()}>
             <p className="section-label mb-3">Why InsightForge</p>
             <h2 className="font-display text-3xl font-bold tracking-[-0.025em] md:text-4xl">
-              Built on a single,{" "}
-              <span className="gradient-text">uncompromising philosophy</span>
+              Built on a single, <span className="gradient-text">uncompromising philosophy</span>
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-              Every feature is designed to ensure AI transparency, business
-              relevance, and evidence-backed confidence.
+              Every feature is designed to ensure AI transparency, business relevance, and
+              evidence-backed confidence.
             </p>
           </motion.div>
 
@@ -518,8 +484,7 @@ function Landing() {
                   border: "1px solid oklch(1 0 0 / 8%)",
                   backdropFilter: "blur(20px) saturate(150%)",
                   WebkitBackdropFilter: "blur(20px) saturate(150%)",
-                  boxShadow:
-                    "0 4px 24px oklch(0 0 0 / 30%), 0 1px 0 oklch(1 0 0 / 6%) inset",
+                  boxShadow: "0 4px 24px oklch(0 0 0 / 30%), 0 1px 0 oklch(1 0 0 / 6%) inset",
                   transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
               >
@@ -550,9 +515,7 @@ function Landing() {
                 <h3 className="text-base font-bold tracking-[-0.02em] text-foreground">
                   {card.title}
                 </h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-                  {card.desc}
-                </p>
+                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{card.desc}</p>
 
                 {/* Bottom premium shadow */}
                 <div
@@ -620,12 +583,11 @@ function Landing() {
             <div className="relative">
               <p className="section-label mb-5">Get started for free</p>
               <h2 className="font-display text-3xl font-bold tracking-[-0.025em] md:text-5xl">
-                Start your first AI Analysis —{" "}
-                <span className="gradient-text">It's Free</span>
+                Start your first AI Analysis — <span className="gradient-text">It's Free</span>
               </h2>
               <p className="mx-auto mt-5 max-w-lg text-base text-muted-foreground">
-                Upload any dataset and let InsightForge AI transform raw data
-                into evidence-backed business intelligence in minutes.
+                Upload any dataset and let InsightForge AI transform raw data into evidence-backed
+                business intelligence in minutes.
               </p>
 
               <motion.div
@@ -662,10 +624,7 @@ function Landing() {
                       color: "oklch(0.82 0.10 290)",
                     }}
                   >
-                    <CheckCircle2
-                      className="h-3 w-3"
-                      style={{ color: "oklch(0.80 0.15 155)" }}
-                    />
+                    <CheckCircle2 className="h-3 w-3" style={{ color: "oklch(0.80 0.15 155)" }} />
                     {badge}
                   </motion.span>
                 ))}
@@ -712,8 +671,7 @@ function NeverPrinciplesBanner() {
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.018]"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, oklch(1 0 0) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, oklch(1 0 0) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
         }}
       />
@@ -761,8 +719,7 @@ function NeverPrinciplesBanner() {
             transition={{ duration: 0.55, ease: EASE_OUT, delay: 0.07 }}
             className="font-display text-3xl font-bold tracking-[-0.028em] text-foreground md:text-4xl"
           >
-            The Principles Behind{" "}
-            <span className="gradient-text">Every AI Decision</span>
+            The Principles Behind <span className="gradient-text">Every AI Decision</span>
           </motion.h2>
 
           <motion.p
@@ -771,8 +728,7 @@ function NeverPrinciplesBanner() {
             transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.14 }}
             className="mx-auto mt-4 max-w-lg text-base text-muted-foreground"
           >
-            InsightForge never generates conclusions without understanding,
-            evidence and reasoning.
+            InsightForge never generates conclusions without understanding, evidence and reasoning.
           </motion.p>
         </div>
 
@@ -795,8 +751,7 @@ function NeverPrinciplesBanner() {
                 border: "1px solid oklch(1 0 0 / 7%)",
                 backdropFilter: "blur(18px) saturate(140%)",
                 WebkitBackdropFilter: "blur(18px) saturate(140%)",
-                boxShadow:
-                  "0 2px 16px oklch(0 0 0 / 28%), 0 1px 0 oklch(1 0 0 / 5%) inset",
+                boxShadow: "0 2px 16px oklch(0 0 0 / 28%), 0 1px 0 oklch(1 0 0 / 5%) inset",
               }}
             >
               {/* Hover: purple border glow (CSS transition via ::before pseudo is hard in inline, so use a layered div) */}
@@ -944,8 +899,7 @@ const WHY_CARDS = [
     Icon: Brain,
     title: "Explainable AI",
     desc: "Every decision is reasoned and transparent—no black boxes.",
-    iconGradient:
-      "linear-gradient(135deg, oklch(0.68 0.22 290), oklch(0.65 0.20 240))",
+    iconGradient: "linear-gradient(135deg, oklch(0.68 0.22 290), oklch(0.65 0.20 240))",
     glowColor: "oklch(0.68 0.22 290 / 18%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.68 0.22 290 / 60%) 50%, transparent 100%)",
@@ -954,8 +908,7 @@ const WHY_CARDS = [
     Icon: TrendingUp,
     title: "Business Intelligence",
     desc: "Understands your domain and speaks the language of your business.",
-    iconGradient:
-      "linear-gradient(135deg, oklch(0.65 0.20 195), oklch(0.60 0.18 220))",
+    iconGradient: "linear-gradient(135deg, oklch(0.65 0.20 195), oklch(0.60 0.18 220))",
     glowColor: "oklch(0.65 0.20 195 / 15%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.65 0.20 195 / 60%) 50%, transparent 100%)",
@@ -964,8 +917,7 @@ const WHY_CARDS = [
     Icon: Target,
     title: "Evidence-backed",
     desc: "Actions are prioritized by evidence strength and business impact.",
-    iconGradient:
-      "linear-gradient(135deg, oklch(0.85 0.19 95), oklch(0.80 0.22 70))",
+    iconGradient: "linear-gradient(135deg, oklch(0.85 0.19 95), oklch(0.80 0.22 70))",
     glowColor: "oklch(0.85 0.19 95 / 15%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.85 0.19 95 / 60%) 50%, transparent 100%)",
@@ -974,8 +926,7 @@ const WHY_CARDS = [
     Icon: ShieldCheck,
     title: "Enterprise-grade & Fast",
     desc: "Firebase encrypted storage with enterprise protection. Results in seconds, not hours.",
-    iconGradient:
-      "linear-gradient(135deg, oklch(0.75 0.18 155), oklch(0.70 0.16 170))",
+    iconGradient: "linear-gradient(135deg, oklch(0.75 0.18 155), oklch(0.70 0.16 170))",
     glowColor: "oklch(0.75 0.18 155 / 15%)",
     borderGradient:
       "linear-gradient(90deg, transparent 0%, oklch(0.75 0.18 155 / 60%) 50%, transparent 100%)",

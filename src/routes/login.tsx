@@ -79,9 +79,7 @@ function Login() {
           }}
         >
           <div className="mb-6 space-y-1.5">
-            <h1 className="font-display text-2xl font-bold tracking-tight">
-              Access platform
-            </h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight">Access platform</h1>
             <p className="text-sm text-muted-foreground">
               Sign in with your enterprise credentials
             </p>

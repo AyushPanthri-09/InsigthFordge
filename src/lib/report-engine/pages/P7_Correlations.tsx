@@ -15,12 +15,8 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
   const { correlations = [] } = data;
 
   // Split into positive and negative correlations
-  const positiveCorrs = correlations
-    .filter((c) => c.r > 0)
-    .sort((a, b) => b.r - a.r);
-  const negativeCorrs = correlations
-    .filter((c) => c.r < 0)
-    .sort((a, b) => a.r - b.r);
+  const positiveCorrs = correlations.filter((c) => c.r > 0).sort((a, b) => b.r - a.r);
+  const negativeCorrs = correlations.filter((c) => c.r < 0).sort((a, b) => a.r - b.r);
 
   const topPos = positiveCorrs.slice(0, 3);
   const topNeg =
@@ -39,9 +35,7 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
 
   // Render a simulated visual correlation heatmap grid using pure CSS/HTML grid elements.
   // This will dynamically show columns intersecting.
-  const uniqueCols = Array.from(
-    new Set(correlations.flatMap((c) => [c.a, c.b])),
-  ).slice(0, 4);
+  const uniqueCols = Array.from(new Set(correlations.flatMap((c) => [c.a, c.b]))).slice(0, 4);
 
   return (
     <ReportPage
@@ -99,8 +93,8 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
                     margin: 0,
                   }}
                 >
-                  This grid maps coefficients ($r$) between attributes. Deep
-                  blue represents strong positive linear correlations.
+                  This grid maps coefficients ($r$) between attributes. Deep blue represents strong
+                  positive linear correlations.
                 </p>
               </div>
 
@@ -117,9 +111,7 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
                     let val = 1.0;
                     if (colA !== colB) {
                       const pair = correlations.find(
-                        (c) =>
-                          (c.a === colA && c.b === colB) ||
-                          (c.a === colB && c.b === colA),
+                        (c) => (c.a === colA && c.b === colB) || (c.a === colB && c.b === colA),
                       );
                       val = pair ? pair.r : 0.15;
                     }
@@ -180,9 +172,7 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
         )}
 
         {/* Top positive and negative panels */}
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <ReportSection title="Top Positive Drivers">
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topPos.length > 0 ? (
@@ -277,8 +267,7 @@ export function P7_Correlations({ data, datasetName, generatedAt }: Props) {
                       style={{
                         fontSize: 14,
                         fontWeight: 850,
-                        color:
-                          c.r < 0 ? "var(--rpt-critical)" : "var(--rpt-info)",
+                        color: c.r < 0 ? "var(--rpt-critical)" : "var(--rpt-info)",
                         textAlign: "right",
                       }}
                     >

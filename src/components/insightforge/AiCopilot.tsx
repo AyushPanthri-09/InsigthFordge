@@ -18,13 +18,7 @@ interface Message {
   timestamp: string;
 }
 
-export function AiCopilot({
-  dataset,
-  understanding,
-}: {
-  dataset: any;
-  understanding: any;
-}) {
+export function AiCopilot({ dataset, understanding }: { dataset: any; understanding: any }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
@@ -72,10 +66,7 @@ export function AiCopilot({
       const promptLower = text.toLowerCase();
       const colListStr = dataset?.columns?.join(", ") || "no columns loaded";
 
-      if (
-        promptLower.includes("summarize") ||
-        promptLower.includes("dimension")
-      ) {
+      if (promptLower.includes("summarize") || promptLower.includes("dimension")) {
         responseText = `This dataset contains ${dataset?.rowCount?.toLocaleString() || 0} rows and ${dataset?.columnCount || 0} columns. The inferred business domain is "${understanding?.domain || "general"}" with a high structural confidence score of 95%.`;
       } else if (
         promptLower.includes("columns") ||
@@ -83,15 +74,9 @@ export function AiCopilot({
         promptLower.includes("type")
       ) {
         responseText = `I mapped the column schema: \`[ ${colListStr} ]\`. The Technical Profiler classified key measure columns as float/integer types and categoricals as metadata dimensions.`;
-      } else if (
-        promptLower.includes("correlation") ||
-        promptLower.includes("relation")
-      ) {
+      } else if (promptLower.includes("correlation") || promptLower.includes("relation")) {
         responseText = `Pearson regression models indicate strong positive linear correlations between your primary measure variables (r = 0.85). I recommend charting these trends inside the EDA tab to isolate performance drivers.`;
-      } else if (
-        promptLower.includes("quality") ||
-        promptLower.includes("clean")
-      ) {
+      } else if (promptLower.includes("quality") || promptLower.includes("clean")) {
         responseText = `Data health profiling is complete. System audit detects minor inconsistencies and duplicate indexes in early rows. Propose applying structural standardizations to maximize analysis safety.`;
       }
 
@@ -143,9 +128,7 @@ export function AiCopilot({
               <div className="flex items-center gap-2">
                 <BrainCircuit className="h-5 w-5 text-primary" />
                 <div className="space-y-0.5">
-                  <h3 className="text-sm font-bold tracking-tight">
-                    AI Copilot
-                  </h3>
+                  <h3 className="text-sm font-bold tracking-tight">AI Copilot</h3>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
                     Insight Scientist
                   </span>
@@ -173,8 +156,7 @@ export function AiCopilot({
                   style={
                     msg.sender === "user"
                       ? {
-                          boxShadow:
-                            "0 4px 12px -3px oklch(0.85 0.19 95 / 25%)",
+                          boxShadow: "0 4px 12px -3px oklch(0.85 0.19 95 / 25%)",
                         }
                       : {}
                   }
@@ -185,9 +167,7 @@ export function AiCopilot({
                     ) : (
                       <Bot className="h-3 w-3" />
                     )}
-                    <span>
-                      {msg.sender === "user" ? "You" : "InsightForge AI"}
-                    </span>
+                    <span>{msg.sender === "user" ? "You" : "InsightForge AI"}</span>
                   </div>
                   <p>{msg.text}</p>
                   <span className="text-[8px] opacity-40 text-right self-end mt-1">

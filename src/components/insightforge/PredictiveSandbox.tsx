@@ -28,9 +28,7 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
   // Generate simulated forecast data over 6 months based on parameters
   const chartData = useMemo(() => {
     const data = [];
-    const baseVolume = dataset?.rowCount
-      ? Math.min(10000, dataset.rowCount * 5)
-      : 5000;
+    const baseVolume = dataset?.rowCount ? Math.min(10000, dataset.rowCount * 5) : 5000;
     const baseTicket = 85; // average purchase value
 
     for (let month = 1; month <= 6; month++) {
@@ -51,18 +49,13 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
           teamEfficiency *
           (1 + month * 0.05),
       );
-      const grossRevenue = Math.round(
-        activeCustomers * baseTicket * priceEffect,
-      );
+      const grossRevenue = Math.round(activeCustomers * baseTicket * priceEffect);
 
       // Expenses: ad spend + team operations costs + variable cost (20% of rev)
-      const operationalCosts =
-        adSpend * 1000 + teamSize * 6000 + grossRevenue * 0.22;
+      const operationalCosts = adSpend * 1000 + teamSize * 6000 + grossRevenue * 0.22;
       const netProfit = Math.max(0, grossRevenue - operationalCosts);
       const profitMargin =
-        grossRevenue > 0
-          ? parseFloat(((netProfit / grossRevenue) * 100).toFixed(1))
-          : 0;
+        grossRevenue > 0 ? parseFloat(((netProfit / grossRevenue) * 100).toFixed(1)) : 0;
 
       data.push({
         name: `Month ${month}`,
@@ -112,13 +105,11 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Sliders className="h-5 w-5 text-primary" />
-            <h2 className="font-display text-lg font-bold tracking-tight">
-              Scenario controls
-            </h2>
+            <h2 className="font-display text-lg font-bold tracking-tight">Scenario controls</h2>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Adjust internal business variables to run real-time math projections
-            on your dataset matrix.
+            Adjust internal business variables to run real-time math projections on your dataset
+            matrix.
           </p>
         </div>
 
@@ -129,9 +120,7 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                 <Percent className="h-3.5 w-3.5 text-primary" /> Price Discount
               </span>
-              <span className="text-sm font-mono font-bold text-primary">
-                {discount}%
-              </span>
+              <span className="text-sm font-mono font-bold text-primary">{discount}%</span>
             </div>
             <input
               type="range"
@@ -151,12 +140,9 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                <DollarSign className="h-3.5 w-3.5 text-primary" /> Monthly Ad
-                Spend
+                <DollarSign className="h-3.5 w-3.5 text-primary" /> Monthly Ad Spend
               </span>
-              <span className="text-sm font-mono font-bold text-primary">
-                ${adSpend}k
-              </span>
+              <span className="text-sm font-mono font-bold text-primary">${adSpend}k</span>
             </div>
             <input
               type="range"
@@ -176,12 +162,9 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                <Users className="h-3.5 w-3.5 text-primary" /> Sales Operations
-                Size
+                <Users className="h-3.5 w-3.5 text-primary" /> Sales Operations Size
               </span>
-              <span className="text-sm font-mono font-bold text-primary">
-                {teamSize} heads
-              </span>
+              <span className="text-sm font-mono font-bold text-primary">{teamSize} heads</span>
             </div>
             <input
               type="range"
@@ -202,8 +185,8 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
         <div className="rounded-xl border border-white/5 bg-background/40 p-3.5 text-[11px] text-muted-foreground flex items-start gap-2">
           <HelpCircle className="h-4 w-4 shrink-0 text-primary mt-0.5" />
           <p className="leading-relaxed">
-            Mathematical parameters are computed client-side using deterministic
-            polynomial formulas relative to dataset size.
+            Mathematical parameters are computed client-side using deterministic polynomial formulas
+            relative to dataset size.
           </p>
         </div>
       </div>
@@ -216,12 +199,8 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
         >
           <Sparkles className="h-5 w-5 shrink-0 animate-pulse mt-0.5" />
           <div className="space-y-1">
-            <div className="text-sm font-bold tracking-tight">
-              {aiAdvice.title}
-            </div>
-            <p className="text-xs leading-relaxed text-foreground/80">
-              {aiAdvice.text}
-            </p>
+            <div className="text-sm font-bold tracking-tight">{aiAdvice.title}</div>
+            <p className="text-xs leading-relaxed text-foreground/80">{aiAdvice.text}</p>
           </div>
         </div>
 
@@ -230,8 +209,7 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
           <div className="flex items-center justify-between mb-4">
             <div className="space-y-0.5">
               <h3 className="text-sm font-semibold flex items-center gap-1">
-                <TrendingUp className="h-4 w-4 text-primary" /> Projected Gross
-                Revenue & Profit
+                <TrendingUp className="h-4 w-4 text-primary" /> Projected Gross Revenue & Profit
               </h3>
               <p className="text-[11px] text-muted-foreground">
                 Deterministic 6-month simulation path
@@ -241,46 +219,19 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
 
           <div className="w-full h-[240px] flex-grow">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={chartData}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-              >
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="oklch(0.85 0.19 95)"
-                      stopOpacity={0.25}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="oklch(0.85 0.19 95)"
-                      stopOpacity={0.0}
-                    />
+                    <stop offset="5%" stopColor="oklch(0.85 0.19 95)" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="oklch(0.85 0.19 95)" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="oklch(0.80 0.14 195)"
-                      stopOpacity={0.25}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="oklch(0.80 0.14 195)"
-                      stopOpacity={0.0}
-                    />
+                    <stop offset="5%" stopColor="oklch(0.80 0.14 195)" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="oklch(0.80 0.14 195)" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="oklch(1 0 0 / 5%)"
-                />
-                <XAxis
-                  dataKey="name"
-                  stroke="oklch(1 0 0 / 40%)"
-                  fontSize={11}
-                  tickLine={false}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 5%)" />
+                <XAxis dataKey="name" stroke="oklch(1 0 0 / 40%)" fontSize={11} tickLine={false} />
                 <YAxis
                   stroke="oklch(1 0 0 / 40%)"
                   fontSize={11}
@@ -352,14 +303,8 @@ export function PredictiveSandbox({ dataset }: { dataset: any }) {
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {kpi.label}
               </span>
-              <div
-                className={`text-lg font-bold ${kpi.color} tracking-tight mt-1`}
-              >
-                {kpi.val}
-              </div>
-              <span className="text-[9px] text-muted-foreground/60">
-                {kpi.unit}
-              </span>
+              <div className={`text-lg font-bold ${kpi.color} tracking-tight mt-1`}>{kpi.val}</div>
+              <span className="text-[9px] text-muted-foreground/60">{kpi.unit}</span>
             </div>
           ))}
         </div>

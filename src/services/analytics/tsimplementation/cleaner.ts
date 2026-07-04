@@ -32,9 +32,7 @@ const PHONE_DIGITS_RE = /[0-9]/;
 
 function isMissingValue(value: unknown): boolean {
   return (
-    value === null ||
-    value === undefined ||
-    (typeof value === "string" && value.trim() === "")
+    value === null || value === undefined || (typeof value === "string" && value.trim() === "")
   );
 }
 
@@ -154,9 +152,7 @@ function convertTypeValue(value: unknown): unknown {
 function getMedian(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 1
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
+  return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
 function getMode(values: string[]): string | null {
@@ -221,8 +217,7 @@ export function detectIssues(
         "Exact duplicates rarely carry signal in transactional data. Removing them avoids double-counting in aggregates and skewed statistics. If duplicates are intentional (e.g. repeated events, audit logs), preserve them.",
       confidence: 0.85,
       affectedRows: dupCount,
-      businessImpact:
-        "Improves accuracy of counts, sums, and averages. Prevents inflated KPIs.",
+      businessImpact: "Improves accuracy of counts, sums, and averages. Prevents inflated KPIs.",
       requiresApproval: dupRatio > 0.1,
       possibleCauses: [
         {
@@ -266,14 +261,8 @@ export function detectIssues(
       profiles,
       intelligence,
     );
-    const {
-      reasoning,
-      possibleCauses,
-      alternativeInterpretations,
-      action,
-      severity,
-      confidence,
-    } = buildNullReasoning(p.name, nullPct, category, schemaRole, nullDecision);
+    const { reasoning, possibleCauses, alternativeInterpretations, action, severity, confidence } =
+      buildNullReasoning(p.name, nullPct, category, schemaRole, nullDecision);
 
     issues.push({
       id: `null_${p.name}`,
@@ -300,8 +289,12 @@ export function detectIssues(
     const intel = intelligence?.[p.name];
     const category = intel?.businessCategory ?? "unknown";
 
-    const { reasoning, possibleCauses, alternativeInterpretations } =
-      buildOutlierReasoning(p.name, p.stats.outlierCount, category, p.stats);
+    const { reasoning, possibleCauses, alternativeInterpretations } = buildOutlierReasoning(
+      p.name,
+      p.stats.outlierCount,
+      category,
+      p.stats,
+    );
 
     issues.push({
       id: `out_${p.name}`,
@@ -321,9 +314,7 @@ export function detectIssues(
 
   // ── 4. String normalization and convertible-type heuristics ─────────────
   for (const p of profiles) {
-    const stringSamples = p.sampleValues.filter(
-      (v): v is string => typeof v === "string",
-    );
+    const stringSamples = p.sampleValues.filter((v): v is string => typeof v === "string");
     if (stringSamples.length === 0) continue;
 
     const hasStripWhitespace = stringSamples.some((s) => s !== s.trim());
@@ -343,9 +334,7 @@ export function detectIssues(
       });
     }
 
-    const emptyStringCount = stringSamples.filter(
-      (s) => s.trim() === "",
-    ).length;
+    const emptyStringCount = stringSamples.filter((s) => s.trim() === "").length;
     if (emptyStringCount > 0) {
       issues.push({
         id: `empty_${p.name}`,
@@ -396,9 +385,7 @@ export function detectIssues(
         parseNumericString(s) !== null
       );
     }).length;
-    if (
-      convertibleCount >= Math.max(2, Math.floor(stringSamples.length * 0.3))
-    ) {
+    if (convertibleCount >= Math.max(2, Math.floor(stringSamples.length * 0.3))) {
       issues.push({
         id: `convert_${p.name}`,
         severity: "info",
@@ -434,10 +421,7 @@ export function detectIssues(
     const phoneSamples = stringSamples.filter(
       (s) => /phone|tel|contact/i.test(p.name) || shouldNormalizePhone(s),
     );
-    if (
-      phoneSamples.length > 0 &&
-      phoneSamples.some((s) => shouldNormalizePhone(s))
-    ) {
+    if (phoneSamples.length > 0 && phoneSamples.some((s) => shouldNormalizePhone(s))) {
       issues.push({
         id: `phone_${p.name}`,
         severity: "info",
@@ -460,9 +444,7 @@ export function detectIssues(
       .slice(0, 3)
       .filter(
         (r) =>
-          Object.values(r).filter(
-            (v) => v === null || v === undefined || v === "",
-          ).length >
+          Object.values(r).filter((v) => v === null || v === undefined || v === "").length >
           Object.keys(r).length * 0.6,
       ).length;
 
@@ -472,8 +454,7 @@ export function detectIssues(
         severity: "warning",
         action: "treat_as_metadata",
         title: "First rows look like metadata or report headers",
-        description:
-          "Several leading rows are mostly empty — common in exported reports.",
+        description: "Several leading rows are mostly empty — common in exported reports.",
         reasoning:
           "Exported spreadsheets often prepend title rows, date stamps, or section headers before the real data. Treating them as metadata prevents polluted types and false outliers.",
         confidence: 0.65,
@@ -504,13 +485,10 @@ export function detectIssues(
     if (p.inferredType !== "categorical") continue;
     // Detect mixed-type columns: mostly numeric but some string values
     const sampleNums = p.sampleValues.filter(
-      (v) =>
-        typeof v === "number" ||
-        (!isNaN(parseFloat(String(v))) && isFinite(Number(v))),
+      (v) => typeof v === "number" || (!isNaN(parseFloat(String(v))) && isFinite(Number(v))),
     );
     const sampleStrs = p.sampleValues.filter(
-      (v) =>
-        typeof v === "string" && isNaN(Number(v)) && String(v).trim() !== "",
+      (v) => typeof v === "string" && isNaN(Number(v)) && String(v).trim() !== "",
     );
 
     if (sampleNums.length > 0 && sampleStrs.length > 0) {
@@ -524,19 +502,16 @@ export function detectIssues(
           "Mixed types prevent reliable aggregation and statistical analysis. The column should be either standardised to numeric (if text values are errors) or split into a numeric measure and a flag column.",
         confidence: 0.75,
         affectedColumns: [p.name],
-        businessImpact:
-          "Blocks chart generation and KPI computation for this column.",
+        businessImpact: "Blocks chart generation and KPI computation for this column.",
         requiresApproval: true,
         possibleCauses: [
           {
-            cause:
-              "N/A, NULL, or placeholder strings mixed with numeric values",
+            cause: "N/A, NULL, or placeholder strings mixed with numeric values",
             plausibility: 0.65,
             evidence: `Sample text values: ${sampleStrs.slice(0, 3).join(", ")}.`,
           },
           {
-            cause:
-              "Column stores both a code and a description (e.g., '10 - Cash')",
+            cause: "Column stores both a code and a description (e.g., '10 - Cash')",
             plausibility: 0.25,
             evidence: "Composite value pattern common in legacy exports.",
           },
@@ -565,11 +540,7 @@ function buildDAIENullDecision(
 ): DAIEColumnDecision {
   const role = classifyDAIERole(profile, category, schemaRole);
   const dependency = describeDAIEDependency(profile, profiles, intelligence);
-  const businessImportance = describeDAIEBusinessImportance(
-    profile,
-    category,
-    schemaRole,
-  );
+  const businessImportance = describeDAIEBusinessImportance(profile, category, schemaRole);
   const statisticalProfile = describeDAIEStatisticalProfile(profile, nullPct);
   const dataQuality = describeDAIEDataQuality(profile, nullPct);
   const pctStr = `${(nullPct * 100).toFixed(0)}%`;
@@ -584,25 +555,18 @@ function buildDAIENullDecision(
     {
       option: "impute",
       label: "Option B: impute only after dependency testing",
-      reasoning: buildImputationOptionReasoning(
-        profile,
-        nullPct,
-        category,
-        schemaRole,
-      ),
+      reasoning: buildImputationOptionReasoning(profile, nullPct, category, schemaRole),
       risk: "Wrong imputation can erase a meaningful absence pattern or create false precision.",
     },
     {
       option: "transform",
-      label:
-        "Option C: transform by adding missingness indicator / Unknown bucket",
+      label: "Option C: transform by adding missingness indicator / Unknown bucket",
       reasoning: `Preserves the original value while making missingness analyzable. Useful when "${profile.name}" participates in segmentation, grouping, or sparse-event logic.`,
       risk: "Adds feature complexity and may over-emphasize missingness if the pattern is random.",
     },
     {
       option: "drop",
-      label:
-        "Option D: drop only after dependency and business override checks",
+      label: "Option D: drop only after dependency and business override checks",
       reasoning: `Dropping is considered only if "${profile.name}" is low-information, non-dependent, non-critical, and has no plausible rare-event or business value despite ${pctStr} missingness.`,
       risk: "Premature deletion may remove a rare fraud, churn, revenue, identity, or compliance signal.",
     },
@@ -650,12 +614,7 @@ function buildDAIENullDecision(
     rejectedOptions.push(
       "Mode/median imputation rejected because missingness may be meaningful rather than noise.",
     );
-  } else if (
-    nullPct > 0.9 &&
-    !highBusinessValue &&
-    !hasDependency &&
-    profile.uniqueCount <= 1
-  ) {
+  } else if (nullPct > 0.9 && !highBusinessValue && !hasDependency && profile.uniqueCount <= 1) {
     finalDecision = "flag_for_review";
     justification = `"${profile.name}" is a drop candidate, but deletion still requires human/source-system validation because missingness alone is not sufficient evidence.`;
     rejectedOptions.push(
@@ -685,11 +644,7 @@ function buildDAIENullDecision(
   };
 }
 
-function classifyDAIERole(
-  profile: ColumnProfile,
-  category: string,
-  schemaRole: string,
-): string {
+function classifyDAIERole(profile: ColumnProfile, category: string, schemaRole: string): string {
   if (schemaRole === "primary_key" || profile.inferredRole === "key")
     return "Primary Key / Identifier";
   if (schemaRole === "dimension_key") return "Identifier / Foreign-key feature";
@@ -723,8 +678,7 @@ function describeDAIEDependency(
 
   if (intel?.isForecastCandidate)
     return "Required for time-series continuity or forecasting; dropping could break temporal analysis.";
-  if (intel?.isKpiCandidate)
-    return "Feeds KPI computation; missingness affects headline metrics.";
+  if (intel?.isKpiCandidate) return "Feeds KPI computation; missingness affects headline metrics.";
   if (siblings.length > 0)
     return `Potential parent/related field for ${siblings.join(", ")}; dependency integrity should be checked before mutation.`;
   if (profile.inferredRole === "dimension")
@@ -739,11 +693,7 @@ function describeDAIEBusinessImportance(
 ): string {
   if (category === "financial_metric")
     return "High: financial/revenue signal; nulls may affect KPIs and cannot be treated as zero without validation.";
-  if (
-    category === "entity_key" ||
-    schemaRole === "primary_key" ||
-    schemaRole === "dimension_key"
-  )
+  if (category === "entity_key" || schemaRole === "primary_key" || schemaRole === "dimension_key")
     return "High: identity/join/compliance relevance; missingness may represent anonymous or unmatched entities.";
   if (category === "time_dimension")
     return "High: event lifecycle and period analysis depend on temporal completeness.";
@@ -754,10 +704,7 @@ function describeDAIEBusinessImportance(
   return "Unknown to medium: no direct high-value business marker found, but role and dependencies still constrain action.";
 }
 
-function describeDAIEStatisticalProfile(
-  profile: ColumnProfile,
-  nullPct: number,
-): string {
+function describeDAIEStatisticalProfile(profile: ColumnProfile, nullPct: number): string {
   const missingness =
     nullPct > 0.8
       ? "likely MNAR/MAR candidate until proven otherwise"
@@ -778,18 +725,12 @@ function describeDAIEStatisticalProfile(
   return `Missingness pattern: ${missingness}. ${skewHint}; outliers=${profile.stats.outlierCount}; cardinality=${profile.uniqueCount}. No single statistic is sufficient for action.`;
 }
 
-function describeDAIEDataQuality(
-  profile: ColumnProfile,
-  nullPct: number,
-): string {
+function describeDAIEDataQuality(profile: ColumnProfile, nullPct: number): string {
   const issues: string[] = [`missing ratio ${(nullPct * 100).toFixed(1)}%`];
   if (profile.stats?.outlierCount)
     issues.push(`${profile.stats.outlierCount} statistical outlier candidates`);
-  if (profile.inferredType === "unknown")
-    issues.push("unstable or unknown inferred type");
-  if (
-    profile.sampleValues.some((v) => typeof v === "string" && v.trim() === "")
-  )
+  if (profile.inferredType === "unknown") issues.push("unstable or unknown inferred type");
+  if (profile.sampleValues.some((v) => typeof v === "string" && v.trim() === ""))
     issues.push("empty-string missing values present in samples");
   return `${issues.join("; ")}. Quality issues generate options and review paths, not automatic deletion.`;
 }
@@ -817,10 +758,7 @@ function buildImputationOptionReasoning(
     }
     return "Median or model-based imputation may be candidates after checking skew, segment dependence, and correlated predictors; do not impute blindly.";
   }
-  if (
-    profile.inferredRole === "dimension" ||
-    profile.inferredType === "categorical"
-  ) {
+  if (profile.inferredRole === "dimension" || profile.inferredType === "categorical") {
     return "Mode imputation is valid only under low-entropy dominance; otherwise create an Unknown/Missing category or use predictive imputation if dependencies exist.";
   }
   return "Imputation requires dependency and missingness-mechanism validation before use.";
@@ -859,8 +797,7 @@ function buildNullReasoning(
 
   // Default safe action — always flag, never auto-drop
   const action: CleaningIssue["action"] = "flag_only";
-  const severity: CleaningIssue["severity"] =
-    nullPct > 0.5 ? "warning" : "info";
+  const severity: CleaningIssue["severity"] = nullPct > 0.5 ? "warning" : "info";
   const confidence = decision.finalDecision === "transform" ? 0.72 : 0.62;
 
   // Category-aware possible causes
@@ -870,8 +807,7 @@ function buildNullReasoning(
   if (category === "financial_metric") {
     possibleCauses.push(
       {
-        cause:
-          "Transaction did not occur (e.g., cancelled order — no payment amount)",
+        cause: "Transaction did not occur (e.g., cancelled order — no payment amount)",
         plausibility: 0.5,
         evidence: `Financial columns are often null when the transaction that populates them did not complete.`,
       },
@@ -895,8 +831,7 @@ function buildNullReasoning(
       {
         cause: "Event not yet occurred (future-dated records)",
         plausibility: 0.55,
-        evidence:
-          "Date columns are commonly null when the event they record has not happened yet.",
+        evidence: "Date columns are commonly null when the event they record has not happened yet.",
       },
       {
         cause: "Optional event that only applies to a subset of records",
@@ -912,14 +847,12 @@ function buildNullReasoning(
       {
         cause: "Online or digital channel where geography is not captured",
         plausibility: 0.45,
-        evidence:
-          "Geographic fields are often optional in digital-first datasets.",
+        evidence: "Geographic fields are often optional in digital-first datasets.",
       },
       {
         cause: "Data privacy masking or GDPR compliance",
         plausibility: 0.3,
-        evidence:
-          "Geographic granularity is frequently suppressed for privacy.",
+        evidence: "Geographic granularity is frequently suppressed for privacy.",
       },
     );
     alternativeInterpretations.push(
@@ -928,17 +861,14 @@ function buildNullReasoning(
   } else if (category === "entity_key") {
     possibleCauses.push(
       {
-        cause:
-          "Optional relationship — not all records are linked to this entity",
+        cause: "Optional relationship — not all records are linked to this entity",
         plausibility: 0.6,
-        evidence:
-          "FK columns are null when the relationship is optional (outer join).",
+        evidence: "FK columns are null when the relationship is optional (outer join).",
       },
       {
         cause: "Guest or anonymous records that have no entity link",
         plausibility: 0.3,
-        evidence:
-          "Common in e-commerce (guest checkout) and CRM (anonymous leads).",
+        evidence: "Common in e-commerce (guest checkout) and CRM (anonymous leads).",
       },
     );
     alternativeInterpretations.push(
@@ -953,8 +883,7 @@ function buildNullReasoning(
         evidence: `${pctStr} null rate suggests optional field.`,
       },
       {
-        cause:
-          "Data pipeline gap — field not populated by all upstream systems",
+        cause: "Data pipeline gap — field not populated by all upstream systems",
         plausibility: 0.3,
         evidence: "Multi-source datasets commonly have partial field coverage.",
       },
@@ -1009,21 +938,18 @@ function buildOutlierReasoning(
       {
         cause: "Seasonal or promotional spike (holiday sale, flash deal)",
         plausibility: 0.35,
-        evidence:
-          "Financial outliers frequently align with peak seasons or campaign periods.",
+        evidence: "Financial outliers frequently align with peak seasons or campaign periods.",
       },
       {
         cause:
           "Data entry error — wrong unit (e.g., paise instead of rupees, cents instead of dollars)",
         plausibility: 0.15,
-        evidence:
-          "Unit mismatch is a common data quality issue in financial columns.",
+        evidence: "Unit mismatch is a common data quality issue in financial columns.",
       },
       {
         cause: "Fraud or anomalous transaction",
         plausibility: 0.05,
-        evidence:
-          "Statistical outliers are a primary fraud detection signal — never auto-remove.",
+        evidence: "Statistical outliers are a primary fraud detection signal — never auto-remove.",
       },
     );
     alternativeInterpretations.push(
@@ -1041,14 +967,12 @@ function buildOutlierReasoning(
       {
         cause: "Data entry error (e.g., extra zero added)",
         plausibility: 0.3,
-        evidence:
-          "Quantity fields are prone to digit-doubling errors in manual entry.",
+        evidence: "Quantity fields are prone to digit-doubling errors in manual entry.",
       },
       {
         cause: "System-generated test or initialisation record",
         plausibility: 0.2,
-        evidence:
-          "Test records are sometimes not filtered from production exports.",
+        evidence: "Test records are sometimes not filtered from production exports.",
       },
     );
     alternativeInterpretations.push(
@@ -1059,8 +983,7 @@ function buildOutlierReasoning(
       {
         cause: "Genuine extreme event (rare but real business occurrence)",
         plausibility: 0.5,
-        evidence:
-          "IQR-based outlier detection is sensitive; not all flagged values are errors.",
+        evidence: "IQR-based outlier detection is sensitive; not all flagged values are errors.",
       },
       {
         cause: "Data quality issue — measurement or entry error",
@@ -1087,11 +1010,7 @@ function buildOutlierReasoning(
   return { reasoning, possibleCauses, alternativeInterpretations };
 }
 
-function buildNullBusinessImpact(
-  colName: string,
-  category: string,
-  nullPct: number,
-): string {
+function buildNullBusinessImpact(colName: string, category: string, nullPct: number): string {
   if (category === "financial_metric") {
     return `Missing values in "${colName}" will cause sum-based KPIs (total revenue, average order value) to be understated. If nulls represent zero-value events, this will create misleading metrics.`;
   }
@@ -1120,11 +1039,7 @@ export function enforceDAIEGovernance(issue: CleaningIssue): CleaningIssue {
   }
   // Heuristic issues without a DAIE decision object are also downgraded
   // (defensive: should not happen in normal flow, but guards future regressions)
-  if (
-    !issue.daieDecision &&
-    issue.action !== "drop_duplicates" &&
-    issue.action !== "flag_only"
-  ) {
+  if (!issue.daieDecision && issue.action !== "drop_duplicates" && issue.action !== "flag_only") {
     return { ...issue, action: "flag_only" };
   }
   return issue;
@@ -1143,15 +1058,8 @@ export function applyIssues(
 
   for (const issue of issues) {
     // Governance backstop: block any issue that bypassed the filter
-    if (
-      issue.action !== "flag_only" &&
-      issue.action !== "drop_duplicates" &&
-      !issue.daieDecision
-    ) {
-      console.warn(
-        "[GOVERNANCE BLOCKED] Issue reached executor without DAIE decision:",
-        issue.id,
-      );
+    if (issue.action !== "flag_only" && issue.action !== "drop_duplicates" && !issue.daieDecision) {
+      console.warn("[GOVERNANCE BLOCKED] Issue reached executor without DAIE decision:", issue.id);
       continue;
     }
 
@@ -1277,10 +1185,7 @@ export function applyIssues(
         }
         return nr;
       });
-    } else if (
-      issue.action === "normalize_empty_strings_to_null" &&
-      issue.affectedColumns
-    ) {
+    } else if (issue.action === "normalize_empty_strings_to_null" && issue.affectedColumns) {
       out = out.map((row) => {
         const nr = { ...row };
         for (const column of issue.affectedColumns!) {
@@ -1306,10 +1211,7 @@ export function applyIssues(
         }
         return nr;
       });
-    } else if (
-      issue.action === "normalize_phone_numbers" &&
-      issue.affectedColumns
-    ) {
+    } else if (issue.action === "normalize_phone_numbers" && issue.affectedColumns) {
       out = out.map((row) => {
         const nr = { ...row };
         for (const column of issue.affectedColumns!) {

@@ -18,12 +18,7 @@
  */
 
 import * as ss from "simple-statistics";
-import type {
-  ColumnProfile,
-  ExtendedNumericStats,
-  NumericStats,
-  StatisticalTest,
-} from "../types";
+import type { ColumnProfile, ExtendedNumericStats, NumericStats, StatisticalTest } from "../types";
 
 type SegmentBreakdown = Array<{
   value: string;
@@ -67,9 +62,7 @@ export function computeExtendedStats(
   const iqr = q3 - q1;
   const min = sorted[0];
   const max = sorted[sorted.length - 1];
-  const outlierCount = nums.filter(
-    (n) => n < q1 - 1.5 * iqr || n > q3 + 1.5 * iqr,
-  ).length;
+  const outlierCount = nums.filter((n) => n < q1 - 1.5 * iqr || n > q3 + 1.5 * iqr).length;
 
   // ── Distribution shape ─────────────────────────────────────────────────
   const skewness = computeSkewness(nums, mean, stdev);
@@ -84,16 +77,13 @@ export function computeExtendedStats(
 
   // ── Coefficient of variation ───────────────────────────────────────────
   // CV = σ/μ; only meaningful when mean ≠ 0
-  const coefficientOfVariation = mean !== 0 ? Math.abs(stdev / mean) : 0;
+  const coefficientOfVariation = Math.abs(mean) > 1e-9 ? Math.abs(stdev / mean) : 0;
 
   // ── 95% Confidence interval for the mean (t-distribution approx) ──────
   // For n > 30: z* ≈ 1.96. For smaller samples: use t* from lookup.
   const zStar = confidenceZ(nums.length, 0.95);
   const marginOfError = zStar * (stdev / Math.sqrt(nums.length));
-  const confidenceInterval95: [number, number] = [
-    mean - marginOfError,
-    mean + marginOfError,
-  ];
+  const confidenceInterval95: [number, number] = [mean - marginOfError, mean + marginOfError];
 
   // ── Z-score anomaly detection ──────────────────────────────────────────
   const zScoreThreshold = 2.5; // industry standard for anomaly detection
@@ -170,18 +160,14 @@ export function computeAllExtendedStats(
  * A full Shapiro-Wilk test requires an external library; this is a fast
  * heuristic that is accurate enough for business reporting.
  */
-export function testNormality(
-  nums: number[],
-  colName: string,
-): StatisticalTest {
+export function testNormality(nums: number[], colName: string): StatisticalTest {
   if (nums.length < 8) {
     return {
       testName: "Normality (Skewness-Kurtosis Test)",
       statistic: 0,
       pValue: 1,
       isSignificant: false,
-      interpretation:
-        "Insufficient data for normality test (minimum 8 observations required).",
+      interpretation: "Insufficient data for normality test (minimum 8 observations required).",
       businessImplication: "Cannot determine distribution shape reliably.",
     };
   }
@@ -264,8 +250,7 @@ export function testGroupDifference(
       pValue: 1,
       isSignificant: false,
       interpretation: "Insufficient data for group comparison.",
-      businessImplication:
-        "Cannot determine if group difference is real or due to chance.",
+      businessImplication: "Cannot determine if group difference is real or due to chance.",
     };
   }
 
@@ -277,7 +262,7 @@ export function testGroupDifference(
   const nB = groupB.length;
 
   const se = Math.sqrt(varA / nA + varB / nB);
-  if (se === 0) {
+  if (Math.abs(se) < 1e-9) {
     return {
       testName: "Group Difference (Welch t-test)",
       statistic: 0,
@@ -292,7 +277,7 @@ export function testGroupDifference(
   // Approximate p-value using normal distribution (valid for n > 30)
   const pValue = approximatePValue(t);
   const isSignificant = pValue < 0.05;
-  const diffPct = meanB !== 0 ? ((meanA - meanB) / Math.abs(meanB)) * 100 : 0;
+  const diffPct = Math.abs(meanB) > 1e-9 ? ((meanA - meanB) / Math.abs(meanB)) * 100 : 0;
 
   return {
     testName: "Group Difference (Welch t-test)",
@@ -320,10 +305,7 @@ export function computeCorrelationCached(
   otherCol: string,
 ): number | null {
   if (cache) {
-    const key =
-      metricCol < otherCol
-        ? `${metricCol}|${otherCol}`
-        : `${otherCol}|${metricCol}`;
+    const key = metricCol < otherCol ? `${metricCol}|${otherCol}` : `${otherCol}|${metricCol}`;
     if (cache.correlationCache.has(key)) {
       const cached = cache.correlationCache.get(key)!;
       return Number.isFinite(cached) ? cached : null;
@@ -331,8 +313,7 @@ export function computeCorrelationCached(
 
     const xs = cache.numericVectors.get(metricCol);
     const ys = cache.numericVectors.get(otherCol);
-    if (!xs || !ys || xs.length < 8 || ys.length < 8 || xs.length !== ys.length)
-      return null;
+    if (!xs || !ys || xs.length < 8 || ys.length < 8 || xs.length !== ys.length) return null;
 
     try {
       const r = ss.sampleCorrelation(xs, ys);
@@ -386,8 +367,7 @@ export function computeDistributionShiftCached(
   const mean = ss.mean(values);
   const stdev = values.length > 1 ? ss.standardDeviation(values) : 0;
   const zScore = stdev > 0 ? (anomalyValue - mean) / stdev : 0;
-  const percentile =
-    (values.filter((v) => v <= anomalyValue).length / values.length) * 100;
+  const percentile = (values.filter((v) => v <= anomalyValue).length / values.length) * 100;
 
   return {
     zScore,
@@ -401,22 +381,16 @@ export function computeDistributionShiftCached(
 // ---------------------------------------------------------------------------
 
 function computeSkewness(nums: number[], mean: number, stdev: number): number {
-  if (stdev === 0 || nums.length < 3) return 0;
+  if (Math.abs(stdev) < 1e-9 || nums.length < 3) return 0;
   const n = nums.length;
-  const cubedDeviations = nums.reduce(
-    (sum, x) => sum + Math.pow((x - mean) / stdev, 3),
-    0,
-  );
+  const cubedDeviations = nums.reduce((sum, x) => sum + Math.pow((x - mean) / stdev, 3), 0);
   return (n / ((n - 1) * (n - 2))) * cubedDeviations;
 }
 
 function computeKurtosis(nums: number[], mean: number, stdev: number): number {
-  if (stdev === 0 || nums.length < 4) return 0;
+  if (Math.abs(stdev) < 1e-9 || nums.length < 4) return 0;
   const n = nums.length;
-  const fourthMoment = nums.reduce(
-    (sum, x) => sum + Math.pow((x - mean) / stdev, 4),
-    0,
-  );
+  const fourthMoment = nums.reduce((sum, x) => sum + Math.pow((x - mean) / stdev, 4), 0);
   // Excess kurtosis (subtract 3 for normal distribution baseline)
   return (
     ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * fourthMoment -
@@ -531,11 +505,7 @@ export function computeSegmentBreakdown(
   return buildSegmentBreakdown(buckets, rows.length, baselineMean);
 }
 
-function addSegmentValue(
-  buckets: Map<string, SegmentBucket>,
-  dim: string,
-  val: number,
-): void {
+function addSegmentValue(buckets: Map<string, SegmentBucket>, dim: string, val: number): void {
   const bucket = buckets.get(dim);
   if (bucket) {
     bucket.sum += val;

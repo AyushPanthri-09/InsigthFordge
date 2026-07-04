@@ -65,9 +65,7 @@ export function UploadDropzone({
       <motion.div
         animate={{
           scale: drag ? 1.15 : 1,
-          backgroundColor: drag
-            ? "oklch(0.68 0.22 290)"
-            : "oklch(0.68 0.22 290 / 12%)",
+          backgroundColor: drag ? "oklch(0.68 0.22 290)" : "oklch(0.68 0.22 290 / 12%)",
         }}
         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         className="grid h-16 w-16 place-items-center rounded-2xl"
@@ -108,9 +106,7 @@ export function UploadDropzone({
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
             >
-              <div className="text-base font-semibold text-primary">
-                Release to upload
-              </div>
+              <div className="text-base font-semibold text-primary">Release to upload</div>
               <p className="mt-1.5 text-sm text-muted-foreground">
                 Your file will start processing immediately
               </p>
@@ -123,9 +119,7 @@ export function UploadDropzone({
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
             >
-              <div className="text-base font-semibold">
-                Drop your dataset to begin
-              </div>
+              <div className="text-base font-semibold">Drop your dataset to begin</div>
               <p className="mt-1.5 text-sm text-muted-foreground">
                 Drag & drop or{" "}
                 <span className="font-medium text-primary underline underline-offset-2">

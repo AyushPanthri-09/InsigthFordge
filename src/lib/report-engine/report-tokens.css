@@ -307,9 +307,7 @@
 
 .rpt-card-accent {
   padding: var(--rpt-card-pad);
-  background:
-    linear-gradient(135deg, rgba(21, 94, 239, 0.09), rgba(15, 159, 143, 0.07)),
-    #ffffff;
+  background: linear-gradient(135deg, rgba(21, 94, 239, 0.09), rgba(15, 159, 143, 0.07)), #ffffff;
   border-color: #c7d7fe;
 }
 
@@ -1145,11 +1143,7 @@
 
 .rpt-exec-document .rpt-page::before {
   height: 6px;
-  background: linear-gradient(
-    90deg,
-    var(--rpt-navy) 0 62%,
-    var(--rpt-gold) 62% 100%
-  );
+  background: linear-gradient(90deg, var(--rpt-navy) 0 62%, var(--rpt-gold) 62% 100%);
 }
 
 .rpt-exec-document .rpt-page-header {
@@ -1251,9 +1245,7 @@
   min-height: 112px;
   padding: 14px 16px 14px 18px;
   border-radius: 8px;
-  background:
-    linear-gradient(90deg, rgba(10, 22, 40, 0.045), rgba(255, 255, 255, 0)),
-    #ffffff;
+  background: linear-gradient(90deg, rgba(10, 22, 40, 0.045), rgba(255, 255, 255, 0)), #ffffff;
   border: 1px solid rgba(10, 22, 40, 0.08);
   border-left: 6px solid var(--rpt-navy);
   box-shadow: 0 8px 20px rgba(10, 22, 40, 0.055);
@@ -1359,11 +1351,7 @@
 
 .rpt-exec-cover-brandbar {
   height: 10px;
-  background: linear-gradient(
-    90deg,
-    var(--rpt-navy) 0 58%,
-    var(--rpt-gold) 58% 100%
-  );
+  background: linear-gradient(90deg, var(--rpt-navy) 0 58%, var(--rpt-gold) 58% 100%);
 }
 
 .rpt-exec-cover-shell {
@@ -1472,11 +1460,7 @@
   justify-content: center;
   background:
     radial-gradient(circle at center, #ffffff 0 57%, transparent 58%),
-    conic-gradient(
-      var(--rpt-mint) calc(var(--score) * 1%),
-      #f1dca8 0 86%,
-      var(--rpt-burgundy) 0
-    );
+    conic-gradient(var(--rpt-mint) calc(var(--score) * 1%), #f1dca8 0 86%, var(--rpt-burgundy) 0);
   box-shadow: 0 12px 30px rgba(10, 22, 40, 0.1);
 }
 
@@ -1542,12 +1526,7 @@
   padding: 20px;
   border-top: 5px solid var(--rpt-gold);
   background:
-    linear-gradient(
-      135deg,
-      rgba(200, 155, 60, 0.13),
-      rgba(255, 255, 255, 0) 50%
-    ),
-    #ffffff;
+    linear-gradient(135deg, rgba(200, 155, 60, 0.13), rgba(255, 255, 255, 0) 50%), #ffffff;
 }
 
 .rpt-exec-hero-value {
@@ -1612,8 +1591,7 @@
 
 .rpt-exec-chart-panel {
   padding: 12px;
-  background:
-    linear-gradient(180deg, rgba(10, 22, 40, 0.026), transparent 68px), #ffffff;
+  background: linear-gradient(180deg, rgba(10, 22, 40, 0.026), transparent 68px), #ffffff;
 }
 
 .rpt-exec-chart-head {
@@ -1670,9 +1648,7 @@
   background: #ffffff;
   padding: 12px 15px;
   box-shadow: 0 10px 24px rgba(10, 22, 40, 0.055);
-  background:
-    linear-gradient(90deg, rgba(200, 155, 60, 0.08), rgba(255, 255, 255, 0)),
-    #ffffff;
+  background: linear-gradient(90deg, rgba(200, 155, 60, 0.08), rgba(255, 255, 255, 0)), #ffffff;
 }
 
 .rpt-exec-banner p {

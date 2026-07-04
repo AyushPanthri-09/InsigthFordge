@@ -1,3 +1,4 @@
+import math
 import pandas as pd
 from typing import List, Dict, Any, Tuple
 from backend.services.data_analyst.contracts import SegmentResult, ConfidenceBreakdown
@@ -25,7 +26,7 @@ class SegmentationEngine:
         
         # Calculate overall mean
         overall_mean = float(df[numerical_col].mean())
-        if pd.isna(overall_mean) or overall_mean == 0:
+        if pd.isna(overall_mean) or math.isclose(overall_mean, 0.0, rel_tol=1e-9, abs_tol=1e-12):
             return results
 
         # Group and calculate category statistics

@@ -37,9 +37,7 @@ export function generateSCQANarrative(
 
   // 2. COMPLICATION
   let complication = "However, our analysis reveals critical constraints. ";
-  const critAnomalies = anomalies.filter(
-    (a) => a.severity === "CRITICAL" || a.severity === "HIGH",
-  );
+  const critAnomalies = anomalies.filter((a) => a.severity === "CRITICAL" || a.severity === "HIGH");
   if (critAnomalies.length > 0) {
     complication += `We identified ${critAnomalies.length} high-severity anomalies, notably ${critAnomalies[0].description.replace(/\.$/, "")}. `;
   } else {
@@ -58,13 +56,11 @@ export function generateSCQANarrative(
   }
 
   // 4. RECOMMENDATION
-  let recommendation =
-    "To resolve these constraints, the primary recommendation is to ";
+  let recommendation = "To resolve these constraints, the primary recommendation is to ";
   if (recommendations.length > 0) {
     recommendation += `${recommendations[0].action.charAt(0).toLowerCase() + recommendations[0].action.slice(1)}. `;
   } else {
-    recommendation +=
-      "implement standardized metric dashboards and establish data audit checks. ";
+    recommendation += "implement standardized metric dashboards and establish data audit checks. ";
   }
 
   // 5. EXPECTED OUTCOME

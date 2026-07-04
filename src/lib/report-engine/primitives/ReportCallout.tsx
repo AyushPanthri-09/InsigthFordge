@@ -15,12 +15,7 @@ interface ReportCalloutProps {
   icon?: string;
 }
 
-export function ReportCallout({
-  title,
-  text,
-  severity = "info",
-  icon,
-}: ReportCalloutProps) {
+export function ReportCallout({ title, text, severity = "info", icon }: ReportCalloutProps) {
   return (
     <div className={`rpt-callout rpt-callout-${severity}`}>
       <span className="rpt-callout-icon">{icon ?? ICONS[severity]}</span>

@@ -11,11 +11,7 @@ interface Props {
   generatedAt: string;
 }
 
-export function P8_StatisticalAnalysis({
-  data,
-  datasetName,
-  generatedAt,
-}: Props) {
+export function P8_StatisticalAnalysis({ data, datasetName, generatedAt }: Props) {
   const tests = data.statisticalTests ?? [];
 
   const statRows = tests.map((t, idx) => ({
@@ -81,10 +77,9 @@ export function P8_StatisticalAnalysis({
               margin: 0,
             }}
           >
-            Automated hypothesis testing sweeps were executed to identify
-            statistically significant differences and correlations across
-            categories. We apply p-value checks (alpha = 0.05) to rule out
-            chance variation and establish true business drivers.
+            Automated hypothesis testing sweeps were executed to identify statistically significant
+            differences and correlations across categories. We apply p-value checks (alpha = 0.05)
+            to rule out chance variation and establish true business drivers.
           </p>
         </div>
 
@@ -102,8 +97,8 @@ export function P8_StatisticalAnalysis({
                   fontSize: 11,
                 }}
               >
-                No active category hypothesis tests were generated. The dataset
-                has uniform parameters.
+                No active category hypothesis tests were generated. The dataset has uniform
+                parameters.
               </div>
             )}
           </div>
@@ -210,19 +205,17 @@ export function P8_StatisticalAnalysis({
                 }}
               >
                 <li style={{ marginBottom: 6 }}>
-                  <strong>Significant:</strong> Rejects the null hypothesis.
-                  There is a verified operational difference between these
-                  groups that warrants action.
+                  <strong>Significant:</strong> Rejects the null hypothesis. There is a verified
+                  operational difference between these groups that warrants action.
                 </li>
                 <li style={{ marginBottom: 6 }}>
-                  <strong>Not Significant:</strong> Fails to reject the null
-                  hypothesis. Differences are likely due to random noise, and no
-                  category changes are recommended.
+                  <strong>Not Significant:</strong> Fails to reject the null hypothesis. Differences
+                  are likely due to random noise, and no category changes are recommended.
                 </li>
                 <li>
-                  <strong>Effect Size:</strong> Measures the magnitude of
-                  difference. Even significant results should only be
-                  prioritized if the effect size is moderate or high.
+                  <strong>Effect Size:</strong> Measures the magnitude of difference. Even
+                  significant results should only be prioritized if the effect size is moderate or
+                  high.
                 </li>
               </ul>
             </div>

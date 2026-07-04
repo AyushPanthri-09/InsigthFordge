@@ -9,7 +9,7 @@ function fmt(v: number): string {
   if (!isFinite(v)) return "-";
   if (Math.abs(v) >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}M`;
   if (Math.abs(v) >= 1_000) return `${(v / 1_000).toFixed(2)}K`;
-  return v % 1 === 0 ? String(v) : v.toFixed(3);
+  return Number.isInteger(v) ? String(v) : v.toFixed(3);
 }
 
 interface Props {
@@ -198,17 +198,14 @@ export function Appendix({ data, datasetName, generatedAt }: Props) {
                 }}
               >
                 <li style={{ marginBottom: 4 }}>
-                  Confidence intervals are set at a baseline of 95% threshold
-                  across numeric variables.
+                  Confidence intervals are set at a baseline of 95% threshold across numeric
+                  variables.
                 </li>
                 <li style={{ marginBottom: 4 }}>
-                  Pearson coefficients compute linear relationships ($r$).
-                  Multilinear relations require additional model regressors.
+                  Pearson coefficients compute linear relationships ($r$). Multilinear relations
+                  require additional model regressors.
                 </li>
-                <li>
-                  Anomaly thresholds flag records with absolute z-scores greater
-                  than 3.0.
-                </li>
+                <li>Anomaly thresholds flag records with absolute z-scores greater than 3.0.</li>
               </ul>
             </div>
           </ReportSection>

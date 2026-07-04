@@ -58,24 +58,10 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
       "item",
       "catalog",
     ],
-    valueTerms: [
-      "pending",
-      "shipped",
-      "delivered",
-      "cancelled",
-      "refunded",
-      "processing",
-    ],
+    valueTerms: ["pending", "shipped", "delivered", "cancelled", "refunded", "processing"],
     processName: "Order-to-Cash",
     coreEntities: ["Customer", "Order", "Product", "Payment"],
-    kpiHints: [
-      "Revenue",
-      "AOV",
-      "Conversion Rate",
-      "Cart Abandonment",
-      "Refund Rate",
-      "CLV",
-    ],
+    kpiHints: ["Revenue", "AOV", "Conversion Rate", "Cart Abandonment", "Refund Rate", "CLV"],
     purposeTemplate:
       "Track and analyze online transactions, customer purchasing behaviour, and product performance.",
   },
@@ -197,23 +183,11 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
       "visit",
       "appointment",
     ],
-    valueTerms: [
-      "inpatient",
-      "outpatient",
-      "admitted",
-      "discharged",
-      "critical",
-    ],
+    valueTerms: ["inpatient", "outpatient", "admitted", "discharged", "critical"],
     processName: "Patient-Care-Cycle",
     coreEntities: ["Patient", "Doctor", "Diagnosis", "Treatment"],
-    kpiHints: [
-      "Avg Length of Stay",
-      "Readmission Rate",
-      "Bed Occupancy",
-      "Claim Approval Rate",
-    ],
-    purposeTemplate:
-      "Track patient outcomes, clinical operations, and healthcare cost management.",
+    kpiHints: ["Avg Length of Stay", "Readmission Rate", "Bed Occupancy", "Claim Approval Rate"],
+    purposeTemplate: "Track patient outcomes, clinical operations, and healthcare cost management.",
   },
   {
     domain: "hr",
@@ -300,14 +274,8 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
     valueTerms: ["in-transit", "delivered", "delayed", "returned", "lost"],
     processName: "Ship-to-Deliver",
     coreEntities: ["Shipment", "Route", "Warehouse", "Carrier"],
-    kpiHints: [
-      "On-Time Delivery Rate",
-      "Avg Delivery Days",
-      "Cost per Shipment",
-      "Return Rate",
-    ],
-    purposeTemplate:
-      "Monitor shipment performance, delivery SLAs, and logistics cost efficiency.",
+    kpiHints: ["On-Time Delivery Rate", "Avg Delivery Days", "Cost per Shipment", "Return Rate"],
+    purposeTemplate: "Monitor shipment performance, delivery SLAs, and logistics cost efficiency.",
   },
   {
     domain: "saas",
@@ -329,26 +297,10 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
       "event",
       "funnel",
     ],
-    valueTerms: [
-      "trial",
-      "active",
-      "churned",
-      "cancelled",
-      "paused",
-      "enterprise",
-      "pro",
-      "free",
-    ],
+    valueTerms: ["trial", "active", "churned", "cancelled", "paused", "enterprise", "pro", "free"],
     processName: "Trial-to-Revenue",
     coreEntities: ["User", "Subscription", "Plan", "Feature"],
-    kpiHints: [
-      "MRR",
-      "ARR",
-      "Churn Rate",
-      "Net Revenue Retention",
-      "Expansion MRR",
-      "DAU/MAU",
-    ],
+    kpiHints: ["MRR", "ARR", "Churn Rate", "Net Revenue Retention", "Expansion MRR", "DAU/MAU"],
     purposeTemplate:
       "Track subscription growth, churn, user engagement, and product-led revenue expansion.",
   },
@@ -374,16 +326,8 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
     valueTerms: ["running", "idle", "maintenance", "breakdown", "completed"],
     processName: "Plan-to-Produce",
     coreEntities: ["Machine", "Batch", "Product", "WorkOrder"],
-    kpiHints: [
-      "OEE",
-      "Defect Rate",
-      "Yield",
-      "Cycle Time",
-      "Scrap Rate",
-      "Downtime",
-    ],
-    purposeTemplate:
-      "Monitor production efficiency, equipment performance, and quality metrics.",
+    kpiHints: ["OEE", "Defect Rate", "Yield", "Cycle Time", "Scrap Rate", "Downtime"],
+    purposeTemplate: "Monitor production efficiency, equipment performance, and quality metrics.",
   },
   {
     domain: "education",
@@ -405,13 +349,7 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
     valueTerms: ["pass", "fail", "absent", "present", "enrolled", "graduated"],
     processName: "Enroll-to-Graduate",
     coreEntities: ["Student", "Course", "Teacher", "Enrollment"],
-    kpiHints: [
-      "Pass Rate",
-      "Avg Score",
-      "Attendance Rate",
-      "Dropout Rate",
-      "Enrollment Growth",
-    ],
+    kpiHints: ["Pass Rate", "Avg Score", "Attendance Rate", "Dropout Rate", "Enrollment Growth"],
     purposeTemplate:
       "Analyse student performance, course outcomes, and institutional effectiveness.",
   },
@@ -430,25 +368,11 @@ const DOMAIN_REGISTRY: DomainDescriptor[] = [
       "workload",
       "throughput",
     ],
-    valueTerms: [
-      "open",
-      "closed",
-      "in-progress",
-      "escalated",
-      "resolved",
-      "pending",
-    ],
+    valueTerms: ["open", "closed", "in-progress", "escalated", "resolved", "pending"],
     processName: "Request-to-Resolution",
     coreEntities: ["Ticket", "Agent", "Queue", "SLA"],
-    kpiHints: [
-      "Resolution Rate",
-      "Avg Handle Time",
-      "SLA Breach Rate",
-      "Backlog",
-      "CSAT",
-    ],
-    purposeTemplate:
-      "Track operational tickets, SLA compliance, and team throughput.",
+    kpiHints: ["Resolution Rate", "Avg Handle Time", "SLA Breach Rate", "Backlog", "CSAT"],
+    purposeTemplate: "Track operational tickets, SLA compliance, and team throughput.",
   },
 ];
 
@@ -487,9 +411,7 @@ export function inferBusinessDomain(
   sampleValues: string[] = [],
 ): DomainInferenceResult {
   const MINIMUM_CONFIDENCE = 0.15; // below this → generic
-  const lowerCols = columns.map((c) =>
-    c.toLowerCase().replace(/[_\-\s]+/g, " "),
-  );
+  const lowerCols = columns.map((c) => c.toLowerCase().replace(/[_\-\s]+/g, " "));
   const colStr = lowerCols.join(" ");
   const valStr = sampleValues.map((v) => String(v).toLowerCase()).join(" ");
 
@@ -500,8 +422,7 @@ export function inferBusinessDomain(
 
     // Sample-value hit ratio (secondary signal — weight 0.3)
     const valHits = desc.valueTerms.filter((t) => valStr.includes(t)).length;
-    const valScore =
-      desc.valueTerms.length > 0 ? valHits / desc.valueTerms.length : 0;
+    const valScore = desc.valueTerms.length > 0 ? valHits / desc.valueTerms.length : 0;
 
     return {
       domain: desc.domain,
@@ -565,9 +486,7 @@ function buildDomainRationale(
   ambiguousWith?: BusinessDomain,
 ): string {
   const lc = columns.map((c) => c.toLowerCase());
-  const matched = desc.terms
-    .filter((t) => lc.some((c) => c.includes(t)))
-    .slice(0, 5);
+  const matched = desc.terms.filter((t) => lc.some((c) => c.includes(t))).slice(0, 5);
   let r = `Domain inferred as "${desc.domain}" (score ${(score * 100).toFixed(0)}%) based on column signals: ${matched.join(", ")}.`;
   if (ambiguousWith) {
     r += ` Note: dataset also shows signals for "${ambiguousWith}"; consider providing analyst notes if domain is unclear.`;
@@ -610,16 +529,8 @@ export function inferBusinessProcesses(
   }
 
   // Cross-domain process detection: returns/refunds
-  const returnSignals = [
-    "return",
-    "refund",
-    "reversal",
-    "chargeback",
-    "cancellation",
-  ];
-  const returnCols = columns.filter((c) =>
-    returnSignals.some((s) => c.toLowerCase().includes(s)),
-  );
+  const returnSignals = ["return", "refund", "reversal", "chargeback", "cancellation"];
+  const returnCols = columns.filter((c) => returnSignals.some((s) => c.toLowerCase().includes(s)));
   if (returnCols.length >= 2) {
     processes.push({
       name: "Return-to-Refund",
@@ -630,17 +541,12 @@ export function inferBusinessProcesses(
   }
 
   // Cross-domain process detection: time-series / forecasting process
-  const hasDate = columns.some((c) =>
-    /date|period|month|year|quarter|week/i.test(c),
-  );
-  const hasMeasure = columns.some((c) =>
-    /amount|revenue|sales|quantity|count|total/i.test(c),
-  );
+  const hasDate = columns.some((c) => /date|period|month|year|quarter|week/i.test(c));
+  const hasMeasure = columns.some((c) => /amount|revenue|sales|quantity|count|total/i.test(c));
   if (hasDate && hasMeasure) {
     processes.push({
       name: "Trend-and-Forecast",
-      description:
-        "Time-series analysis to track performance over time and project future values.",
+      description: "Time-series analysis to track performance over time and project future values.",
       involvedColumns: columns.filter((c) =>
         /date|period|month|year|quarter|week|amount|revenue|sales/i.test(c),
       ),
@@ -659,10 +565,7 @@ export function inferBusinessProcesses(
  * Extracts primary business entities from column names.
  * Uses noun patterns common in transactional datasets.
  */
-export function extractPrimaryEntities(
-  columns: string[],
-  domain: BusinessDomain,
-): string[] {
+export function extractPrimaryEntities(columns: string[], domain: BusinessDomain): string[] {
   const domainDesc = DOMAIN_REGISTRY.find((d) => d.domain === domain);
   const knownEntities = domainDesc?.coreEntities ?? [];
 
@@ -707,18 +610,14 @@ export function suggestKPICandidates(
   if (!descriptor) return [];
 
   const lc = columns.map((c) => c.toLowerCase());
-  const kpis: Array<{ name: string; rationale: string; columns: string[] }> =
-    [];
+  const kpis: Array<{ name: string; rationale: string; columns: string[] }> = [];
 
   // Revenue / amount KPI
-  const revenueCol = columns.find((c) =>
-    /revenue|amount|sales|total|price/i.test(c),
-  );
+  const revenueCol = columns.find((c) => /revenue|amount|sales|total|price/i.test(c));
   if (revenueCol) {
     kpis.push({
       name: "Total Revenue",
-      rationale:
-        "Sum of all transaction amounts — primary financial health indicator.",
+      rationale: "Sum of all transaction amounts — primary financial health indicator.",
       columns: [revenueCol],
     });
   }
@@ -728,21 +627,17 @@ export function suggestKPICandidates(
   if (countCol) {
     kpis.push({
       name: "Total Volume",
-      rationale:
-        "Aggregate units or transactions — operational throughput indicator.",
+      rationale: "Aggregate units or transactions — operational throughput indicator.",
       columns: [countCol],
     });
   }
 
   // Date-based KPI
-  const dateCol = columns.find((c) =>
-    /date|time|period|created|updated/i.test(c),
-  );
+  const dateCol = columns.find((c) => /date|time|period|created|updated/i.test(c));
   if (dateCol && revenueCol) {
     kpis.push({
       name: "Period-over-Period Growth",
-      rationale:
-        "Compare revenue across periods to identify trends and seasonality.",
+      rationale: "Compare revenue across periods to identify trends and seasonality.",
       columns: [dateCol, revenueCol],
     });
   }

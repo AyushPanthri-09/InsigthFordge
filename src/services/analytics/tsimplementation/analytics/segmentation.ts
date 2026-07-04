@@ -29,9 +29,7 @@ export function runSegmentationAnalysis(
 ): SegmentationResult {
   const contributions: SegmentContribution[] = [];
 
-  const metricValues = rows
-    .map((r) => Number(r[targetMetric]))
-    .filter((v) => Number.isFinite(v));
+  const metricValues = rows.map((r) => Number(r[targetMetric])).filter((v) => Number.isFinite(v));
 
   if (metricValues.length === 0 || rows.length === 0) {
     return {
@@ -74,10 +72,9 @@ export function runSegmentationAnalysis(
     for (const [segVal, sumVal] of segmentSums.entries()) {
       const count = segmentCounts.get(segVal) ?? 1;
       const meanVal = sumVal / count;
-      const contributionPct =
-        overallSum !== 0 ? (sumVal / overallSum) * 100 : 0;
+      const contributionPct = Math.abs(overallSum) > 1e-9 ? (sumVal / overallSum) * 100 : 0;
       const deviationPct =
-        overallMean !== 0 ? ((meanVal - overallMean) / overallMean) * 100 : 0;
+        Math.abs(overallMean) > 1e-9 ? ((meanVal - overallMean) / overallMean) * 100 : 0;
 
       contributions.push({
         dimension: dim,

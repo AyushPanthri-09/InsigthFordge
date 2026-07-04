@@ -201,13 +201,7 @@ export interface ExtendedNumericStats extends NumericStats {
   /** Number of values flagged as anomalies by z-score method. */
   anomalyCount: number;
   /** Detected distribution shape. */
-  distributionShape:
-    | "normal"
-    | "right_skewed"
-    | "left_skewed"
-    | "bimodal"
-    | "uniform"
-    | "unknown";
+  distributionShape: "normal" | "right_skewed" | "left_skewed" | "bimodal" | "uniform" | "unknown";
   /** Plain-English business explanation of the distribution. */
   distributionExplanation: string;
   /** Percentile breakdown: p5, p10, p25, p50, p75, p90, p95. */
@@ -663,8 +657,7 @@ export interface KPI {
   rationale: string;
 }
 
-export type ChartType =
-  "bar" | "line" | "area" | "pie" | "scatter" | "histogram" | "heatmap";
+export type ChartType = "bar" | "line" | "area" | "pie" | "scatter" | "histogram" | "heatmap";
 
 export interface ChartSpec {
   id: string;
@@ -714,8 +707,7 @@ export interface EDAReport {
   segmentation?: any;
 }
 
-export type InsightLevel =
-  "descriptive" | "diagnostic" | "predictive" | "prescriptive";
+export type InsightLevel = "descriptive" | "diagnostic" | "predictive" | "prescriptive";
 
 export interface Evidence {
   type: "dataset" | "external" | "inference";
@@ -788,13 +780,7 @@ export interface AnalyticsReport {
 
 export interface ReasoningStep {
   timestamp: number;
-  phase:
-    | "understanding"
-    | "profiling"
-    | "cleaning"
-    | "eda"
-    | "analytics"
-    | "reporting";
+  phase: "understanding" | "profiling" | "cleaning" | "eda" | "analytics" | "reporting";
   message: string;
   detail?: string;
 }
@@ -815,20 +801,11 @@ export interface AnalyzeOptions {
  */
 export interface AnalyticsService {
   parseFile(file: File): Promise<ParsedDataset>;
-  understandDataset(
-    datasetId: string,
-    notes?: AnalystNotes,
-  ): Promise<DatasetUnderstanding>;
-  proposeCleaning(
-    datasetId: string,
-    notes?: AnalystNotes,
-  ): Promise<CleaningReport>;
+  understandDataset(datasetId: string, notes?: AnalystNotes): Promise<DatasetUnderstanding>;
+  proposeCleaning(datasetId: string, notes?: AnalystNotes): Promise<CleaningReport>;
   applyCleaning(datasetId: string, issueIds: string[]): Promise<CleaningReport>;
   runEDA(datasetId: string, notes?: AnalystNotes): Promise<EDAReport>;
-  runAnalytics(
-    datasetId: string,
-    notes?: AnalystNotes,
-  ): Promise<AnalyticsReport>;
+  runAnalytics(datasetId: string, notes?: AnalystNotes): Promise<AnalyticsReport>;
   /** Convenience: full pipeline orchestrator. */
   analyzeAll(file: File, options?: AnalyzeOptions): Promise<FullAnalysis>;
 }

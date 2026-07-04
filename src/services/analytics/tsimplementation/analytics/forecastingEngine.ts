@@ -3,10 +3,7 @@ import type { ForecastResult } from "../../types";
 
 export interface ExtendedForecastResult extends ForecastResult {
   selectedMethod:
-    | "moving_average"
-    | "weighted_moving_average"
-    | "exponential_smoothing"
-    | "linear_regression";
+    "moving_average" | "weighted_moving_average" | "exponential_smoothing" | "linear_regression";
   explanation: string;
   mape: number;
 }
@@ -33,17 +30,8 @@ export function generateAdvancedForecast(
   // Let's compute MAPE for each candidate method
   const mapes = {
     moving_average: evaluateMA(historicalValues, trainLimit, backtestCount),
-    weighted_moving_average: evaluateWMA(
-      historicalValues,
-      trainLimit,
-      backtestCount,
-    ),
-    exponential_smoothing: evaluateES(
-      historicalValues,
-      trainLimit,
-      backtestCount,
-      0.3,
-    ),
+    weighted_moving_average: evaluateWMA(historicalValues, trainLimit, backtestCount),
+    exponential_smoothing: evaluateES(historicalValues, trainLimit, backtestCount, 0.3),
     linear_regression: evaluateLR(historicalValues, trainLimit, backtestCount),
   };
 
@@ -104,9 +92,7 @@ export function generateAdvancedForecast(
     .filter((r) => !isNaN(r));
 
   const stdError =
-    residuals.length > 1
-      ? ss.standardDeviation(residuals)
-      : ss.mean(historicalValues) * 0.1;
+    residuals.length > 1 ? ss.standardDeviation(residuals) : ss.mean(historicalValues) * 0.1;
 
   const nextPeriods = predictions.map((pred, i) => {
     // Confidence bounds widen as we look further into the future (sqrt(i+1) factor)
@@ -123,8 +109,7 @@ export function generateAdvancedForecast(
   const confidence = Math.max(0.4, Math.min(0.95, 1 - minMape));
 
   return {
-    method: methodLabel as
-      "moving_average" | "exponential_smoothing" | "holt_trend",
+    method: methodLabel as "moving_average" | "exponential_smoothing" | "holt_trend",
     selectedMethod: bestMethod,
     nextPeriods,
     confidence,
@@ -145,11 +130,7 @@ export function generateAdvancedForecast(
 
 // --- Algorithm Evaluators & Forecasters ---
 
-function evaluateMA(
-  vals: number[],
-  trainLimit: number,
-  testCount: number,
-): number {
+function evaluateMA(vals: number[], trainLimit: number, testCount: number): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);
@@ -170,11 +151,7 @@ function forecastMA(vals: number[], count: number, k = 3): number[] {
   return result.slice(-count);
 }
 
-function evaluateWMA(
-  vals: number[],
-  trainLimit: number,
-  testCount: number,
-): number {
+function evaluateWMA(vals: number[], trainLimit: number, testCount: number): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);
@@ -193,19 +170,13 @@ function forecastWMA(vals: number[], count: number, k = 3): number[] {
     // Pad with mean if fewer than k items
     while (slice.length < k) slice.unshift(ss.mean(slice.length ? slice : [0]));
 
-    const pred =
-      slice[2] * weights[0] + slice[1] * weights[1] + slice[0] * weights[2];
+    const pred = slice[2] * weights[0] + slice[1] * weights[1] + slice[0] * weights[2];
     result.push(pred);
   }
   return result.slice(-count);
 }
 
-function evaluateES(
-  vals: number[],
-  trainLimit: number,
-  testCount: number,
-  alpha: number,
-): number {
+function evaluateES(vals: number[], trainLimit: number, testCount: number, alpha: number): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);
@@ -224,11 +195,7 @@ function forecastES(vals: number[], count: number, alpha = 0.3): number[] {
   return Array(count).fill(level);
 }
 
-function evaluateLR(
-  vals: number[],
-  trainLimit: number,
-  testCount: number,
-): number {
+function evaluateLR(vals: number[], trainLimit: number, testCount: number): number {
   let errors = 0;
   for (let idx = 0; idx < testCount; idx++) {
     const subset = vals.slice(0, trainLimit + idx);

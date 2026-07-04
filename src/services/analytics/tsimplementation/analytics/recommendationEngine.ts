@@ -60,8 +60,7 @@ export function generateRecommendations(
         effort: "medium",
         priority: "critical",
         riskOfInaction: "Inaccurate financial reports and compliance audits.",
-        successMetric:
-          "Resolution of negative sales numbers in monthly records.",
+        successMetric: "Resolution of negative sales numbers in monthly records.",
         timeHorizon: "immediate",
         reasoning: `Detected impossible negative sales values in '${anomaly.column}'.`,
         confidence: 0.9,
@@ -71,16 +70,12 @@ export function generateRecommendations(
     if (anomaly.type === "duplicate_transaction") {
       recommendations.push({
         id: nextId(),
-        action:
-          "Implement unique transaction token checks in the payment gateway API",
-        expectedImpact:
-          "Eradicate double-billing and refund processing overhead.",
+        action: "Implement unique transaction token checks in the payment gateway API",
+        expectedImpact: "Eradicate double-billing and refund processing overhead.",
         effort: "low",
         priority: "high",
-        riskOfInaction:
-          "Chargeback penalties, customer complaints, and duplicated revenues.",
-        successMetric:
-          "Zero duplicate transaction flags in transaction audits.",
+        riskOfInaction: "Chargeback penalties, customer complaints, and duplicated revenues.",
+        successMetric: "Zero duplicate transaction flags in transaction audits.",
         timeHorizon: "immediate",
         reasoning: `Detected duplicate transactions with matching timestamps and prices.`,
         confidence: 0.95,
@@ -101,8 +96,7 @@ export function generateRecommendations(
     if (discountVal > 15 && marginVal < 30) {
       recommendations.push({
         id: nextId(),
-        action:
-          "Reduce base discount rates by 10% and shift to bundled promotional offers",
+        action: "Reduce base discount rates by 10% and shift to bundled promotional offers",
         expectedImpact:
           "Increase overall gross margin percentage by 3-5 percentage points without dropping transaction counts.",
         effort: "low",
@@ -123,8 +117,7 @@ export function generateRecommendations(
     if (churnVal > 5) {
       recommendations.push({
         id: nextId(),
-        action:
-          "Launch a customer health tracking dashboard and proactive renewal playbooks",
+        action: "Launch a customer health tracking dashboard and proactive renewal playbooks",
         expectedImpact: "Reduce subscription churn rate under the 3% target.",
         effort: "high",
         priority: "high",
@@ -145,14 +138,11 @@ export function generateRecommendations(
     if (attrVal > 15) {
       recommendations.push({
         id: nextId(),
-        action:
-          "Conduct targeted compensation audits and department retention interviews",
-        expectedImpact:
-          "Stem workforce attrition and lower recruitment and onboarding costs.",
+        action: "Conduct targeted compensation audits and department retention interviews",
+        expectedImpact: "Stem workforce attrition and lower recruitment and onboarding costs.",
         effort: "medium",
         priority: "high",
-        riskOfInaction:
-          "Loss of institutional knowledge and delayed project timelines.",
+        riskOfInaction: "Loss of institutional knowledge and delayed project timelines.",
         successMetric: "Reduction of annual attrition below 10%.",
         timeHorizon: "medium_term",
         reasoning: `Employee attrition rate is high at ${attrVal.toFixed(1)}%, signaling cultural or market pay mismatch.`,
@@ -165,19 +155,16 @@ export function generateRecommendations(
   for (const corr of correlations) {
     if (corr.strength === "strong_positive") {
       const isMarketingSpend = ["spend", "marketing", "ads", "budget"].some(
-        (k) =>
-          corr.a.toLowerCase().includes(k) || corr.b.toLowerCase().includes(k),
+        (k) => corr.a.toLowerCase().includes(k) || corr.b.toLowerCase().includes(k),
       );
       const isRevenue = ["revenue", "sales", "conversions"].some(
-        (k) =>
-          corr.a.toLowerCase().includes(k) || corr.b.toLowerCase().includes(k),
+        (k) => corr.a.toLowerCase().includes(k) || corr.b.toLowerCase().includes(k),
       );
 
       if (isMarketingSpend && isRevenue) {
         recommendations.push({
           id: nextId(),
-          action:
-            "Increase marketing ad budget allocate to high-performing channels",
+          action: "Increase marketing ad budget allocate to high-performing channels",
           expectedImpact:
             "Drive proportional growth in top-line revenue based on strong correlation.",
           effort: "low",
@@ -198,12 +185,10 @@ export function generateRecommendations(
     recommendations.push({
       id: nextId(),
       action: "Review data schemas and establish standard KPI dashboards",
-      expectedImpact:
-        "Uniform transparency of business performance across departments.",
+      expectedImpact: "Uniform transparency of business performance across departments.",
       effort: "low",
       priority: "medium",
-      riskOfInaction:
-        "Lack of metrics accountability and delayed decision responses.",
+      riskOfInaction: "Lack of metrics accountability and delayed decision responses.",
       successMetric: "Dashboard adoption rate across stakeholders.",
       timeHorizon: "short_term",
       reasoning: "Establish basic monitoring baseline.",

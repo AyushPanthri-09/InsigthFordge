@@ -128,8 +128,7 @@ const CATEGORY_SIGNALS: Array<{
   // Time dimensions
 
   {
-    pattern:
-      /\b(date|datetime|timestamp|time|created_at|updated_at|modified)\b/i,
+    pattern: /\b(date|datetime|timestamp|time|created_at|updated_at|modified)\b/i,
     category: "time_dimension",
     tags: ["timeline", "seasonality_candidate", "forecast_timeline"],
     schemaRole: "date_key",
@@ -168,16 +167,14 @@ const CATEGORY_SIGNALS: Array<{
   },
   // Status flags
   {
-    pattern:
-      /\b(status|state|flag|active|is_|has_|type|category|class|label|tag)\b/i,
+    pattern: /\b(status|state|flag|active|is_|has_|type|category|class|label|tag)\b/i,
     category: "status_flag",
     tags: ["categorical_filter", "dimension"],
     schemaRole: "dimension_attribute",
   },
   // Descriptors
   {
-    pattern:
-      /\b(name|title|description|notes|comment|remarks|detail|text|label)\b/i,
+    pattern: /\b(name|title|description|notes|comment|remarks|detail|text|label)\b/i,
     category: "descriptor",
     tags: ["free_text", "non_aggregatable"],
     schemaRole: "dimension_attribute",
@@ -192,29 +189,19 @@ const CATEGORY_SIGNALS: Array<{
  * Maps (category, domain) → a human-readable meaning template.
  * Keeps meaning generation deterministic and testable.
  */
-const MEANING_TEMPLATES: Record<
-  BusinessColumnCategory,
-  Record<string, string>
-> = {
+const MEANING_TEMPLATES: Record<BusinessColumnCategory, Record<string, string>> = {
   financial_metric: {
     ecommerce:
       "Transaction monetary value — aggregates to total revenue and feeds into AOV calculations.",
-    finance:
-      "Financial ledger amount — used in P&L, balance sheet, or cash flow reporting.",
-    retail:
-      "Sales transaction value — aggregates to store revenue and gross margin.",
-    banking:
-      "Monetary transaction amount — contributes to loan book or deposit analysis.",
-    default:
-      "Numeric financial measure — suitable for summing, averaging, and forecasting.",
+    finance: "Financial ledger amount — used in P&L, balance sheet, or cash flow reporting.",
+    retail: "Sales transaction value — aggregates to store revenue and gross margin.",
+    banking: "Monetary transaction amount — contributes to loan book or deposit analysis.",
+    default: "Numeric financial measure — suitable for summing, averaging, and forecasting.",
   },
   operational_metric: {
-    ecommerce:
-      "Order volume metric — measures purchasing intensity and operational throughput.",
-    manufacturing:
-      "Production volume measure — feeds OEE and capacity utilisation calculations.",
-    logistics:
-      "Shipment quantity — tracks load volume and carrier utilisation.",
+    ecommerce: "Order volume metric — measures purchasing intensity and operational throughput.",
+    manufacturing: "Production volume measure — feeds OEE and capacity utilisation calculations.",
+    logistics: "Shipment quantity — tracks load volume and carrier utilisation.",
     default: "Operational count or volume measure — indicates activity level.",
   },
   time_dimension: {
@@ -237,29 +224,22 @@ const MEANING_TEMPLATES: Record<
       "Campaign geography — measures regional campaign effectiveness and market penetration.",
   },
   entity_key: {
-    default:
-      "Identifier column — primary or foreign key used to join related datasets.",
-    ecommerce:
-      "Transactional identifier — links orders to customers, products, or payments.",
+    default: "Identifier column — primary or foreign key used to join related datasets.",
+    ecommerce: "Transactional identifier — links orders to customers, products, or payments.",
     hr: "Employee or department identifier — enables joins across workforce tables.",
   },
   descriptor: {
-    default:
-      "Descriptive text column — provides context but is not directly aggregatable.",
+    default: "Descriptive text column — provides context but is not directly aggregatable.",
   },
   status_flag: {
-    default:
-      "Categorical status indicator — segments records into meaningful business states.",
-    ecommerce:
-      "Order lifecycle stage — tracks customer journey from placement to fulfilment.",
-    operations:
-      "Ticket or workflow state — drives SLA monitoring and resolution analysis.",
+    default: "Categorical status indicator — segments records into meaningful business states.",
+    ecommerce: "Order lifecycle stage — tracks customer journey from placement to fulfilment.",
+    operations: "Ticket or workflow state — drives SLA monitoring and resolution analysis.",
   },
   ratio_metric: {
     default:
       "Rate or percentage measure — already normalised; do not sum, use average or last-known.",
-    finance:
-      "Financial ratio — used in profitability analysis and performance benchmarking.",
+    finance: "Financial ratio — used in profitability analysis and performance benchmarking.",
     marketing: "Performance rate — CTR, conversion rate, or efficiency metric.",
   },
   unknown: {
@@ -278,20 +258,13 @@ const MEANING_TEMPLATES: Record<
  * @param profile   - The basic ColumnProfile produced by profiler.ts
  * @param domain    - The business domain inferred by the Business Context Engine
  */
-export function analyseColumn(
-  profile: ColumnProfile,
-  domain: string,
-): ColumnIntelligence {
+export function analyseColumn(profile: ColumnProfile, domain: string): ColumnIntelligence {
   const name = profile.name;
   const nameLower = name.toLowerCase();
   const inferredType = profile.inferredType;
 
   // Step 1: Determine business category via signal matching
-  const { category, tags, schemaRole } = detectCategoryAndRole(
-    nameLower,
-    inferredType,
-    profile,
-  );
+  const { category, tags, schemaRole } = detectCategoryAndRole(nameLower, inferredType, profile);
 
   // Step 2: Override schema role based on actual profile data
   const finalSchemaRole = resolveSchemaRole(schemaRole, profile);
@@ -300,16 +273,8 @@ export function analyseColumn(
   const businessMeaning = resolveMeaning(category, domain, name, profile);
 
   // Step 4: Determine KPI and forecast candidacy
-  const isKpiCandidate = determineKpiCandidacy(
-    category,
-    finalSchemaRole,
-    profile,
-  );
-  const isForecastCandidate = determineForecastCandidacy(
-    category,
-    finalSchemaRole,
-    profile,
-  );
+  const isKpiCandidate = determineKpiCandidacy(category, finalSchemaRole, profile);
+  const isForecastCandidate = determineForecastCandidacy(category, finalSchemaRole, profile);
   const isGeographic = category === "geo_dimension";
 
   // Step 5: Compute confidence
@@ -442,12 +407,8 @@ function detectCategoryAndRole(
  * A column with 100% unique values and numeric type → primary_key candidate.
  * A column with low cardinality → dimension_attribute.
  */
-function resolveSchemaRole(
-  initial: SchemaRole,
-  profile: ColumnProfile,
-): SchemaRole {
-  const uniqueRatio =
-    profile.uniqueCount / Math.max(1, profile.nonNullCount + profile.nullCount);
+function resolveSchemaRole(initial: SchemaRole, profile: ColumnProfile): SchemaRole {
+  const uniqueRatio = profile.uniqueCount / Math.max(1, profile.nonNullCount + profile.nullCount);
 
   // Pure key detection: nearly all values are unique + short name with "id"
   if (
@@ -469,11 +430,7 @@ function resolveSchemaRole(
   }
 
   // Low-cardinality numeric that looks like a measure → fact_measure
-  if (
-    initial === "fact_measure" &&
-    profile.inferredRole === "measure" &&
-    profile.stats
-  ) {
+  if (initial === "fact_measure" && profile.inferredRole === "measure" && profile.stats) {
     return "fact_measure";
   }
 
@@ -486,17 +443,14 @@ function resolveMeaning(
   columnName: string,
   _profile: ColumnProfile,
 ): string {
-  const domainKey =
-    domain in (MEANING_TEMPLATES[category] ?? {}) ? domain : "default";
+  const domainKey = domain in (MEANING_TEMPLATES[category] ?? {}) ? domain : "default";
   const template =
     MEANING_TEMPLATES[category]?.[domainKey] ??
     MEANING_TEMPLATES[category]?.["default"] ??
     "Column purpose undetermined.";
 
   // Prepend a context-specific prefix derived from the column name
-  const pretty = columnName
-    .replace(/[_-]+/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  const pretty = columnName.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return `${pretty}: ${template}`;
 }
 
@@ -505,10 +459,8 @@ function determineKpiCandidacy(
   schemaRole: SchemaRole,
   profile: ColumnProfile,
 ): boolean {
-  if (category === "financial_metric" || category === "ratio_metric")
-    return true;
-  if (category === "operational_metric" && schemaRole === "fact_measure")
-    return true;
+  if (category === "financial_metric" || category === "ratio_metric") return true;
+  if (category === "operational_metric" && schemaRole === "fact_measure") return true;
   if (profile.inferredRole === "measure" && profile.stats) return true;
   return false;
 }
@@ -537,17 +489,11 @@ function computeConfidence(
   category: BusinessColumnCategory,
   profile: ColumnProfile,
 ): number {
-  const hasDirectNameMatch = CATEGORY_SIGNALS.some((s) =>
-    s.pattern.test(name.toLowerCase()),
-  );
-  const typeIsUnambiguous =
-    inferredType !== "unknown" && inferredType !== "categorical";
+  const hasDirectNameMatch = CATEGORY_SIGNALS.some((s) => s.pattern.test(name.toLowerCase()));
+  const typeIsUnambiguous = inferredType !== "unknown" && inferredType !== "categorical";
   const categoryIsKnown = category !== "unknown";
-  const density =
-    profile.nonNullCount /
-    Math.max(1, profile.nonNullCount + profile.nullCount);
-  const isHighCardCategorical =
-    inferredType === "categorical" && profile.uniqueCount > 100;
+  const density = profile.nonNullCount / Math.max(1, profile.nonNullCount + profile.nullCount);
+  const isHighCardCategorical = inferredType === "categorical" && profile.uniqueCount > 100;
 
   return columnIntelligenceConfidence(
     hasDirectNameMatch,
@@ -646,11 +592,8 @@ export function extractMeasuresAndDimensions(
     businessMeaning: string;
   }>;
 } {
-  const measures: ReturnType<typeof extractMeasuresAndDimensions>["measures"] =
-    [];
-  const dimensions: ReturnType<
-    typeof extractMeasuresAndDimensions
-  >["dimensions"] = [];
+  const measures: ReturnType<typeof extractMeasuresAndDimensions>["measures"] = [];
+  const dimensions: ReturnType<typeof extractMeasuresAndDimensions>["dimensions"] = [];
 
   for (const p of profiles) {
     const intel = intelligence[p.name];
@@ -680,10 +623,7 @@ export function extractMeasuresAndDimensions(
       });
     }
 
-    if (
-      intel.schemaRole === "dimension_attribute" ||
-      intel.schemaRole === "date_key"
-    ) {
+    if (intel.schemaRole === "dimension_attribute" || intel.schemaRole === "date_key") {
       const total = p.nonNullCount + p.nullCount;
       const cardinality: "low" | "medium" | "high" =
         p.uniqueCount <= 15 ? "low" : p.uniqueCount <= 100 ? "medium" : "high";
@@ -714,10 +654,7 @@ export function extractMeasuresAndDimensions(
  * Looks for sibling columns that form a geographic hierarchy
  * (e.g., if column is "region", looks for "country", "city", "state").
  */
-function detectGeoHierarchy(
-  columnName: string,
-  allProfiles: ColumnProfile[],
-): string[] {
+function detectGeoHierarchy(columnName: string, allProfiles: ColumnProfile[]): string[] {
   const GEO_LEVELS = [
     "country",
     "continent",
@@ -730,9 +667,7 @@ function detectGeoHierarchy(
     "zip",
     "postal",
   ];
-  const currentLevel = GEO_LEVELS.findIndex((g) =>
-    columnName.toLowerCase().includes(g),
-  );
+  const currentLevel = GEO_LEVELS.findIndex((g) => columnName.toLowerCase().includes(g));
   if (currentLevel === -1) return [];
 
   const hierarchy: string[] = [];

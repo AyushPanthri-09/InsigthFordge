@@ -14,13 +14,8 @@ interface Props {
 }
 
 export function P5_Anomalies({ data, datasetName, generatedAt }: Props) {
-  const totalAnomalies = data.anomalyColumns.reduce(
-    (sum, c) => sum + c.anomalyCount,
-    0,
-  );
-  const significantTests = data.statisticalTests.filter(
-    (t) => t.isSignificant,
-  ).length;
+  const totalAnomalies = data.anomalyColumns.reduce((sum, c) => sum + c.anomalyCount, 0);
+  const significantTests = data.statisticalTests.filter((t) => t.isSignificant).length;
 
   const barSpec = {
     id: "anomaly_bar",
@@ -102,9 +97,7 @@ export function P5_Anomalies({ data, datasetName, generatedAt }: Props) {
                       fontSize: 18,
                       fontWeight: 850,
                       color:
-                        item.variant === "critical"
-                          ? "var(--rpt-critical)"
-                          : "var(--rpt-warning)",
+                        item.variant === "critical" ? "var(--rpt-critical)" : "var(--rpt-warning)",
                       marginTop: 4,
                     }}
                   >
@@ -140,9 +133,8 @@ export function P5_Anomalies({ data, datasetName, generatedAt }: Props) {
                   margin: 0,
                 }}
               >
-                Autonomous audits run multi-variant distribution profiles to
-                verify record consistency. Outliers are filtered using a z-score
-                cutoff threshold of 3.0.
+                Autonomous audits run multi-variant distribution profiles to verify record
+                consistency. Outliers are filtered using a z-score cutoff threshold of 3.0.
               </p>
             </div>
           </div>
@@ -212,9 +204,7 @@ export function P5_Anomalies({ data, datasetName, generatedAt }: Props) {
                   key: "explanation",
                   header: "Executive Impact Interpretation",
                   render: (r) => (
-                    <span
-                      style={{ fontSize: 9.5, color: "var(--rpt-text-muted)" }}
-                    >
+                    <span style={{ fontSize: 9.5, color: "var(--rpt-text-muted)" }}>
                       {String(r.explanation)}
                     </span>
                   ),
@@ -300,17 +290,13 @@ export function P5_Anomalies({ data, datasetName, generatedAt }: Props) {
                       marginTop: 6,
                     }}
                   >
-                    <span
-                      style={{ fontSize: 8.5, color: "var(--rpt-text-muted)" }}
-                    >
+                    <span style={{ fontSize: 8.5, color: "var(--rpt-text-muted)" }}>
                       Test Statistic:{" "}
                       <code style={{ fontFamily: "var(--rpt-font-mono)" }}>
                         {t.statistic.toFixed(2)}
                       </code>
                     </span>
-                    <span style={{ fontSize: 10, fontWeight: 800 }}>
-                      p: {t.pValue.toFixed(4)}
-                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 800 }}>p: {t.pValue.toFixed(4)}</span>
                   </div>
                 </div>
               ))}

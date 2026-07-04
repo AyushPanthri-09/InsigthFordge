@@ -73,9 +73,7 @@ export const generateUnderstanding = createServerFn({ method: "POST" })
       "generic",
     ];
     const rawDomain = data.heuristicDomain?.toLowerCase();
-    const domain = (
-      validDomains.includes(rawDomain || "") ? rawDomain : "generic"
-    ) as
+    const domain = (validDomains.includes(rawDomain || "") ? rawDomain : "generic") as
       | "ecommerce"
       | "retail"
       | "finance"
@@ -116,11 +114,7 @@ export const generateUnderstanding = createServerFn({ method: "POST" })
       primaryEntities = ["Employee", "Department", "Position", "Payroll"];
     } else if (domain === "marketing" || domain === "saas") {
       primaryEntities = ["Lead", "Campaign", "Subscription", "Account"];
-    } else if (
-      domain === "logistics" ||
-      domain === "operations" ||
-      domain === "manufacturing"
-    ) {
+    } else if (domain === "logistics" || domain === "operations" || domain === "manufacturing") {
       primaryEntities = ["Asset", "Shipment", "Inventory", "Facility"];
     }
 
@@ -138,19 +132,15 @@ export const generateUnderstanding = createServerFn({ method: "POST" })
     if (suggestedKPIs.length === 0) {
       suggestedKPIs.push({
         name: "Total Records",
-        rationale:
-          "Baseline count of valid logs or entries within this dataset.",
+        rationale: "Baseline count of valid logs or entries within this dataset.",
         columns: [],
       });
     }
 
     // 6. Generate column meanings
     const columnMeanings = data.columns.map((col) => {
-      const intel = data.columnIntelligenceSummary?.find(
-        (c) => c.column === col,
-      );
-      let role: "dimension" | "measure" | "key" | "date" | "metadata" =
-        "dimension";
+      const intel = data.columnIntelligenceSummary?.find((c) => c.column === col);
+      let role: "dimension" | "measure" | "key" | "date" | "metadata" = "dimension";
       if (intel?.schemaRole) {
         const r = intel.schemaRole.toLowerCase();
         if (["dimension", "measure", "key", "date", "metadata"].includes(r)) {
@@ -180,9 +170,7 @@ export const generateUnderstanding = createServerFn({ method: "POST" })
     if (data.columnIntelligenceSummary) {
       for (const colIntel of data.columnIntelligenceSummary) {
         if (colIntel.confidence < 0.5) {
-          warnings.push(
-            `Column "${colIntel.column}" has low classification confidence.`,
-          );
+          warnings.push(`Column "${colIntel.column}" has low classification confidence.`);
         }
       }
     }
@@ -258,12 +246,10 @@ export const reasonCleaningIssues = createServerFn({ method: "POST" })
         action: "drop_duplicates",
         title: "Duplicate Records Identified",
         description: `Found ${data.duplicateRowCount.toLocaleString()} identical rows.`,
-        reasoning:
-          "Duplicate rows compromise analytical integrity and inflate summary statistics.",
+        reasoning: "Duplicate rows compromise analytical integrity and inflate summary statistics.",
         confidence: 1.0,
         affectedColumns: [],
-        businessImpact:
-          "Aggregations like sums and averages will be incorrectly inflated.",
+        businessImpact: "Aggregations like sums and averages will be incorrectly inflated.",
         requiresApproval: true,
       });
     }
@@ -271,12 +257,7 @@ export const reasonCleaningIssues = createServerFn({ method: "POST" })
     // 2. Scan columns for nulls and outliers
     for (const col of data.columnSummaries) {
       if (col.nullPct && col.nullPct > 0) {
-        const severity =
-          col.nullPct > 0.4
-            ? "critical"
-            : col.nullPct > 0.1
-              ? "warning"
-              : "info";
+        const severity = col.nullPct > 0.4 ? "critical" : col.nullPct > 0.1 ? "warning" : "info";
         issues.push({
           severity,
           action: col.isKpiCandidate ? "fill_missing" : "flag_only",
@@ -303,8 +284,7 @@ export const reasonCleaningIssues = createServerFn({ method: "POST" })
           reasoning: `Outliers in "${col.column}" could be valid high-performing records (e.g. key buyers) or system anomalies. Flagging preserves raw integrity.`,
           confidence: 0.85,
           affectedColumns: [col.column],
-          businessImpact:
-            "Outliers will skew basic statistical measures like mean and variance.",
+          businessImpact: "Outliers will skew basic statistical measures like mean and variance.",
           requiresApproval: true,
         });
       }
@@ -328,9 +308,7 @@ const AnalyticsInput = z.object({
   understanding: z.string(),
   kpis: z.array(z.object({ label: z.string(), value: z.string() })),
   topFindings: z.array(z.string()),
-  correlations: z.array(
-    z.object({ a: z.string(), b: z.string(), r: z.number() }),
-  ),
+  correlations: z.array(z.object({ a: z.string(), b: z.string(), r: z.number() })),
   trendSummaries: z.array(z.string()).optional(),
   notes: z.string().optional(),
   processName: z.string().optional(),
@@ -362,9 +340,7 @@ const AnalyticsInput = z.object({
       spanDays: z.number().optional(),
     })
     .optional(),
-  suggestedKPIs: z
-    .array(z.object({ name: z.string(), rationale: z.string() }))
-    .optional(),
+  suggestedKPIs: z.array(z.object({ name: z.string(), rationale: z.string() })).optional(),
   timeSeriesNarratives: z.array(z.string()).optional(),
   rootCauseSummaries: z.array(z.string()).optional(),
   distributionInsights: z
@@ -396,9 +372,7 @@ const AnalyticsInput = z.object({
         trend: z.string(),
         totalGrowthPct: z.number(),
         confidence: z.number(),
-        nextPeriods: z.array(
-          z.object({ period: z.string(), predicted: z.number() }),
-        ),
+        nextPeriods: z.array(z.object({ period: z.string(), predicted: z.number() })),
       }),
     )
     .optional(),
@@ -451,8 +425,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
         title: `KPI Distribution Performance: ${primaryKpi.label}`,
         observation: `${primaryKpi.label} is currently measured at ${primaryKpi.value}.`,
         summary: `Tracks the primary metric "${primaryKpi.label}" and its baseline behavior across the dataset.`,
-        reasoning:
-          "Extracted via statistical aggregation over the clean records subset.",
+        reasoning: "Extracted via statistical aggregation over the clean records subset.",
         confidence: 0.95,
         conclusion: `The operational metric ${primaryKpi.label} stands at ${primaryKpi.value}, acting as the primary anchor for this analysis.`,
         recommendation: `Monitor ${primaryKpi.label} variance continuously to detect operational shifts early.`,
@@ -465,8 +438,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
         ],
         hypotheses: [
           {
-            statement:
-              "The observed metric value is within normal historical range.",
+            statement: "The observed metric value is within normal historical range.",
             supportingEvidence: [
               {
                 type: "dataset",
@@ -485,14 +457,12 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
             opposingEvidence: [
               {
                 type: "dataset",
-                description:
-                  "Z-score sweeps confirm outlier control is active.",
+                description: "Z-score sweeps confirm outlier control is active.",
                 weight: 0.8,
               },
             ],
             verdict: "rejected",
-            rationale:
-              "Statistical outlier checks did not reveal extreme bias.",
+            rationale: "Statistical outlier checks did not reveal extreme bias.",
             confidence: 0.15,
           },
         ],
@@ -522,8 +492,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
             supportingEvidence: [
               {
                 type: "dataset",
-                description:
-                  "High coefficient of variation points to segment variance.",
+                description: "High coefficient of variation points to segment variance.",
                 weight: 0.8,
               },
             ],
@@ -533,8 +502,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
             confidence: 0.8,
           },
           {
-            statement:
-              "The distribution shape is due to a temporary data logging issue.",
+            statement: "The distribution shape is due to a temporary data logging issue.",
             supportingEvidence: [],
             opposingEvidence: [
               {
@@ -544,8 +512,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
               },
             ],
             verdict: "rejected",
-            rationale:
-              "Temporal checks show consistent distribution patterns over time.",
+            rationale: "Temporal checks show consistent distribution patterns over time.",
             confidence: 0.2,
           },
         ],
@@ -556,11 +523,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
     if (data.correlations && data.correlations.length > 0) {
       const corr = data.correlations[0];
       const strengthStr =
-        Math.abs(corr.r) > 0.7
-          ? "strong"
-          : Math.abs(corr.r) > 0.4
-            ? "moderate"
-            : "weak";
+        Math.abs(corr.r) > 0.7 ? "strong" : Math.abs(corr.r) > 0.4 ? "moderate" : "weak";
       diagnostic.push({
         title: `Statistical Driver: ${corr.a} and ${corr.b}`,
         observation: `Discovered a correlation coefficient (r) of ${corr.r.toFixed(2)} between "${corr.a}" and "${corr.b}".`,
@@ -588,8 +551,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
             ],
             opposingEvidence: [],
             verdict: "supported",
-            rationale:
-              "Strong statistical association supports operational influence.",
+            rationale: "Strong statistical association supports operational influence.",
             confidence: 0.8,
           },
           {
@@ -598,14 +560,12 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
             opposingEvidence: [
               {
                 type: "dataset",
-                description:
-                  "High sample count rules out accidental significance.",
+                description: "High sample count rules out accidental significance.",
                 weight: 0.9,
               },
             ],
             verdict: "rejected",
-            rationale:
-              "Statistical power calculation rejects spurious occurrence.",
+            rationale: "Statistical power calculation rejects spurious occurrence.",
             confidence: 0.1,
           },
         ],
@@ -617,8 +577,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
       diagnostic.push({
         title: "Root Cause Investigation Summary",
         observation: rca,
-        summary:
-          "Identified operational drivers and anomalies contributing to metric deviation.",
+        summary: "Identified operational drivers and anomalies contributing to metric deviation.",
         reasoning:
           "Synthesized from autonomous anomaly scans and segmentation contribution filters.",
         confidence: 0.9,
@@ -635,13 +594,11 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
         ],
         hypotheses: [
           {
-            statement:
-              "The variance was caused by systemic operational bottlenecks.",
+            statement: "The variance was caused by systemic operational bottlenecks.",
             supportingEvidence: [
               {
                 type: "dataset",
-                description:
-                  "High segment contribution percentage matches the root cause.",
+                description: "High segment contribution percentage matches the root cause.",
                 weight: 0.85,
               },
             ],
@@ -656,8 +613,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
             opposingEvidence: [
               {
                 type: "dataset",
-                description:
-                  "Statistical test significance confirms it is not noise.",
+                description: "Statistical test significance confirms it is not noise.",
                 weight: 0.9,
               },
             ],
@@ -728,13 +684,10 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
       prescriptive.push({
         title: "Operational Recommendation",
         observation: finding,
-        summary:
-          "Actionable strategy based on detected correlations and segment contributions.",
-        reasoning:
-          "Derived by identifying low-effort, high-impact levers from dataset drivers.",
+        summary: "Actionable strategy based on detected correlations and segment contributions.",
+        reasoning: "Derived by identifying low-effort, high-impact levers from dataset drivers.",
         confidence: 0.85,
-        conclusion:
-          "Targeted action on driver variables will yield significant improvements.",
+        conclusion: "Targeted action on driver variables will yield significant improvements.",
         recommendation: `Implement optimization measures based on: "${finding}".`,
         evidence: [
           {
@@ -759,8 +712,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
             confidence: 0.85,
           },
           {
-            statement:
-              "Intervention will cause unintended operational friction.",
+            statement: "Intervention will cause unintended operational friction.",
             supportingEvidence: [],
             opposingEvidence: [
               {
@@ -770,8 +722,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
               },
             ],
             verdict: "rejected",
-            rationale:
-              "Proposed changes are modular and contain safety safeguards.",
+            rationale: "Proposed changes are modular and contain safety safeguards.",
             confidence: 0.2,
           },
         ],
@@ -790,8 +741,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
       complication = `Operational diagnostic sweeps detected major variances: ${data.rootCauseSummaries[0]}.`;
     }
 
-    let insightVal =
-      "Statistical checks map key correlation pathways and trend channels.";
+    let insightVal = "Statistical checks map key correlation pathways and trend channels.";
     if (data.correlations && data.correlations.length > 0) {
       insightVal = `A notable correlation (r = ${data.correlations[0].r.toFixed(2)}) exists between "${data.correlations[0].a}" and "${data.correlations[0].b}".`;
     }
@@ -816,10 +766,7 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
 
     let businessHealthScore = 95;
     if (data.distributionInsights) {
-      const totalAnomalies = data.distributionInsights.reduce(
-        (sum, d) => sum + d.anomalyCount,
-        0,
-      );
+      const totalAnomalies = data.distributionInsights.reduce((sum, d) => sum + d.anomalyCount, 0);
       businessHealthScore = Math.max(50, 100 - totalAnomalies * 4);
     }
 

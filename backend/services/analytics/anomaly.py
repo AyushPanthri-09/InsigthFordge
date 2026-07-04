@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 from typing import List, Dict, Any
@@ -32,7 +33,7 @@ class AnomalyDetectionEngine:
             q1 = series.quantile(0.25)
             q3 = series.quantile(0.75)
             iqr = q3 - q1
-            if iqr == 0:
+            if math.isclose(iqr, 0.0, rel_tol=1e-9, abs_tol=1e-12):
                 # If IQR is 0 (due to constant or high skew), skip to prevent divide by zero
                 continue
                 

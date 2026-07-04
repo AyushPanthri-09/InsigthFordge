@@ -46,8 +46,7 @@ export function P1_Cover({ data, datasetName, generatedAt }: Props) {
                 width: 38,
                 height: 38,
                 borderRadius: 8,
-                background:
-                  "linear-gradient(135deg, var(--rpt-brand), var(--rpt-accent))",
+                background: "linear-gradient(135deg, var(--rpt-brand), var(--rpt-accent))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -81,11 +80,7 @@ export function P1_Cover({ data, datasetName, generatedAt }: Props) {
               </div>
             </div>
           </div>
-          <ReportBadge
-            label="Confidential - Executive Review"
-            variant="critical"
-            dot
-          />
+          <ReportBadge label="Confidential - Executive Review" variant="critical" dot />
         </div>
 
         {/* Center Hero Title */}
@@ -262,10 +257,7 @@ export function P1_Cover({ data, datasetName, generatedAt }: Props) {
               style={{
                 fontSize: 22,
                 fontWeight: 900,
-                color:
-                  data.businessHealthScore >= 80
-                    ? "var(--rpt-success)"
-                    : "var(--rpt-warning)",
+                color: data.businessHealthScore >= 80 ? "var(--rpt-success)" : "var(--rpt-warning)",
               }}
             >
               {data.businessHealthScore}%
@@ -300,10 +292,7 @@ export function P1_Cover({ data, datasetName, generatedAt }: Props) {
               style={{
                 fontSize: 22,
                 fontWeight: 900,
-                color:
-                  data.dataQualityScore >= 80
-                    ? "var(--rpt-success)"
-                    : "var(--rpt-warning)",
+                color: data.dataQualityScore >= 80 ? "var(--rpt-success)" : "var(--rpt-warning)",
               }}
             >
               {data.dataQualityScore}%
@@ -373,8 +362,7 @@ export function P1_Cover({ data, datasetName, generatedAt }: Props) {
                   color: "var(--rpt-ink)",
                 }}
               >
-                {data.rowCount.toLocaleString()} records / {data.columnCount}{" "}
-                features
+                {data.rowCount.toLocaleString()} records / {data.columnCount} features
               </span>
             </div>
           </div>

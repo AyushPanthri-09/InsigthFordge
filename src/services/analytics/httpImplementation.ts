@@ -46,25 +46,16 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       };
     },
 
-    async understandDataset(
-      datasetId: string,
-      notes?: any,
-    ): Promise<DatasetUnderstanding> {
+    async understandDataset(datasetId: string, notes?: any): Promise<DatasetUnderstanding> {
       // Return a placeholder since analyzeAll handles the combined call
       throw new Error("Method not implemented. Use analyzeAll instead.");
     },
 
-    async proposeCleaning(
-      datasetId: string,
-      notes?: any,
-    ): Promise<CleaningReport> {
+    async proposeCleaning(datasetId: string, notes?: any): Promise<CleaningReport> {
       throw new Error("Method not implemented. Use analyzeAll instead.");
     },
 
-    async applyCleaning(
-      datasetId: string,
-      issueIds: string[],
-    ): Promise<CleaningReport> {
+    async applyCleaning(datasetId: string, issueIds: string[]): Promise<CleaningReport> {
       throw new Error("Method not implemented. Use analyzeAll instead.");
     },
 
@@ -72,10 +63,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       throw new Error("Method not implemented. Use analyzeAll instead.");
     },
 
-    async runAnalytics(
-      datasetId: string,
-      notes?: any,
-    ): Promise<AnalyticsReport> {
+    async runAnalytics(datasetId: string, notes?: any): Promise<AnalyticsReport> {
       throw new Error("Method not implemented. Use analyzeAll instead.");
     },
 
@@ -93,8 +81,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         timestamp: Date.now(),
         phase: "understanding",
         message: "Staging and parsing dataset file...",
-        detail:
-          "FastAPI is verifying file size constraints and parsing CSV matrices.",
+        detail: "FastAPI is verifying file size constraints and parsing CSV matrices.",
       });
 
       const r = await fetch(`${baseUrl}/analyze`, {
@@ -127,35 +114,27 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       };
 
       // Map backend ProfileReport & Narrative to DatasetUnderstanding
-      const columnProfiles: ColumnProfile[] = (data.profile.columns || []).map(
-        (col: any) => ({
-          name: col.name,
-          inferredType: col.type || "unknown",
-          inferredRole: col.role || "metadata",
-          nonNullCount: Math.round(dataset.rowCount * (1 - (col.nullPct || 0))),
-          nullCount: Math.round(dataset.rowCount * (col.nullPct || 0)),
-          uniqueCount: Math.min(20, dataset.rowCount),
-          sampleValues: dataset.preview
-            .map((row: any) => row[col.name])
-            .filter((v) => v !== undefined),
-          businessMeaning: `Column '${col.name}' containing ${col.role} values.`,
-        }),
-      );
+      const columnProfiles: ColumnProfile[] = (data.profile.columns || []).map((col: any) => ({
+        name: col.name,
+        inferredType: col.type || "unknown",
+        inferredRole: col.role || "metadata",
+        nonNullCount: Math.round(dataset.rowCount * (1 - (col.nullPct || 0))),
+        nullCount: Math.round(dataset.rowCount * (col.nullPct || 0)),
+        uniqueCount: Math.min(20, dataset.rowCount),
+        sampleValues: dataset.preview
+          .map((row: any) => row[col.name])
+          .filter((v) => v !== undefined),
+        businessMeaning: `Column '${col.name}' containing ${col.role} values.`,
+      }));
 
       const understanding: DatasetUnderstanding = {
         datasetId: dataset.datasetId,
         domain: data.profile.domain || "generic",
         domainConfidence: data.profile.domainConfidence || 0.9,
-        summary:
-          data.narrative.situation ||
-          "Dataset successfully profiled by backend parser.",
-        purpose:
-          data.narrative.complication ||
-          "Analyze metrics and correlations for trends.",
+        summary: data.narrative.situation || "Dataset successfully profiled by backend parser.",
+        purpose: data.narrative.complication || "Analyze metrics and correlations for trends.",
         primaryEntities:
-          data.profile.domain === "ecommerce"
-            ? ["Customer", "Order", "Product"]
-            : ["Record"],
+          data.profile.domain === "ecommerce" ? ["Customer", "Order", "Product"] : ["Record"],
         suggestedKPIs: (data.kpis || []).map((k: any) => ({
           name: k.label,
           rationale: k.rationale,
@@ -178,21 +157,18 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       });
 
       // Map QualityReport to CleaningReport
-      const cleaningIssues: CleaningIssue[] = (data.quality.issues || []).map(
-        (issue: any) => ({
-          id: issue.id,
-          severity: issue.severity || "warning",
-          action: issue.action || "flag_only",
-          title: `Quality warning on column: ${issue.column || "General"}`,
-          description: issue.description,
-          reasoning:
-            "Maintaining analytical consistency requires cleaning outlier distributions.",
-          confidence: 0.9,
-          businessImpact: "Affects aggregates and data model consistency.",
-          requiresApproval: true,
-          applied: false,
-        }),
-      );
+      const cleaningIssues: CleaningIssue[] = (data.quality.issues || []).map((issue: any) => ({
+        id: issue.id,
+        severity: issue.severity || "warning",
+        action: issue.action || "flag_only",
+        title: `Quality warning on column: ${issue.column || "General"}`,
+        description: issue.description,
+        reasoning: "Maintaining analytical consistency requires cleaning outlier distributions.",
+        confidence: 0.9,
+        businessImpact: "Affects aggregates and data model consistency.",
+        requiresApproval: true,
+        applied: false,
+      }));
 
       const cleaning: CleaningReport = {
         datasetId: dataset.datasetId,
@@ -216,9 +192,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       if (dataset.columns.length >= 2) {
         const xCol =
           dataset.columns.find(
-            (c) =>
-              c.toLowerCase().includes("date") ||
-              c.toLowerCase().includes("time"),
+            (c) => c.toLowerCase().includes("date") || c.toLowerCase().includes("time"),
           ) || dataset.columns[0];
         const yCols = dataset.columns.filter((c) => c !== xCol).slice(0, 2);
 
@@ -257,15 +231,12 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         title: ins.title,
         observation: ins.observation,
         summary: ins.summary,
-        reasoning:
-          "We modeled the variance using standard correlation coefficients.",
+        reasoning: "We modeled the variance using standard correlation coefficients.",
         hypotheses: [
           {
             id: "h1",
             statement: "The rise is due to segment seasonality.",
-            supportingEvidence: [
-              { description: "Positive Q3 indicators.", strength: 0.8 },
-            ],
+            supportingEvidence: [{ description: "Positive Q3 indicators.", strength: 0.8 }],
             opposingEvidence: [],
             verdict: "supported",
             rationale: "Aligns with seasonality models.",
@@ -285,8 +256,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         predictive: insights.filter((i) => i.level === "predictive"),
         prescriptive: insights.filter((i) => i.level === "prescriptive"),
         businessHealthScore: data.quality.qualityScore || 90,
-        executiveSummary:
-          data.narrative.insight || "Analysis completed successfully.",
+        executiveSummary: data.narrative.insight || "Analysis completed successfully.",
       };
 
       options?.onProgress?.({

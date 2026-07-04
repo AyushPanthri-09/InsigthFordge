@@ -48,12 +48,7 @@ export function CleaningReportView({ report }: { report: CleaningReport }) {
           <div className="shrink-0">
             <div className="field-label mb-1.5">Data Quality Score</div>
             <div className="flex items-baseline gap-1.5">
-              <span
-                className={cn(
-                  "font-display text-4xl font-semibold tabular-nums",
-                  scoreColor,
-                )}
-              >
+              <span className={cn("font-display text-4xl font-semibold tabular-nums", scoreColor)}>
                 {report.qualityScore}
               </span>
               <span className="text-sm text-muted-foreground">/100</span>
@@ -68,10 +63,7 @@ export function CleaningReportView({ report }: { report: CleaningReport }) {
             </div>
             <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted/60">
               <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-700",
-                  barColor,
-                )}
+                className={cn("h-full rounded-full transition-all duration-700", barColor)}
                 style={{ width: `${report.qualityScore}%` }}
               />
             </div>
@@ -92,17 +84,12 @@ export function CleaningReportView({ report }: { report: CleaningReport }) {
               </span>
               {report.rowsBefore !== report.rowsAfter && (
                 <span className="text-destructive/80">
-                  −{(report.rowsBefore - report.rowsAfter).toLocaleString()}{" "}
-                  removed
+                  −{(report.rowsBefore - report.rowsAfter).toLocaleString()} removed
                 </span>
               )}
             </div>
 
-            {report.notes && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                {report.notes}
-              </p>
-            )}
+            {report.notes && <p className="mt-3 text-xs text-muted-foreground">{report.notes}</p>}
           </div>
         </div>
       </div>
@@ -115,9 +102,7 @@ export function CleaningReportView({ report }: { report: CleaningReport }) {
               <CheckCircle2 className="h-6 w-6 text-success" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">
-                No issues detected
-              </p>
+              <p className="text-sm font-semibold text-foreground">No issues detected</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 Dataset looks healthy — no cleaning was required.
               </p>
@@ -127,10 +112,7 @@ export function CleaningReportView({ report }: { report: CleaningReport }) {
           report.issues.map((issue) => {
             const cfg = SEV_CONFIG[issue.severity];
             return (
-              <div
-                key={issue.id}
-                className={cn("card-elevated overflow-hidden border", cfg.card)}
-              >
+              <div key={issue.id} className={cn("card-elevated overflow-hidden border", cfg.card)}>
                 <div className="flex items-start gap-4 p-4 sm:p-5">
                   {/* Severity icon */}
                   <div
@@ -157,17 +139,11 @@ export function CleaningReportView({ report }: { report: CleaningReport }) {
                       )}
                     </div>
 
-                    <p className="mt-1.5 text-sm text-foreground/80">
-                      {issue.description}
-                    </p>
+                    <p className="mt-1.5 text-sm text-foreground/80">{issue.description}</p>
 
                     <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                      <IssueField label="Reasoning">
-                        {issue.reasoning}
-                      </IssueField>
-                      <IssueField label="Business impact">
-                        {issue.businessImpact}
-                      </IssueField>
+                      <IssueField label="Reasoning">{issue.reasoning}</IssueField>
+                      <IssueField label="Business impact">{issue.businessImpact}</IssueField>
                     </div>
                   </div>
                 </div>
@@ -180,13 +156,7 @@ export function CleaningReportView({ report }: { report: CleaningReport }) {
   );
 }
 
-const IssueField = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
+const IssueField = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="rounded-lg border border-border/60 bg-background/40 px-3 py-2.5">
     <div className="field-label mb-1">{label}</div>
     <div className="text-xs text-foreground/80">{children}</div>

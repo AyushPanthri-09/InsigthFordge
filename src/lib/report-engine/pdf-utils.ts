@@ -31,37 +31,25 @@ export function downloadBase64Pdf(pdf: GeneratedPdf): void {
   URL.revokeObjectURL(url);
 }
 
-export async function waitForReportPaint(
-  container: HTMLElement,
-): Promise<void> {
+export async function waitForReportPaint(container: HTMLElement): Promise<void> {
   await new Promise<void>((resolve) => {
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => setTimeout(resolve, 800)),
-    );
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 800)));
   });
 
   if ("fonts" in document) {
     await document.fonts.ready;
   }
 
-  const charts = Array.from(
-    container.querySelectorAll(".recharts-wrapper svg"),
-  );
+  const charts = Array.from(container.querySelectorAll(".recharts-wrapper svg"));
   if (charts.length === 0) {
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
 }
 
 export function openBrowserPrintFallback(html: string): void {
-  const printWindow = window.open(
-    "",
-    "_blank",
-    "noopener,noreferrer,width=1200,height=900",
-  );
+  const printWindow = window.open("", "_blank", "noopener,noreferrer,width=1200,height=900");
   if (!printWindow) {
-    throw new Error(
-      "Unable to open browser print fallback. Please allow popups for this site.",
-    );
+    throw new Error("Unable to open browser print fallback. Please allow popups for this site.");
   }
 
   printWindow.document.open();

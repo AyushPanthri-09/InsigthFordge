@@ -7,12 +7,7 @@ interface ReportGridProps {
   className?: string;
 }
 
-export function ReportGrid({
-  cols = 2,
-  gap = 12,
-  children,
-  className = "",
-}: ReportGridProps) {
+export function ReportGrid({ cols = 2, gap = 12, children, className = "" }: ReportGridProps) {
   const colClass =
     cols === "auto"
       ? "rpt-grid-auto"

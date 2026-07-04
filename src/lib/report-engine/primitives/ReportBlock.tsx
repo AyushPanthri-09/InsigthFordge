@@ -18,11 +18,7 @@ export function ReportBlock({
   style,
 }: ReportBlockProps) {
   const cls =
-    variant === "sm"
-      ? "rpt-card-sm"
-      : variant === "accent"
-        ? "rpt-card-accent"
-        : "rpt-card";
+    variant === "sm" ? "rpt-card-sm" : variant === "accent" ? "rpt-card-accent" : "rpt-card";
 
   return (
     <div className={`${cls} ${className}`} style={style}>
