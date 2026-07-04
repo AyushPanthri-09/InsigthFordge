@@ -203,6 +203,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         message: "Calculating correlations and visualizations...",
       });
 
+
       // Map KPIs & Correlations to EDAReport
       const charts: any[] = [];
 
@@ -219,13 +220,18 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
             id: `chart_${idx}`,
             title: `${yCol} Trend across ${xCol}`,
             type: "line",
-            xColumn: xCol,
-            yColumns: [yCol],
-            rationale: `Line chart visualizing sequence distribution of ${yCol}.`,
-            confidence: 0.95,
+            xKey: xCol,
+            yKeys: [yCol],
+            data: dataset.preview.map((row: any) => ({
+              [xCol]: row[xCol],
+              [yCol]: row[yCol],
+            })),
+            description: `Line chart visualizing sequence distribution of ${yCol}.`,
+            insight: `Sequence distribution analysis of ${yCol} against ${xCol}.`,
           });
         });
       }
+
 
       const eda: EDAReport = {
         datasetId: dataset.datasetId,
