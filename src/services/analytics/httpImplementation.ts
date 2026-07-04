@@ -9,7 +9,6 @@ import type {
   ColumnProfile,
   CleaningIssue,
   AIInsight,
-  KPIDetail,
 } from "./types";
 import { authService } from "../auth";
 
@@ -198,15 +197,10 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       const cleaning: CleaningReport = {
         datasetId: dataset.datasetId,
         issues: cleaningIssues,
-        appliedIssueIds: [],
-        originalRowCount: dataset.rowCount,
-        cleanedRowCount: dataset.rowCount,
-        originalColumnCount: dataset.columnCount,
-        cleanedColumnCount: dataset.columnCount,
-        qualityScoreBefore: data.quality.qualityScore || 100,
-        qualityScoreAfter: data.quality.qualityScore || 100,
-        narrative:
-          "Clean report generated. Inconsistencies detected and flagged.",
+        rowsBefore: dataset.rowCount,
+        rowsAfter: dataset.rowCount,
+        qualityScore: data.quality?.qualityScore || 100,
+        notes: "Clean report generated. Inconsistencies detected and flagged.",
       };
 
       options?.onProgress?.({
@@ -246,6 +240,8 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         kpis: data.kpis || [],
         correlations: data.correlations || [],
         charts,
+        distributions: [],
+        topFindings: [],
       };
 
       options?.onProgress?.({

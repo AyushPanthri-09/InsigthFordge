@@ -87,7 +87,6 @@ export function P10_RootCause({ data, datasetName, generatedAt }: Props) {
                     <div
                       style={{
                         display: "flex",
-                        justifyContext: "space-between",
                         alignItems: "center",
                         justifyContent: "space-between",
                         marginBottom: 6,
@@ -270,7 +269,7 @@ export function P10_RootCause({ data, datasetName, generatedAt }: Props) {
                       marginBottom: 4,
                     }}
                   >
-                    Anomaly Case Study: {item.column || "Total Count"}
+                    Anomaly Case Study: {item.targetMetric || "Total Count"}
                   </div>
                   <p
                     style={{
@@ -280,11 +279,11 @@ export function P10_RootCause({ data, datasetName, generatedAt }: Props) {
                       margin: 0,
                     }}
                   >
-                    <strong>Observation:</strong> {item.explanation}
+                    <strong>Observation:</strong> {item.conclusion}
                     <br />
-                    <strong>Evidence:</strong> {item.evidence}
+                    <strong>Evidence:</strong> {item.rootCauses?.[0]?.observation || `Deviation: ${(item.deviationPct * 100).toFixed(1)}% (Baseline: ${item.baselineValue.toLocaleString()}, Target: ${item.targetValue.toLocaleString()})`}
                     <br />
-                    <strong>Recommended Action:</strong> {item.correctiveAction}
+                    <strong>Recommended Action:</strong> {item.rootCauses?.[0]?.hypotheses?.[0]?.statement || "Establish baseline thresholds and alerts for this metric."}
                   </p>
                 </div>
               ))}

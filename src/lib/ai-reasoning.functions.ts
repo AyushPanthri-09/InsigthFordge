@@ -76,9 +76,15 @@ export const generateUnderstanding = createServerFn({ method: "POST" })
     const domain = (
       validDomains.includes(rawDomain || "") ? rawDomain : "generic"
     ) as
-      | "e-commerce"
+      | "ecommerce"
+      | "retail"
       | "finance"
+      | "banking"
       | "healthcare"
+      | "education"
+      | "manufacturing"
+      | "logistics"
+      | "hr"
       | "marketing"
       | "saas"
       | "operations"
@@ -238,6 +244,10 @@ export const reasonCleaningIssues = createServerFn({ method: "POST" })
       column?: string;
       nullCount?: number;
       nullPct?: number;
+      confidence?: number;
+      affectedColumns?: string[];
+      businessImpact?: string;
+      requiresApproval?: boolean;
     }
     const issues: CleaningIssueItem[] = [];
 
@@ -402,6 +412,30 @@ export const reasonAnalytics = createServerFn({ method: "POST" })
       observation: string;
       summary: string;
       confidence: number;
+      reasoning?: string;
+      conclusion?: string;
+      recommendation?: string;
+      evidence?: Array<{
+        type: string;
+        description: string;
+        weight: number;
+      }>;
+      hypotheses?: Array<{
+        statement: string;
+        supportingEvidence: Array<{
+          type: string;
+          description: string;
+          weight: number;
+        }>;
+        opposingEvidence: Array<{
+          type: string;
+          description: string;
+          weight: number;
+        }>;
+        verdict: "supported" | "rejected" | "inconclusive";
+        rationale: string;
+        confidence: number;
+      }>;
     }
     const descriptive: AIInsightItem[] = [];
     const diagnostic: AIInsightItem[] = [];

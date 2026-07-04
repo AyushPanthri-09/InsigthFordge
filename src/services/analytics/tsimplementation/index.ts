@@ -30,6 +30,8 @@ import type {
   ReasoningStep,
   AIInsight,
   ColumnProfile,
+  CleaningIssue,
+  CleaningAction,
 } from "../types";
 
 // Internal extension of the public AnalyticsService interface.
@@ -296,9 +298,18 @@ export const tsAnalyticsService: AnalyticsService = {
         },
       });
 
-      const aiIssues = ai.issues.map((it, i) => ({
+      const aiIssues: CleaningIssue[] = ai.issues.map((it, i) => ({
         id: `ai_${i}_${it.action}`,
-        ...it,
+        severity: it.severity,
+        action: it.action as CleaningAction,
+        title: it.title,
+        description: it.description,
+        reasoning: it.reasoning,
+        confidence: it.confidence ?? 0.85,
+        affectedColumns: it.affectedColumns ?? [],
+        businessImpact: it.businessImpact ?? "Potential analysis skew or inconsistencies if uncorrected.",
+        requiresApproval: it.requiresApproval ?? true,
+        applied: false,
       }));
 
       // Merge: AI issues first (more specific), heuristic issues fill gaps.
