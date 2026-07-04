@@ -10,6 +10,8 @@ class EventBus:
     """
     _instance = None
     _lock = threading.Lock()
+    _listeners: Dict[str, List[Callable[[WorkflowEvent], None]]] = {}
+    _history: List[WorkflowEvent] = []
 
     def __new__(cls, *args, **kwargs):
         with cls._lock:

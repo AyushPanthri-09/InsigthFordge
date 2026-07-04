@@ -10,6 +10,8 @@ class SharedProjectMemory:
     """
     _instance = None
     _lock = threading.Lock()
+    _memory: Dict[str, SemanticResult] = {}
+    _custom_data: Dict[str, Dict[str, Any]] = {}
 
     def __new__(cls):
         with cls._lock:

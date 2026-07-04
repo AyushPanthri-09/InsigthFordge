@@ -71,9 +71,9 @@ export function sanitizeReportValue<T>(value: T): T {
   return value;
 }
 
-export function sanitizeReportString<T extends string | number | boolean | null | undefined>(
-  value: T,
-): string {
+export function sanitizeReportString<
+  T extends string | number | boolean | null | undefined,
+>(value: T): string {
   if (typeof value === "string") {
     return sanitizeReportText(value);
   }

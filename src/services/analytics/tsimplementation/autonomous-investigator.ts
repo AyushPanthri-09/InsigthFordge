@@ -138,7 +138,7 @@ function buildFindingPool(
         .map((r) => Number(r[ts.measureColumn]))
         .filter((n) => Number.isFinite(n));
       if (metricValues.length < 5) continue;
-           baseline = ss.median(metricValues);
+      baseline = ss.median(metricValues);
       if (baseline === 0) continue;
     }
 
@@ -146,7 +146,7 @@ function buildFindingPool(
     const peakPeriodData = ts.periods.find((p) => p.period === ts.peakPeriod);
     if (!peakPeriodData) continue;
 
-        let deviationPct =
+    let deviationPct =
       ((peakPeriodData.value - baseline) / Math.abs(baseline)) * 100;
     // Cap extreme deviations to prevent statistical hallucinations
     if (deviationPct > 1000) deviationPct = 1000;

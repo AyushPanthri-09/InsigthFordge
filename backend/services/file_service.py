@@ -63,7 +63,7 @@ class FileService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Staging file upload failed."
-            )
+            ) from e
         finally:
             await file.seek(0)
             

@@ -72,13 +72,14 @@ export function ReportTable<T extends object>({
                 const safeValue =
                   typeof cellValue === "string"
                     ? sanitizeReportString(cellValue)
-                    : typeof cellValue === "number" || typeof cellValue === "boolean"
-                    ? sanitizeReportString(cellValue)
-                    : React.isValidElement(cellValue)
-                    ? cellValue
-                    : cellValue == null
-                    ? ""
-                    : sanitizeReportString(String(cellValue));
+                    : typeof cellValue === "number" ||
+                        typeof cellValue === "boolean"
+                      ? sanitizeReportString(cellValue)
+                      : React.isValidElement(cellValue)
+                        ? cellValue
+                        : cellValue == null
+                          ? ""
+                          : sanitizeReportString(String(cellValue));
 
                 return (
                   <td

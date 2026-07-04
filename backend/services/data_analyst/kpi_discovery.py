@@ -167,7 +167,7 @@ class KPIDiscoveryEngine:
         res = []
         
         salary_col = None
-        for col, meta in trusted_dataset.column_dictionary.items():
+        for col in trusted_dataset.column_dictionary.keys():
             if any(term in col.lower() for term in ["salary", "pay", "compensation"]):
                 salary_col = col
                 break

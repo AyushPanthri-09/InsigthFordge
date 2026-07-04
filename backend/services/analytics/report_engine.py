@@ -165,8 +165,9 @@ class ExecutiveReportEngine:
 
         # Insight
         insight = "During exploration, "
-        if eda_report.get("correlations"):
-            top_corr = eda_report.get("correlations")[0]
+        correlations = eda_report.get("correlations")
+        if correlations and len(correlations) > 0:
+            top_corr = correlations[0]
             insight += f"we discovered a {top_corr['strength']} relationship between '{top_corr['a']}' and '{top_corr['b']}' (r = {top_corr['r']:.2f})."
         elif numeric_cols:
             insight += f"we mapped distribution structures for '{numeric_cols[0]}' showing baseline values averaging {cleaned_df[numeric_cols[0]].mean():.2f}."

@@ -26,21 +26,27 @@ function pct(value: number | undefined): string {
   return `${Math.round(normalized)}%`;
 }
 
-function short(text: string | undefined, fallback: string, limit = 210): string {
+function short(
+  text: string | undefined,
+  fallback: string,
+  limit = 210,
+): string {
   const value = (text || fallback).replace(/\s+/g, " ").trim();
   return value.length > limit ? `${value.slice(0, limit - 3)}...` : value;
 }
 
 function primaryKpi(doc: ReportDocument): KPI | undefined {
-  const revenue = doc.p2.kpis.find((kpi) =>
-    /revenue|sales|amount|profit|orders|quantity/i.test(`${kpi.label} ${kpi.id}`),
+  const revenue = (doc.p2?.kpis ?? []).find((kpi) =>
+    /revenue|sales|amount|profit|orders|quantity/i.test(
+      `${kpi.label} ${kpi.id}`,
+    ),
   );
-  return revenue ?? doc.p2.kpis[0];
+  return revenue ?? doc.p2?.kpis?.[0];
 }
 
 function kpiTiles(doc: ReportDocument, count = 8) {
   const hero = primaryKpi(doc);
-  const base = doc.p2.kpis
+  const base = (doc.p2?.kpis ?? [])
     .filter((kpi) => kpi.id !== hero?.id)
     .map((kpi) => ({
       label: kpi.label,
@@ -51,14 +57,30 @@ function kpiTiles(doc: ReportDocument, count = 8) {
   return [
     {
       label: hero?.label || "Business Health",
-      value: hero?.formattedValue || `${doc.p1.businessHealthScore}%`,
+      value: hero?.formattedValue || `${doc.p1?.businessHealthScore ?? 100}%`,
       note: hero?.rationale || "Primary performance indicator.",
     },
     ...base,
-    { label: "Records", value: doc.p1.rowCount.toLocaleString(), note: "Analyzed rows." },
-    { label: "Features", value: String(doc.p1.columnCount), note: "Dataset columns." },
-    { label: "Data Quality", value: `${doc.p1.dataQualityScore}%`, note: "Cleaning readiness score." },
-    { label: "Health Score", value: `${doc.p1.businessHealthScore}%`, note: "Composite business posture." },
+    {
+      label: "Records",
+      value: (doc.p1?.rowCount ?? 0).toLocaleString(),
+      note: "Analyzed rows.",
+    },
+    {
+      label: "Features",
+      value: String(doc.p1?.columnCount ?? 0),
+      note: "Dataset columns.",
+    },
+    {
+      label: "Data Quality",
+      value: `${doc.p1?.dataQualityScore ?? 100}%`,
+      note: "Cleaning readiness score.",
+    },
+    {
+      label: "Health Score",
+      value: `${doc.p1?.businessHealthScore ?? 100}%`,
+      note: "Composite business posture.",
+    },
   ].slice(0, count);
 }
 
@@ -82,7 +104,13 @@ function PageLead({
   );
 }
 
-function NoteBox({ title, children }: { title: string; children: React.ReactNode }) {
+function NoteBox({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="aa-note">
       <strong>{title}</strong>
@@ -91,7 +119,13 @@ function NoteBox({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function KpiGrid({ items, columns = 4 }: { items: ReturnType<typeof kpiTiles>; columns?: 2 | 3 | 4 | 5 }) {
+function KpiGrid({
+  items,
+  columns = 4,
+}: {
+  items: ReturnType<typeof kpiTiles>;
+  columns?: 2 | 3 | 4 | 5;
+}) {
   return (
     <div className={`aa-kpi-grid aa-kpi-grid-${columns}`}>
       {items.map((item, index) => (
@@ -135,13 +169,22 @@ function InsightTriplet({ doc }: { doc: ReportDocument }) {
   return (
     <div className="aa-triplet">
       <NoteBox title="What happened">
-        {short(doc.p1.scqa?.situation || doc.p1.executiveSummary, "The uploaded dataset was analyzed across performance, quality, drivers, risks, forecast, and actions.")}
+        {short(
+          doc.p1.scqa?.situation || doc.p1.executiveSummary,
+          "The uploaded dataset was analyzed across performance, quality, drivers, risks, forecast, and actions.",
+        )}
       </NoteBox>
       <NoteBox title="Why it matters">
-        {short(doc.p1.scqa?.complication || doc.p1.scqa?.question, "The report connects metrics to business impact so the reader can prioritize decisions instead of reading disconnected numbers.")}
+        {short(
+          doc.p1.scqa?.complication || doc.p1.scqa?.question,
+          "The report connects metrics to business impact so the reader can prioritize decisions instead of reading disconnected numbers.",
+        )}
       </NoteBox>
       <NoteBox title="What to do next">
-        {short(doc.p1.scqa?.recommendedAction || doc.p7.executiveSummary, "Focus on the highest-priority recommendations and validate anomalies before scaling decisions.")}
+        {short(
+          doc.p1.scqa?.recommendedAction || doc.p7.executiveSummary,
+          "Focus on the highest-priority recommendations and validate anomalies before scaling decisions.",
+        )}
       </NoteBox>
     </div>
   );
@@ -149,33 +192,50 @@ function InsightTriplet({ doc }: { doc: ReportDocument }) {
 
 function Heatmap({ doc }: { doc: ReportDocument }) {
   const correlations = doc.p2.correlations ?? [];
-  const cols = Array.from(new Set(correlations.flatMap((c) => [c.a, c.b]))).slice(0, 5);
+  const cols = Array.from(
+    new Set(correlations.flatMap((c) => [c.a, c.b])),
+  ).slice(0, 5);
 
   if (cols.length < 2) {
-    return <div className="aa-empty" style={{ height: 200 }}>Correlation matrix needs at least two numeric fields.</div>;
+    return (
+      <div className="aa-empty" style={{ height: 200 }}>
+        Correlation matrix needs at least two numeric fields.
+      </div>
+    );
   }
 
   return (
-    <div className="aa-heatmap" style={{ gridTemplateColumns: `112px repeat(${cols.length}, 1fr)` }}>
+    <div
+      className="aa-heatmap"
+      style={{ gridTemplateColumns: `112px repeat(${cols.length}, 1fr)` }}
+    >
       <div />
       {cols.map((col) => (
-        <div className="aa-heatmap-head" key={`head-${col}`}>{col}</div>
+        <div className="aa-heatmap-head" key={`head-${col}`}>
+          {col}
+        </div>
       ))}
       {cols.map((row) => (
         <React.Fragment key={row}>
           <div className="aa-heatmap-row">{row}</div>
           {cols.map((col) => {
             const pair = correlations.find(
-              (c) => (c.a === row && c.b === col) || (c.a === col && c.b === row),
+              (c) =>
+                (c.a === row && c.b === col) || (c.a === col && c.b === row),
             );
-            const value = row === col ? 1 : pair?.r ?? 0;
+            const value = row === col ? 1 : (pair?.r ?? 0);
             const alpha = Math.max(0.12, Math.min(0.88, Math.abs(value)));
             const background =
-              value < 0 ? `rgba(139, 28, 28, ${alpha})` : `rgba(0, 153, 168, ${alpha})`;
+              value < 0
+                ? `rgba(139, 28, 28, ${alpha})`
+                : `rgba(0, 153, 168, ${alpha})`;
             return (
               <div
                 className="aa-heatmap-cell"
-                style={{ background, color: alpha > 0.42 ? "#fff" : "var(--rpt-navy)" }}
+                style={{
+                  background,
+                  color: alpha > 0.42 ? "#fff" : "var(--rpt-navy)",
+                }}
                 key={`${row}-${col}`}
               >
                 {value.toFixed(2)}
@@ -190,10 +250,13 @@ function Heatmap({ doc }: { doc: ReportDocument }) {
 
 export function HtmlReportDocument({ doc }: Props) {
   const shared = { datasetName: doc.datasetName, generatedAt: doc.generatedAt };
-  const mainChart = doc.p2.primaryCharts[0] ?? doc.p3.trendCharts[0];
-  const secondChart = doc.p2.primaryCharts[1] ?? doc.p3.trendCharts[1] ?? doc.p2.primaryCharts[0];
-  const forecast = doc.p6.forecasts[0];
-  const anomalyChart: ChartSpec | undefined = doc.p5.anomalyColumns.length
+  const mainChart = doc.p2?.primaryCharts?.[0] ?? doc.p3?.trendCharts?.[0];
+  const secondChart =
+    doc.p2?.primaryCharts?.[1] ??
+    doc.p3?.trendCharts?.[1] ??
+    doc.p2?.primaryCharts?.[0];
+  const forecast = doc.p6?.forecasts?.[0];
+  const anomalyChart: ChartSpec | undefined = doc.p5?.anomalyColumns?.length
     ? {
         id: "aa-anomalies",
         type: "bar",
@@ -201,13 +264,16 @@ export function HtmlReportDocument({ doc }: Props) {
         description: "Anomaly concentration by field",
         xKey: "column",
         yKeys: ["anomalyCount"],
-        data: doc.p5.anomalyColumns.map((item) => ({
+        data: (doc.p5?.anomalyColumns ?? []).map((item) => ({
           column: item.column,
           anomalyCount: item.anomalyCount,
         })),
       }
     : undefined;
-  const sortedRecommendations = [...doc.p7.recommendations].slice(0, 5);
+  const sortedRecommendations = [...(doc.p7?.recommendations ?? [])].slice(
+    0,
+    5,
+  );
 
   return (
     <div className="rpt-document aa-report">
@@ -220,7 +286,9 @@ export function HtmlReportDocument({ doc }: Props) {
       >
         <div className="aa-stack">
           <div className="aa-title-block">
-            <div className="aa-logo-word">InsightForge<span>AI</span></div>
+            <div className="aa-logo-word">
+              InsightForge<span>AI</span>
+            </div>
             <h1>{doc.p1.reportTitle || "Data Analysis Report"}</h1>
             <p>{doc.datasetName}</p>
           </div>
@@ -228,25 +296,35 @@ export function HtmlReportDocument({ doc }: Props) {
           <div className="aa-purpose">
             <strong>Purpose</strong>
             <p>
-              To turn raw performance data into a clear client-friendly story: what happened,
-              why it happened, and what should happen next.
+              To turn raw performance data into a clear client-friendly story:
+              what happened, why it happened, and what should happen next.
             </p>
           </div>
 
           <KpiGrid items={kpiTiles(doc, 6)} columns={3} />
           <div className="aa-two">
-            <ChartBox spec={mainChart} title="Primary Performance Trend" height={230} />
+            <ChartBox
+              spec={mainChart}
+              title="Primary Performance Trend"
+              height={230}
+            />
             <div className="aa-panel aa-summary-panel">
               <div className="aa-panel-head">
                 <strong>Quick Summary</strong>
                 <span>{doc.p1.domain}</span>
               </div>
-              <p>{short(doc.p1.executiveSummary, doc.p1.scqa?.headline || "Executive summary unavailable.", 520)}</p>
+              <p>
+                {short(
+                  doc.p1.executiveSummary,
+                  doc.p1.scqa?.headline || "Executive summary unavailable.",
+                  520,
+                )}
+              </p>
               <div className="aa-mini-facts">
-                <span>Rows: {doc.p1.rowCount.toLocaleString()}</span>
-                <span>Features: {doc.p1.columnCount}</span>
-                <span>Health: {doc.p1.businessHealthScore}%</span>
-                <span>Quality: {doc.p1.dataQualityScore}%</span>
+                <span>Rows: {(doc.p1?.rowCount ?? 0).toLocaleString()}</span>
+                <span>Features: {doc.p1?.columnCount ?? 0}</span>
+                <span>Health: {doc.p1?.businessHealthScore ?? 100}%</span>
+                <span>Quality: {doc.p1?.dataQualityScore ?? 100}%</span>
               </div>
             </div>
           </div>
@@ -269,7 +347,11 @@ export function HtmlReportDocument({ doc }: Props) {
           />
           <div className="aa-two aa-two-even">
             <ChartBox spec={mainChart} title="Performance Trend" height={250} />
-            <ChartBox spec={secondChart} title="Secondary Performance View" height={250} />
+            <ChartBox
+              spec={secondChart}
+              title="Secondary Performance View"
+              height={250}
+            />
           </div>
           <KpiGrid items={kpiTiles(doc, 8)} columns={4} />
           <ReportTable
@@ -282,7 +364,11 @@ export function HtmlReportDocument({ doc }: Props) {
             rows={kpiTiles(doc, 6).map((item) => ({
               metric: item.label,
               value: item.value,
-              interpretation: short(item.note, "KPI generated from uploaded data.", 110),
+              interpretation: short(
+                item.note,
+                "KPI generated from uploaded data.",
+                110,
+              ),
             }))}
           />
         </div>
@@ -316,7 +402,7 @@ export function HtmlReportDocument({ doc }: Props) {
                 { key: "r", header: "r", align: "right" },
                 { key: "strength", header: "Strength" },
               ]}
-              rows={(doc.p2.correlations ?? [])
+              rows={(doc.p2?.correlations ?? [])
                 .filter((c) => c.r > 0)
                 .sort((a, b) => b.r - a.r)
                 .slice(0, 5)
@@ -333,7 +419,7 @@ export function HtmlReportDocument({ doc }: Props) {
                 { key: "r", header: "r", align: "right" },
                 { key: "strength", header: "Strength" },
               ]}
-              rows={(doc.p2.correlations ?? [])
+              rows={(doc.p2?.correlations ?? [])
                 .filter((c) => c.r < 0)
                 .sort((a, b) => a.r - b.r)
                 .slice(0, 5)
@@ -362,13 +448,38 @@ export function HtmlReportDocument({ doc }: Props) {
             purpose="Before acting on insights, review data quality, outliers, and statistical flags."
           />
           <div className="aa-two">
-            <ChartBox spec={anomalyChart} title="Outliers by Column" height={225} />
+            <ChartBox
+              spec={anomalyChart}
+              title="Outliers by Column"
+              height={225}
+            />
             <KpiGrid
               items={[
-                { label: "Anomaly Fields", value: String(doc.p5.anomalyColumns.length), note: "Columns with outliers." },
-                { label: "Exception Rows", value: fmt(doc.p5.anomalyColumns.reduce((sum, item) => sum + item.anomalyCount, 0)), note: "Flagged records." },
-                { label: "Quality Score", value: `${doc.p4.qualityScore}%`, note: "Post-cleaning score." },
-                { label: "Rows Removed", value: doc.p4.rowsRemoved.toLocaleString(), note: "Cleaning impact." },
+                {
+                  label: "Anomaly Fields",
+                  value: String(doc.p5?.anomalyColumns?.length ?? 0),
+                  note: "Columns with outliers.",
+                },
+                {
+                  label: "Exception Rows",
+                  value: fmt(
+                    (doc.p5?.anomalyColumns ?? []).reduce(
+                      (sum, item) => sum + item.anomalyCount,
+                      0,
+                    ),
+                  ),
+                  note: "Flagged records.",
+                },
+                {
+                  label: "Quality Score",
+                  value: `${doc.p4?.qualityScore ?? 100}%`,
+                  note: "Post-cleaning score.",
+                },
+                {
+                  label: "Rows Removed",
+                  value: (doc.p4?.rowsRemoved ?? 0).toLocaleString(),
+                  note: "Cleaning impact.",
+                },
               ]}
               columns={2}
             />
@@ -381,11 +492,15 @@ export function HtmlReportDocument({ doc }: Props) {
               { key: "shape", header: "Shape" },
               { key: "interpretation", header: "Business Interpretation" },
             ]}
-            rows={doc.p5.anomalyColumns.slice(0, 6).map((item) => ({
+            rows={(doc.p5?.anomalyColumns ?? []).slice(0, 6).map((item) => ({
               field: item.column,
               outliers: item.anomalyCount.toLocaleString(),
               shape: item.distributionShape,
-              interpretation: short(item.explanation, "Outlier concentration requires review.", 130),
+              interpretation: short(
+                item.explanation,
+                "Outlier concentration requires review.",
+                130,
+              ),
             }))}
           />
           <ReportTable
@@ -395,10 +510,14 @@ export function HtmlReportDocument({ doc }: Props) {
               { key: "severity", header: "Severity", align: "center" },
               { key: "impact", header: "Impact" },
             ]}
-            rows={doc.p4.issues.slice(0, 5).map((issue) => ({
+            rows={(doc.p4?.issues ?? []).slice(0, 5).map((issue) => ({
               issue: issue.title,
               severity: issue.severity,
-              impact: short(issue.businessImpact || issue.reasoning, "Quality issue detected.", 140),
+              impact: short(
+                issue.businessImpact || issue.reasoning,
+                "Quality issue detected.",
+                140,
+              ),
             }))}
           />
         </div>
@@ -417,13 +536,35 @@ export function HtmlReportDocument({ doc }: Props) {
             title="What comes next?"
             purpose="Use forecast direction as planning guidance, then validate it against current risk signals."
           />
-          <ChartBox spec={forecast?.chartSpec} title="Forecast Trend" height={330} />
+          <ChartBox
+            spec={forecast?.chartSpec}
+            title="Forecast Trend"
+            height={330}
+          />
           <KpiGrid
             items={[
-              { label: "Target", value: forecast?.measureColumn || "N/A", note: "Forecasted measure." },
-              { label: "Confidence", value: forecast ? pct(forecast.confidence) : "N/A", note: forecast?.method || "Model confidence." },
-              { label: "Growth", value: forecast ? `${forecast.totalGrowthPct.toFixed(1)}%` : "N/A", note: forecast?.overallTrend || "Trend direction." },
-              { label: "Peak Period", value: forecast?.peakPeriod || "N/A", note: "Highest modeled period." },
+              {
+                label: "Target",
+                value: forecast?.measureColumn || "N/A",
+                note: "Forecasted measure.",
+              },
+              {
+                label: "Confidence",
+                value: forecast ? pct(forecast.confidence) : "N/A",
+                note: forecast?.method || "Model confidence.",
+              },
+              {
+                label: "Growth",
+                value: forecast
+                  ? `${forecast.totalGrowthPct.toFixed(1)}%`
+                  : "N/A",
+                note: forecast?.overallTrend || "Trend direction.",
+              },
+              {
+                label: "Peak Period",
+                value: forecast?.peakPeriod || "N/A",
+                note: "Highest modeled period.",
+              },
             ]}
             columns={4}
           />
@@ -444,10 +585,18 @@ export function HtmlReportDocument({ doc }: Props) {
           />
           <div className="aa-two">
             <NoteBox title="Assumptions">
-              {short(forecast?.assumptions.slice(0, 3).join(" "), "Forecast assumptions depend on the stability and chronology of the available data.", 240)}
+              {short(
+                (forecast?.assumptions ?? []).slice(0, 3).join(" "),
+                "Forecast assumptions depend on the stability and chronology of the available data.",
+                240,
+              )}
             </NoteBox>
             <NoteBox title="Risks">
-              {short(forecast?.risks.slice(0, 3).join(" "), "Forecast direction should be interpreted with anomaly and quality constraints.", 240)}
+              {short(
+                (forecast?.risks ?? []).slice(0, 3).join(" "),
+                "Forecast direction should be interpreted with anomaly and quality constraints.",
+                240,
+              )}
             </NoteBox>
           </div>
         </div>
@@ -477,31 +626,46 @@ export function HtmlReportDocument({ doc }: Props) {
             ]}
             rows={(sortedRecommendations.length
               ? sortedRecommendations
-              : doc.p1.topRecommendations.map((item, index) => ({
-                  id: `fallback-${index}`,
-                  priority: item.priority,
-                  title: item.title,
-                  recommendation: item.summary,
-                  expectedImpact: item.priority === "critical" || item.priority === "high" ? "High" : "Medium",
-                  timeHorizon: item.effort === "low" ? "30 days" : "60-90 days",
-                  confidence: 0.82,
-                } as (typeof sortedRecommendations)[number]))
-            ).slice(0, 6).map((item) => ({
-              priority: item.priority,
-              action: item.title || item.recommendation,
-              impact: item.expectedImpact,
-              timeline: item.timeHorizon || "90 days",
-              confidence: pct(item.confidence),
-            }))}
+              : (doc.p1?.topRecommendations ?? []).map(
+                  (item, index) =>
+                    ({
+                      id: `fallback-${index}`,
+                      priority: item.priority,
+                      title: item.title,
+                      recommendation: item.summary,
+                      expectedImpact:
+                        item.priority === "critical" || item.priority === "high"
+                          ? "High"
+                          : "Medium",
+                      timeHorizon:
+                        item.effort === "low" ? "30 days" : "60-90 days",
+                      confidence: 0.82,
+                    }) as (typeof sortedRecommendations)[number],
+                )
+            )
+              .slice(0, 6)
+              .map((item) => ({
+                priority: item.priority,
+                action: item.title || item.recommendation,
+                impact: item.expectedImpact,
+                timeline: item.timeHorizon || "90 days",
+                confidence: pct(item.confidence),
+              }))}
           />
           <div className="aa-two">
             <NoteBox title="Client-friendly takeaway">
-              {short(doc.p7.executiveSummary || doc.p1.scqa?.recommendedAction, "The report should support a decision, not just present numbers.", 260)}
+              {short(
+                doc.p7?.executiveSummary || doc.p1?.scqa?.recommendedAction,
+                "The report should support a decision, not just present numbers.",
+                260,
+              )}
             </NoteBox>
             <NoteBox title="Technical appendix">
-              Dataset: {doc.appendix.rowCount.toLocaleString()} rows, {doc.appendix.columnCount} features.
-              Domain: {doc.appendix.domain}. Methods include KPI profiling, visual EDA, Pearson
-              correlations, anomaly detection, and forecasting where supported.
+              Dataset: {(doc.appendix?.rowCount ?? 0).toLocaleString()} rows,{" "}
+              {doc.appendix?.columnCount ?? 0} features. Domain:{" "}
+              {doc.appendix?.domain ?? "generic"}. Methods include KPI
+              profiling, visual EDA, Pearson correlations, anomaly detection,
+              and forecasting where supported.
             </NoteBox>
           </div>
           <div className="aa-closing">

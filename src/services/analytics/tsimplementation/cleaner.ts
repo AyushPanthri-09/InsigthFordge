@@ -122,7 +122,8 @@ function parseNumericString(value: string): number | null {
 function parseDateString(value: string): Date | null {
   const trimmed = value.trim();
   if (trimmed === "") return null;
-  if (!/[\/\.\sA-Za-z-]/.test(trimmed) || /^\d+$/.test(trimmed)) return null;
+  const dateCharsRegex = new RegExp("[/.\\sA-Za-z-]");
+  if (!dateCharsRegex.test(trimmed) || /^\d+$/.test(trimmed)) return null;
   const parsed = new Date(trimmed);
   return Number.isFinite(parsed.getTime()) ? parsed : null;
 }
@@ -176,7 +177,7 @@ function getMode(values: string[]): string | null {
 
 function shouldNormalizePhone(value: string): boolean {
   const trimmed = value.trim();
-  return PHONE_DIGITS_RE.test(trimmed) && /[\s().\-]/.test(trimmed);
+  return PHONE_DIGITS_RE.test(trimmed) && /[\s().-]/.test(trimmed);
 }
 
 // ---------------------------------------------------------------------------

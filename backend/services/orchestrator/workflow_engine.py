@@ -140,7 +140,7 @@ class WorkflowEngine:
                     from backend.services.intelligence.semantic_engine import UniversalSemanticEngine
                     # Run semantic analysis
                     RetryManager.execute_with_retry(
-                        lambda: UniversalSemanticEngine.analyze(df, dataset_id=dataset_id),
+                        lambda df=df, dataset_id=dataset_id: UniversalSemanticEngine.analyze(df, dataset_id=dataset_id),
                         stage_name=stage.name
                     )
                     CheckpointManager.save_checkpoint(dataset_id, stage.stage_id, {"completed": True})
@@ -148,7 +148,7 @@ class WorkflowEngine:
                 elif stage.stage_id == "Data Engineer":
                     from backend.services.data_engineer.engineer import AIDataEngineer
                     certified_env = RetryManager.execute_with_retry(
-                        lambda: AIDataEngineer.certify_and_clean(df, dataset_id=dataset_id),
+                        lambda df=df, dataset_id=dataset_id: AIDataEngineer.certify_and_clean(df, dataset_id=dataset_id),
                         stage_name=stage.name
                     )
                     cleaned_df = certified_env.dataframe
@@ -156,21 +156,44 @@ class WorkflowEngine:
                     CheckpointManager.save_checkpoint(dataset_id, stage.stage_id, {"completed": True})
 
                 elif stage.stage_id == "Data Analyst":
+                    if not certified_env or not certified_env.metadata:
+                        meta = mem.get_metadata(dataset_id, "trusted_dataset")
+                        if meta:
+                            from backend.services.data_engineer import CertifiedDatasetEnvelope
+                            certified_env = CertifiedDatasetEnvelope(dataframe=cleaned_df, metadata=meta)
+                        else:
+                            raise ValueError("Stage 'Data Analyst' requires a valid trusted_dataset metadata context.")
+
                     from backend.services.data_analyst.analyst import AIDataAnalyst
                     analyst_result = RetryManager.execute_with_retry(
-                        lambda: AIDataAnalyst.analyze_trusted_dataset(certified_env.metadata, cleaned_df),
+                        lambda env=certified_env, df=cleaned_df: AIDataAnalyst.analyze_trusted_dataset(env.metadata, df),
                         stage_name=stage.name
                     )
                     mem.set_metadata(dataset_id, "analyst_result", analyst_result.model_dump())
                     CheckpointManager.save_checkpoint(dataset_id, stage.stage_id, {"completed": True})
 
                 elif stage.stage_id == "Business Analyst":
+                    if not certified_env or not certified_env.metadata:
+                        meta = mem.get_metadata(dataset_id, "trusted_dataset")
+                        if meta:
+                            from backend.services.data_engineer import CertifiedDatasetEnvelope
+                            certified_env = CertifiedDatasetEnvelope(dataframe=cleaned_df, metadata=meta)
+                        else:
+                            raise ValueError("Stage 'Business Analyst' requires a valid trusted_dataset metadata context.")
+                    if not analyst_result:
+                        analyst_dump = mem.get_metadata(dataset_id, "analyst_result")
+                        if analyst_dump:
+                            from backend.services.data_analyst.contracts import AnalystResult
+                            analyst_result = AnalystResult(**analyst_dump)
+                        else:
+                            raise ValueError("Stage 'Business Analyst' requires a valid analyst_result context.")
+
                     from backend.services.business_analyst.analyst import AIBusinessAnalyst
                     business_result = RetryManager.execute_with_retry(
-                        lambda: AIBusinessAnalyst.analyze_business(
+                        lambda dataset_id=dataset_id, env=certified_env, res=analyst_result: AIBusinessAnalyst.analyze_business(
                             dataset_id=dataset_id,
-                            trusted_dataset=certified_env.metadata,
-                            analyst_result=analyst_result
+                            trusted_dataset=env.metadata,
+                            analyst_result=res
                         ),
                         stage_name=stage.name
                     )
@@ -178,11 +201,19 @@ class WorkflowEngine:
                     CheckpointManager.save_checkpoint(dataset_id, stage.stage_id, {"completed": True})
 
                 elif stage.stage_id == "Strategy Advisor":
+                    if not business_result:
+                        biz_dump = mem.get_metadata(dataset_id, "business_result")
+                        if biz_dump:
+                            from backend.services.business_analyst.contracts import BusinessAnalystResult
+                            business_result = BusinessAnalystResult(**biz_dump)
+                        else:
+                            raise ValueError("Stage 'Strategy Advisor' requires a valid business_result context.")
+
                     from backend.services.strategy_advisor.advisor import AIStrategyAdvisor
                     strategy_result = RetryManager.execute_with_retry(
-                        lambda: AIStrategyAdvisor.generate_strategy(
+                        lambda dataset_id=dataset_id, res=business_result: AIStrategyAdvisor.generate_strategy(
                             dataset_id=dataset_id,
-                            business_result=business_result
+                            business_result=res
                         ),
                         stage_name=stage.name
                     )
@@ -190,14 +221,43 @@ class WorkflowEngine:
                     CheckpointManager.save_checkpoint(dataset_id, stage.stage_id, {"completed": True})
 
                 elif stage.stage_id == "Executive Communicator":
+                    if not certified_env or not certified_env.metadata:
+                        meta = mem.get_metadata(dataset_id, "trusted_dataset")
+                        if meta:
+                            from backend.services.data_engineer import CertifiedDatasetEnvelope
+                            certified_env = CertifiedDatasetEnvelope(dataframe=cleaned_df, metadata=meta)
+                        else:
+                            raise ValueError("Stage 'Executive Communicator' requires a valid trusted_dataset metadata context.")
+                    if not analyst_result:
+                        analyst_dump = mem.get_metadata(dataset_id, "analyst_result")
+                        if analyst_dump:
+                            from backend.services.data_analyst.contracts import AnalystResult
+                            analyst_result = AnalystResult(**analyst_dump)
+                        else:
+                            raise ValueError("Stage 'Executive Communicator' requires a valid analyst_result context.")
+                    if not business_result:
+                        biz_dump = mem.get_metadata(dataset_id, "business_result")
+                        if biz_dump:
+                            from backend.services.business_analyst.contracts import BusinessAnalystResult
+                            business_result = BusinessAnalystResult(**biz_dump)
+                        else:
+                            raise ValueError("Stage 'Executive Communicator' requires a valid business_result context.")
+                    if not strategy_result:
+                        strat_dump = mem.get_metadata(dataset_id, "strategy_result")
+                        if strat_dump:
+                            from backend.services.strategy_advisor.contracts import StrategyAdvisorResult
+                            strategy_result = StrategyAdvisorResult(**strat_dump)
+                        else:
+                            raise ValueError("Stage 'Executive Communicator' requires a valid strategy_result context.")
+
                     from backend.services.executive_communicator.communicator import AIExecutiveCommunicator
                     executive_result = RetryManager.execute_with_retry(
-                        lambda: AIExecutiveCommunicator.generate_reports(
+                        lambda dataset_id=dataset_id, env=certified_env, a_res=analyst_result, b_res=business_result, s_res=strategy_result: AIExecutiveCommunicator.generate_reports(
                             dataset_id=dataset_id,
-                            trusted_dataset=certified_env.metadata,
-                            analyst_result=analyst_result,
-                            business_result=business_result,
-                            strategy_result=strategy_result
+                            trusted_dataset=env.metadata,
+                            analyst_result=a_res,
+                            business_result=b_res,
+                            strategy_result=s_res
                         ),
                         stage_name=stage.name
                     )

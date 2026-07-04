@@ -9,6 +9,7 @@ class RollbackManager:
     """
     _instance = None
     _lock = threading.Lock()
+    _backups: Dict[str, Tuple[str, pd.Series]] = {}
 
     def __new__(cls):
         with cls._lock:

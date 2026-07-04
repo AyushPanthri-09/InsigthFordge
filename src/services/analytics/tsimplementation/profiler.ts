@@ -290,13 +290,13 @@ export function profileDataset(
 
   // Step 3 — Column intelligence (semantic analysis per column)
   const intelligence = analyseAllColumns(profiles, domainResult.domain);
-    // --- POST-PROCESS: Override name-based semantics with value sampling ---
+  // --- POST-PROCESS: Override name-based semantics with value sampling ---
   // This fixes the "phone numbers in date column" type of bug generically
   // We need to import sampleMatches from column-intelligence.ts (add import at top)
   for (const p of profiles) {
     const intel = intelligence[p.name];
     if (!intel) continue;
-    
+
     // If it was classified as a time dimension, check if values actually look like dates
     if (intel.businessCategory === "time_dimension") {
       let dateCount = 0;
@@ -308,16 +308,23 @@ export function profileDataset(
         const str = String(val);
         // Try to parse as date
         const d = new Date(str);
-        const isDate = !isNaN(d.getTime()) && d.getFullYear() > 1900 && d.getFullYear() < 2100;
+        const isDate =
+          !isNaN(d.getTime()) &&
+          d.getFullYear() > 1900 &&
+          d.getFullYear() < 2100;
         // Check if it looks like a phone number (digits + + - ( ) )
-        const isPhone = /^[\d+\-() ]{7,15}$/.test(str.replace(/\s/g, ''));
+        const isPhone = /^[\d+\-() ]{7,15}$/.test(str.replace(/\s/g, ""));
         if (isDate) dateCount++;
         if (isPhone) phoneCount++;
         checked++;
         if (checked >= 30) break;
       }
       // If >50% of samples look like phone numbers, override
-      if (checked > 5 && phoneCount / checked > 0.5 && dateCount / checked < 0.3) {
+      if (
+        checked > 5 &&
+        phoneCount / checked > 0.5 &&
+        dateCount / checked < 0.3
+      ) {
         intel.businessCategory = "descriptor";
         intel.schemaRole = "dimension_attribute";
         intel.businessTags = ["free_text", "non_aggregatable"];

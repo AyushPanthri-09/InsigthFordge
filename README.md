@@ -25,20 +25,20 @@ Features
 System Architecture
 
 User
-   │
-   ▼
+│
+▼
 Frontend (React + Vite)
-   │
-   ▼
+│
+▼
 FastAPI Backend
-   │
-   ├── Data Validation
-   ├── Data Cleaning
-   ├── Statistical Analysis
-   ├── AI Insight Generation
-   └── Report Generation
-   │
-   ▼
+│
+├── Data Validation
+├── Data Cleaning
+├── Statistical Analysis
+├── AI Insight Generation
+└── Report Generation
+│
+▼
 Results Dashboard
 
 ---
@@ -83,12 +83,12 @@ Project Structure
 InsightForge/
 │
 ├── backend/
-│   ├── api/
-│   ├── core/
-│   ├── services/
-│   ├── repositories/
-│   ├── models/
-│   └── utils/
+│ ├── api/
+│ ├── core/
+│ ├── services/
+│ ├── repositories/
+│ ├── models/
+│ └── utils/
 │
 ├── src/
 │

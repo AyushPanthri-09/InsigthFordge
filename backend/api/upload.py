@@ -31,7 +31,7 @@ async def upload_file(file: UploadFile = File(...)) -> UploadResponse:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Intake pipeline staging failure: {str(e)}"
-        )
+        ) from e
         
     duration = time.time() - start_time
     logger.info(

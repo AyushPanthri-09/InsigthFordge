@@ -47,13 +47,13 @@ async def analyze_dataset(file: UploadFile = File(...)) -> AnalyzeResponse:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=e.message
-        )
+        ) from e
     except Exception as e:
         logger.error(f"Internal analysis pipeline failure: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Analytics pipeline failed: {str(e)}"
-        )
+        ) from e
     finally:
         # Staging file cleanup to avoid local storage leaks
         if os.path.exists(staged_path):

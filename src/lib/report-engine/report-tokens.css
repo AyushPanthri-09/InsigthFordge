@@ -1145,7 +1145,11 @@
 
 .rpt-exec-document .rpt-page::before {
   height: 6px;
-  background: linear-gradient(90deg, var(--rpt-navy) 0 62%, var(--rpt-gold) 62% 100%);
+  background: linear-gradient(
+    90deg,
+    var(--rpt-navy) 0 62%,
+    var(--rpt-gold) 62% 100%
+  );
 }
 
 .rpt-exec-document .rpt-page-header {
@@ -1355,7 +1359,11 @@
 
 .rpt-exec-cover-brandbar {
   height: 10px;
-  background: linear-gradient(90deg, var(--rpt-navy) 0 58%, var(--rpt-gold) 58% 100%);
+  background: linear-gradient(
+    90deg,
+    var(--rpt-navy) 0 58%,
+    var(--rpt-gold) 58% 100%
+  );
 }
 
 .rpt-exec-cover-shell {
@@ -1464,7 +1472,11 @@
   justify-content: center;
   background:
     radial-gradient(circle at center, #ffffff 0 57%, transparent 58%),
-    conic-gradient(var(--rpt-mint) calc(var(--score) * 1%), #f1dca8 0 86%, var(--rpt-burgundy) 0);
+    conic-gradient(
+      var(--rpt-mint) calc(var(--score) * 1%),
+      #f1dca8 0 86%,
+      var(--rpt-burgundy) 0
+    );
   box-shadow: 0 12px 30px rgba(10, 22, 40, 0.1);
 }
 
@@ -1530,7 +1542,11 @@
   padding: 20px;
   border-top: 5px solid var(--rpt-gold);
   background:
-    linear-gradient(135deg, rgba(200, 155, 60, 0.13), rgba(255, 255, 255, 0) 50%),
+    linear-gradient(
+      135deg,
+      rgba(200, 155, 60, 0.13),
+      rgba(255, 255, 255, 0) 50%
+    ),
     #ffffff;
 }
 
@@ -1597,8 +1613,7 @@
 .rpt-exec-chart-panel {
   padding: 12px;
   background:
-    linear-gradient(180deg, rgba(10, 22, 40, 0.026), transparent 68px),
-    #ffffff;
+    linear-gradient(180deg, rgba(10, 22, 40, 0.026), transparent 68px), #ffffff;
 }
 
 .rpt-exec-chart-head {

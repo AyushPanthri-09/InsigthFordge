@@ -119,8 +119,8 @@ def refresh_access_token(payload: RefreshRequestSchema, db: Session = Depends(ge
         token_type: str = token_payload.get("type")
         if user_id_str is None or token_type != "refresh":
             raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        raise credentials_exception from e
 
     # Check refresh token register in database
     active_session = user_repository.get_active_session(db, payload.refresh_token)

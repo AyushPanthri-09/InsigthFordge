@@ -12,7 +12,10 @@ interface Props {
   readonly doc: ReportDocument;
 }
 
-const priorityTone: Record<string, "critical" | "warning" | "success" | "info"> = {
+const priorityTone: Record<
+  string,
+  "critical" | "warning" | "success" | "info"
+> = {
   critical: "critical",
   high: "warning",
   medium: "info",
@@ -20,11 +23,13 @@ const priorityTone: Record<string, "critical" | "warning" | "success" | "info"> 
 };
 
 export function P0_OnePageExecutiveTemplate({ doc }: Props) {
-  const kpis = doc.p1.topKpis.length > 0 ? doc.p1.topKpis : doc.p2.kpis.slice(0, 4);
+  const kpis =
+    doc.p1.topKpis.length > 0 ? doc.p1.topKpis : doc.p2.kpis.slice(0, 4);
   const chartSpec = doc.p2.primaryCharts?.[0];
   const actions = doc.p7.recommendations.slice(0, 3);
   const insights = doc.p2.descriptiveInsights.slice(0, 3);
-  const riskNote = doc.p4.notes ||
+  const riskNote =
+    doc.p4.notes ||
     "Review the dataset quality notes and validate assumptions before scaling recommendations.";
 
   const healthScore = doc.p1.businessHealthScore;
@@ -151,7 +156,11 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   key={kpi.id}
                   label={kpi.label}
                   value={kpi.formattedValue ?? String(kpi.value)}
-                  caption={kpi.trend ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%` : undefined}
+                  caption={
+                    kpi.trend
+                      ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%`
+                      : undefined
+                  }
                 />
               ))}
               {kpis.slice(2, 4).map((kpi) => (
@@ -159,7 +168,11 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   key={kpi.id}
                   label={kpi.label}
                   value={kpi.formattedValue ?? String(kpi.value)}
-                  caption={kpi.trend ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%` : undefined}
+                  caption={
+                    kpi.trend
+                      ? `${kpi.trend.direction.toUpperCase()} ${kpi.trend.pct}%`
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -186,9 +199,7 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
             >
               Top Focus
             </div>
-            <h3 style={{ margin: 0, fontSize: 18 }}>
-              {doc.p1.scqa.headline}
-            </h3>
+            <h3 style={{ margin: 0, fontSize: 18 }}>{doc.p1.scqa.headline}</h3>
             <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.6 }}>
               {doc.p1.executiveSummary}
             </p>
@@ -392,7 +403,9 @@ export function P0_OnePageExecutiveTemplate({ doc }: Props) {
                   header: "Trend",
                   align: "right",
                   render: (row: any) =>
-                    row.trend ? `${row.trend.direction} ${row.trend.pct}%` : "—",
+                    row.trend
+                      ? `${row.trend.direction} ${row.trend.pct}%`
+                      : "—",
                 },
               ]}
               rows={kpis.map((kpi) => ({

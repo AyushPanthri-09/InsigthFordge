@@ -43,8 +43,8 @@ async def get_current_user(
             raise credentials_exception
             
         user_uuid = uuid.UUID(user_id_str)
-    except (JWTError, ValueError):
-        raise credentials_exception
+    except (JWTError, ValueError) as e:
+        raise credentials_exception from e
         
     user = db.query(User).filter(User.id == user_uuid).first()
     if not user:

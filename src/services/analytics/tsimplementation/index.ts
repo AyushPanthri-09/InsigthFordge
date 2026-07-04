@@ -307,7 +307,9 @@ export const tsAnalyticsService: AnalyticsService = {
         reasoning: it.reasoning,
         confidence: it.confidence ?? 0.85,
         affectedColumns: it.affectedColumns ?? [],
-        businessImpact: it.businessImpact ?? "Potential analysis skew or inconsistencies if uncorrected.",
+        businessImpact:
+          it.businessImpact ??
+          "Potential analysis skew or inconsistencies if uncorrected.",
         requiresApproval: it.requiresApproval ?? true,
         applied: false,
       }));

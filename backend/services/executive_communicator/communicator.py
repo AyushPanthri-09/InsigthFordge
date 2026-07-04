@@ -44,12 +44,18 @@ class AIExecutiveCommunicator:
         """
         logger.info(f"[AIExecutiveCommunicator] Starting report compilation for dataset ID: {dataset_id}")
         
-        if hasattr(trusted_dataset, "quality_report"):
-            dq_conf = float(trusted_dataset.quality_report.quality_score.trust_score) / 100.0
+        if isinstance(trusted_dataset, dict):
+            try:
+                dq_conf = float(trusted_dataset.get("quality_report", {}).get("quality_score", {}).get("trust_score", 100)) / 100.0
+            except (TypeError, ValueError, KeyError):
+                dq_conf = 1.0
         else:
             try:
-                dq_conf = float(trusted_dataset["quality_report"]["quality_score"]["trust_score"]) / 100.0
-            except (KeyError, TypeError):
+                if hasattr(trusted_dataset, "quality_report") and trusted_dataset.quality_report is not None:
+                    dq_conf = float(trusted_dataset.quality_report.quality_score.trust_score) / 100.0
+                else:
+                    dq_conf = 1.0
+            except AttributeError:
                 dq_conf = 1.0
 
         # 1. Generate Executive Summary Card

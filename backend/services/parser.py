@@ -48,11 +48,11 @@ class DatasetParser:
                 
             return df
             
-        except pd.errors.EmptyDataError:
+        except pd.errors.EmptyDataError as e:
             logger.warning(f"File is empty: '{file_path}'")
-            raise ParserException("The uploaded file contains no data (empty dataset).")
+            raise ParserException("The uploaded file contains no data (empty dataset).") from e
         except ParserException:
             raise
         except Exception as e:
             logger.error(f"Parsing error on file '{file_path}': {str(e)}")
-            raise ParserException(f"Failed to parse file: {str(e)}")
+            raise ParserException(f"Failed to parse file: {str(e)}") from e

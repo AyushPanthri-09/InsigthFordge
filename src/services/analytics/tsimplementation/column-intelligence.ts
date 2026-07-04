@@ -34,7 +34,7 @@ function sampleMatches(
   rows: Record<string, unknown>[],
   colName: string,
   regex: RegExp,
-  sampleSize = 50
+  sampleSize = 50,
 ): boolean {
   let matched = 0;
   let checked = 0;
@@ -126,9 +126,8 @@ const CATEGORY_SIGNALS: Array<{
     schemaRole: "fact_measure",
   },
   // Time dimensions
-  
+
   {
-    
     pattern:
       /\b(date|datetime|timestamp|time|created_at|updated_at|modified)\b/i,
     category: "time_dimension",
@@ -496,7 +495,7 @@ function resolveMeaning(
 
   // Prepend a context-specific prefix derived from the column name
   const pretty = columnName
-    .replace(/[_\-]+/g, " ")
+    .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
   return `${pretty}: ${template}`;
 }

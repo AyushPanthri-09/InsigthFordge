@@ -281,9 +281,13 @@ export function P10_RootCause({ data, datasetName, generatedAt }: Props) {
                   >
                     <strong>Observation:</strong> {item.conclusion}
                     <br />
-                    <strong>Evidence:</strong> {item.rootCauses?.[0]?.observation || `Deviation: ${(item.deviationPct * 100).toFixed(1)}% (Baseline: ${item.baselineValue.toLocaleString()}, Target: ${item.targetValue.toLocaleString()})`}
+                    <strong>Evidence:</strong>{" "}
+                    {item.rootCauses?.[0]?.observation ||
+                      `Deviation: ${(item.deviationPct * 100).toFixed(1)}% (Baseline: ${item.baselineValue.toLocaleString()}, Target: ${item.targetValue.toLocaleString()})`}
                     <br />
-                    <strong>Recommended Action:</strong> {item.rootCauses?.[0]?.hypotheses?.[0]?.statement || "Establish baseline thresholds and alerts for this metric."}
+                    <strong>Recommended Action:</strong>{" "}
+                    {item.rootCauses?.[0]?.hypotheses?.[0]?.statement ||
+                      "Establish baseline thresholds and alerts for this metric."}
                   </p>
                 </div>
               ))}

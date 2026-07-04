@@ -65,7 +65,7 @@ async function renderReportDom(
 
   // Remove [object Object] artifacts
   html = html.replace(/\[object Object\]/g, "");
-  
+
   wrapper.innerHTML = html;
 
   return {
@@ -103,11 +103,11 @@ export async function createPrintableReportHtml(
   try {
     // Get the HTML
     let html = rendered.wrapper.innerHTML;
-    
+
     // FINAL SANITIZATION PASS — removes any remaining placeholder artifacts
     html = html.replace(/image\[\[[^\]]*\]\]/g, "");
     html = html.replace(/\[object Object\]/g, "");
-    
+
     // ✅ DEBUG: Check if image[[ still exists after sanitization
     if (html.includes("image[[")) {
       console.log("🚨 WARNING: image[[ STILL PRESENT after sanitization!");
@@ -116,7 +116,7 @@ export async function createPrintableReportHtml(
     } else {
       console.log("✅ image[[ successfully removed from HTML.");
     }
-    
+
     return buildPrintHtml(html);
   } finally {
     rendered.cleanup();

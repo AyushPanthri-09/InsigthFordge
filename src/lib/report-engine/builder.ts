@@ -44,21 +44,23 @@ function deepSanitizeStrings<T>(value: T): T {
     sanitized = sanitized.replace(/\s+/g, " ").trim();
     return sanitized as T;
   }
-  
+
   if (Array.isArray(value)) {
     return value.map((item) => deepSanitizeStrings(item)) as T;
   }
-  
+
   if (value && typeof value === "object") {
     const result: Record<string, unknown> = {};
     for (const key in value) {
       if (Object.prototype.hasOwnProperty.call(value, key)) {
-        result[key] = deepSanitizeStrings((value as Record<string, unknown>)[key]);
+        result[key] = deepSanitizeStrings(
+          (value as Record<string, unknown>)[key],
+        );
       }
     }
     return result as T;
   }
-  
+
   return value;
 }
 
@@ -458,7 +460,7 @@ function buildAppendix(analysis: FullAnalysis): AppendixData {
 export function buildReportDocument(analysis: FullAnalysis): ReportDocument {
   // ✅ Step 1: Sanitize the entire input analysis object
   const sanitizedAnalysis = deepSanitizeStrings(analysis);
-  
+
   const now = new Date();
   const generatedAt = formatDateTime(now);
   const reportId = generateReportId(
