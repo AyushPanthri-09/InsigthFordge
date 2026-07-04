@@ -33,7 +33,7 @@ class BusinessRuleDiscovery:
         financial_concepts = ["revenue", "cost", "profit"]
         for concept in financial_concepts:
             for col in concept_cols.get(concept, []):
-                if col in df.columns and np.issubdtype(df[col].dtype, np.number):
+                if col in df.columns and pd.api.types.is_numeric_dtype(df[col].dtype):
                     violations = int((df[col] < 0).sum())
                     rules.append({
                         "name": f"non_negative_{col}",
@@ -53,7 +53,7 @@ class BusinessRuleDiscovery:
 
         # 2. Check Positive Quantity (Quantity > 0)
         for col in concept_cols.get("quantity", []):
-            if col in df.columns and np.issubdtype(df[col].dtype, np.number):
+            if col in df.columns and pd.api.types.is_numeric_dtype(df[col].dtype):
                 violations = int((df[col] <= 0).sum())
                 rules.append({
                     "name": f"positive_{col}",
@@ -149,7 +149,7 @@ class BusinessRuleDiscovery:
                 revenue_col = col
 
         if discount_col and revenue_col:
-            if np.issubdtype(df[discount_col].dtype, np.number) and np.issubdtype(df[revenue_col].dtype, np.number):
+            if pd.api.types.is_numeric_dtype(df[discount_col].dtype) and pd.api.types.is_numeric_dtype(df[revenue_col].dtype):
                 violations = int((df[discount_col] > df[revenue_col]).sum())
                 rules.append({
                     "name": f"discount_limit_{discount_col}",
@@ -169,7 +169,7 @@ class BusinessRuleDiscovery:
 
         # 5. Check Age Non-Negative
         for col in df.columns:
-            if "age" in col.lower() and np.issubdtype(df[col].dtype, np.number):
+            if "age" in col.lower() and pd.api.types.is_numeric_dtype(df[col].dtype):
                 violations = int((df[col] < 0).sum())
                 rules.append({
                     "name": f"age_non_negative_{col}",

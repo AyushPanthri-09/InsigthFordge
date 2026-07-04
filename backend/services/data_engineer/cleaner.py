@@ -36,7 +36,7 @@ class DataEngineerCleaner:
             business_role = meta.business_role
 
             # 1. Trim Whitespace (String types)
-            if cleaned_df[col].dtype == "object":
+            if cleaned_df[col].dtype == "object" or pd.api.types.is_string_dtype(cleaned_df[col].dtype):
                 # Backup column
                 rollback_id = f"rb_trim_{col}_{uuid.uuid4().hex[:6]}"
                 rollback_mgr.register_backup(rollback_id, col, cleaned_df[col])

@@ -247,8 +247,9 @@ class AIDataEngineer:
             # Check 1: Revenue or financial measures must be numeric
             if meta.business_role == "measure" and meta.column_type in ["numeric", "currency"]:
                 # Check if it contains mostly non-numeric values
-                is_numeric = np.issubdtype(series.dtype, np.number)
+                is_numeric = pd.api.types.is_numeric_dtype(series.dtype)
                 if not is_numeric:
+
                     contradiction_flag = True
                     score = max(0.1, score - 0.5)
                     reasoning_steps.append("Contradiction: Classified as numeric/currency measure but values are non-numeric strings.")
@@ -276,7 +277,7 @@ class AIDataEngineer:
 
             # Check 4: Dimensions should not be continuous high cardinality floats
             elif meta.business_role == "dimension" and meta.column_type == "categorical":
-                if np.issubdtype(series.dtype, np.floating) and nunique > len(df) * 0.9:
+                if pd.api.types.is_float_dtype(series.dtype) and nunique > len(df) * 0.9:
                     contradiction_flag = True
                     score = max(0.3, score - 0.3)
                     reasoning_steps.append("Contradiction: Classified as categorical dimension but contains continuous float values.")

@@ -90,11 +90,33 @@ class AuthService {
     return response.json();
   }
 
-  logout() {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.refreshKey);
-    localStorage.removeItem(this.userKey);
-    toast.info("Logged out successfully");
+  async logout(): Promise<void> {
+    const accessToken = this.getAccessToken();
+    const refreshToken = this.getRefreshToken();
+
+    try {
+      if (accessToken && refreshToken) {
+        const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+
+        if (!response.ok) {
+          console.warn("Backend logout failed; clearing local session only.", response.status);
+        }
+      }
+    } catch (error) {
+      console.warn("Backend logout failed; clearing local session only.", error);
+    } finally {
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.refreshKey);
+      localStorage.removeItem(this.userKey);
+      toast.info("Logged out successfully");
+    }
   }
 
   private async fetchProfile(token: string, email: string, role: string): Promise<UserProfile> {

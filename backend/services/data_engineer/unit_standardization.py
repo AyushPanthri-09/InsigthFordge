@@ -15,11 +15,11 @@ class UnitStandardizer:
         - Weight: g -> kg (divide by 1000), lbs -> kg (divide by 2.20462)
         - Length: cm -> m (divide by 100), inches -> cm (multiply by 2.54)
         """
-        if series.dtype != "object":
+        if not pd.api.types.is_object_dtype(series.dtype) and not pd.api.types.is_string_dtype(series.dtype):
             return series, 0
             
         col_lower = col_name.lower()
-        cleaned = series.copy()
+        cleaned = pd.Series(index=series.index, dtype="float64")
         changes = 0
         
         # Determine weight or length base
@@ -73,7 +73,10 @@ class UnitStandardizer:
                 
         if changes > 0:
             try:
-                return pd.to_numeric(cleaned, errors='ignore'), changes
+                numeric = pd.to_numeric(cleaned, errors='coerce')
+                if numeric.notna().any():
+                    return numeric, changes
+                return cleaned, changes
             except Exception:
                 return cleaned, changes
         return series, 0

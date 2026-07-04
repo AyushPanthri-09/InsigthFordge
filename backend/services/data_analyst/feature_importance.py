@@ -34,7 +34,7 @@ class FeatureImportanceEngine:
         X_df = pd.DataFrame()
         for col in feature_cols:
             series = df_clean[col]
-            if np.issubdtype(series.dtype, np.number):
+            if pd.api.types.is_numeric_dtype(series.dtype):
                 X_df[col] = series.fillna(series.mean() if not series.dropna().empty else 0.0)
             else:
                 # Factorize categories

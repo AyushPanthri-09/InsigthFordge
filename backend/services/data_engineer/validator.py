@@ -95,7 +95,7 @@ class DataEngineerValidator:
                 ))
 
             # 7. Infinite values
-            if np.issubdtype(series.dtype, np.number):
+            if pd.api.types.is_numeric_dtype(series.dtype):
                 inf_count = int(np.isinf(series).sum())
                 if inf_count > 0:
                     issues.append(ValidationIssue(

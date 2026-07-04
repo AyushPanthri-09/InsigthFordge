@@ -55,7 +55,7 @@ class ColumnProfilerEngine:
             # Range & Distribution
             col_range = None
             distribution = {}
-            if np.issubdtype(series.dtype, np.number):
+            if pd.api.types.is_numeric_dtype(series.dtype):
                 non_null_numeric = series.dropna()
                 if len(non_null_numeric) > 0:
                     col_range = {

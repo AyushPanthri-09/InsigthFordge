@@ -69,8 +69,8 @@ function Dashboard() {
     }
   }, [router]);
 
-  const handleLogout = () => {
-    authService.logout();
+  const handleLogout = async () => {
+    await authService.logout();
     router.navigate({ to: "/login" });
   };
 

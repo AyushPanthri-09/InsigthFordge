@@ -38,7 +38,7 @@ class MissingValueIntelligence:
         for other_col in df.columns:
             if other_col == col:
                 continue
-            if np.issubdtype(df[other_col].dtype, np.number):
+            if pd.api.types.is_numeric_dtype(df[other_col].dtype):
                 other_series = df[other_col].fillna(df[other_col].median() if df[other_col].median() else 0)
                 if other_series.std() > 0:
                     corr = abs(float(null_indicator.corr(other_series)))

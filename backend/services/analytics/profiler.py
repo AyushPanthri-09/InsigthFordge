@@ -52,12 +52,12 @@ class DatasetProfilingEngine:
             # 1. Determine role & type
             role = "dimension"
             col_type = "categorical"
-            
-            if np.issubdtype(series.dtype, np.datetime64) or isinstance(series.dtype, pd.DatetimeTZDtype):
+
+            if pd.api.types.is_datetime64_any_dtype(series.dtype) or isinstance(series.dtype, pd.DatetimeTZDtype):
                 role = "datetime"
                 col_type = "temporal"
                 datetime_cols.append(col)
-            elif np.issubdtype(series.dtype, np.number):
+            elif pd.api.types.is_numeric_dtype(series.dtype):
                 # Is it an identifier or a scale?
                 if nunique == row_count and series.dtype in ["int64", "int32"]:
                     role = "key"
@@ -82,6 +82,7 @@ class DatasetProfilingEngine:
                     role = "dimension"
                     col_type = "categorical"
                     categorical_cols.append(col)
+
 
             # Compute column statistics
             col_stats = {

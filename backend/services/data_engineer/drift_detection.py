@@ -43,7 +43,7 @@ class DriftDetector:
             baseline_summary = baseline_metadata[col]
             
             # If numeric, compare distribution properties (mean and variance check)
-            if np.issubdtype(series.dtype, np.number) and baseline_summary.get("type") == "numeric":
+            if pd.api.types.is_numeric_dtype(series.dtype) and baseline_summary.get("type") == "numeric":
                 baseline_mean = baseline_summary.get("mean", 0.0)
                 baseline_std = baseline_summary.get("std", 1.0)
                 
@@ -92,7 +92,7 @@ class DriftDetector:
             if len(series) == 0:
                 continue
                 
-            if np.issubdtype(df[col].dtype, np.number):
+            if pd.api.types.is_numeric_dtype(df[col].dtype):
                 summaries[col] = {
                     "type": "numeric",
                     "mean": float(series.mean()),

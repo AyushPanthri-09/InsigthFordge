@@ -119,7 +119,7 @@ class DatasetCleaningEngine:
             # 4. Impute missing values
             null_count = int(series.isnull().sum())
             if config.get("impute_missing", True) and null_count > 0:
-                if np.issubdtype(series.dtype, np.number):
+                if pd.api.types.is_numeric_dtype(series.dtype):
                     # Numeric: use median to be robust against outliers
                     median_val = float(series.median()) if not pd.isna(series.median()) else 0.0
                     cleaned_df[col] = cleaned_df[col].fillna(median_val)
@@ -154,7 +154,7 @@ class DatasetCleaningEngine:
             series = cleaned_df[col]
 
             # 5. Handle Outliers
-            if config.get("handle_outliers", True) and np.issubdtype(series.dtype, np.number):
+            if config.get("handle_outliers", True) and pd.api.types.is_numeric_dtype(series.dtype):
                 q1 = series.quantile(0.25)
                 q3 = series.quantile(0.75)
                 iqr = q3 - q1

@@ -105,7 +105,7 @@ class DatasetValidationEngine:
             series = df[col]
             null_count = int(series.isnull().sum())
             null_pct = null_count / row_count
-            
+
             # 6. Excessive missing values
             if null_pct > 0.4:
                 issues.append({
@@ -115,8 +115,10 @@ class DatasetValidationEngine:
                     "description": f"Column '{col}' has {null_pct:.1%} missing values.",
                     "action": "drop_or_impute"
                 })
-                recommendations.append(f"Consider dropping or imputing missing values in column '{col}'.")
-                
+                recommendations.append(
+                    f"Consider dropping or imputing missing values in column '{col}'."
+                )
+
             # 7. Constant columns (low variance)
             non_null_series = series.dropna()
             if non_null_series.nunique() == 1:
@@ -127,14 +129,16 @@ class DatasetValidationEngine:
                     "description": f"Column '{col}' contains a constant value: {non_null_series.iloc[0]}",
                     "action": "drop_column"
                 })
-                recommendations.append(f"Drop column '{col}' since it has no variance and provides no predictive power.")
-                
+                recommendations.append(
+                    f"Drop column '{col}' since it has no variance and provides no predictive power."
+                )
+
             # 8. High cardinality for categorical column
             # Let's define a rough logic for detecting categorical columns
             is_object = series.dtype == "object"
-            if is_object and not col in unnamed_cols:
+            if is_object and col not in unnamed_cols:
                 nunique = non_null_series.nunique()
-                if nunique > 100 and nunique / len(non_null_series) > 0.5:
+                if nunique > 100 and len(non_null_series) > 0 and nunique / len(non_null_series) > 0.5:
                     issues.append({
                         "id": f"val_high_cardinality_{col}",
                         "column": str(col),
@@ -142,10 +146,12 @@ class DatasetValidationEngine:
                         "description": f"Column '{col}' has high cardinality ({nunique} unique text values).",
                         "action": "flag_high_cardinality"
                     })
-                    recommendations.append(f"Ensure '{col}' is not a primary key or text comment before using it in models.")
+                    recommendations.append(
+                        f"Ensure '{col}' is not a primary key or text comment before using it in models."
+                    )
 
             # 9. Infinite values
-            if np.issubdtype(series.dtype, np.number):
+            if pd.api.types.is_numeric_dtype(series.dtype):
                 inf_count = int(np.isinf(series).sum())
                 if inf_count > 0:
                     issues.append({
@@ -155,7 +161,9 @@ class DatasetValidationEngine:
                         "description": f"Column '{col}' contains {inf_count} infinite values.",
                         "action": "replace_inf"
                     })
-                    recommendations.append(f"Replace infinite values in column '{col}' with NaN or extreme values.")
+                    recommendations.append(
+                        f"Replace infinite values in column '{col}' with NaN or extreme values."
+                    )
 
             # 10. Mixed data types
             # Check if column has mixed types (e.g. float and string)
@@ -168,7 +176,9 @@ class DatasetValidationEngine:
                     "description": f"Column '{col}' contains mixed data types: {[t.__name__ for t in types_in_col]}",
                     "action": "cast_types"
                 })
-                recommendations.append(f"Standardize column '{col}' to a single datatype.")
+                recommendations.append(
+                    f"Standardize column '{col}' to a single datatype."
+                )
 
             # 11. Complex numbers check
             dtype_str = str(series.dtype)
@@ -180,7 +190,10 @@ class DatasetValidationEngine:
                     "description": f"Column '{col}' has unsupported complex data type.",
                     "action": "drop_or_cast"
                 })
-                recommendations.append(f"Remove or cast complex column '{col}' to a supported datatype.")
+                recommendations.append(
+                    f"Remove or cast complex column '{col}' to a supported datatype."
+                )
+
 
         # Determine overall validation state
         crit_issues = [i for i in issues if i["severity"] in ["critical"]]

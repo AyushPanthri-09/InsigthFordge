@@ -57,17 +57,6 @@ async function renderReportDom(
     }, 100);
   });
 
-  // ✅ ONLY remove specific placeholder patterns, NOT ALL HTML tags
-  let html = wrapper.innerHTML;
-
-  // Remove image[[...]] placeholders (any numbers inside)
-  html = html.replace(/image\[\[[^\]]*\]\]/g, "");
-
-  // Remove [object Object] artifacts
-  html = html.replace(/\[object Object\]/g, "");
-
-  wrapper.innerHTML = html;
-
   return {
     wrapper,
     cleanup: () => {

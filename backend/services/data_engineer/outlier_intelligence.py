@@ -16,7 +16,7 @@ class OutlierIntelligence:
         Returns: (boolean_mask, lower_bound, upper_bound, outliers_count)
         """
         non_null = series.dropna()
-        if len(non_null) < 5 or not np.issubdtype(series.dtype, np.number):
+        if len(non_null) < 5 or not pd.api.types.is_numeric_dtype(series.dtype):
             return pd.Series([False] * len(series)), 0.0, 0.0, 0
             
         q1 = non_null.quantile(0.25)
@@ -95,7 +95,7 @@ class OutlierIntelligence:
         """
         decisions = []
         for col in df.columns:
-            if not np.issubdtype(df[col].dtype, np.number):
+            if not pd.api.types.is_numeric_dtype(df[col].dtype):
                 continue
                 
             mask, lower_bound, upper_bound, count = OutlierIntelligence.detect_column_outliers(df[col])

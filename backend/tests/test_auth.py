@@ -90,6 +90,48 @@ def test_auth_get_profile() -> None:
     assert profile["email"] == "profile_test@insightforge.ai"
     assert profile["role"] == "Admin"
 
+def test_auth_refresh_and_logout_revokes_session() -> None:
+    """
+    Test refresh token rotation and logout session revocation.
+    """
+    client.post(
+        "/auth/register",
+        json={"email": "refresh_test@insightforge.ai", "password": "securepassword123", "role": "Analyst"}
+    )
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "refresh_test@insightforge.ai", "password": "securepassword123"}
+    )
+    refresh_token = login_resp.json()["refresh_token"]
+
+    refresh_resp = client.post(
+        "/auth/refresh",
+        json={"refresh_token": refresh_token}
+    )
+    assert refresh_resp.status_code == 200
+    refreshed = refresh_resp.json()
+    assert refreshed["refresh_token"] != refresh_token
+    assert refreshed["access_token"] != login_resp.json()["access_token"]
+
+    stale_resp = client.post(
+        "/auth/refresh",
+        json={"refresh_token": refresh_token}
+    )
+    assert stale_resp.status_code == 401
+
+    logout_resp = client.post(
+        "/auth/logout",
+        headers={"Authorization": f"Bearer {refreshed['access_token']}"},
+        json={"refresh_token": refreshed["refresh_token"]}
+    )
+    assert logout_resp.status_code == 200
+
+    revoked_resp = client.post(
+        "/auth/refresh",
+        json={"refresh_token": refreshed["refresh_token"]}
+    )
+    assert revoked_resp.status_code == 401
+
 def test_auth_invalid_credentials() -> None:
     """
     Test login with wrong password returns 401.

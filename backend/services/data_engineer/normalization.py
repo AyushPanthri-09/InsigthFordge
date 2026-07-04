@@ -13,7 +13,7 @@ class NormalizationEngine:
         """
         Trims leading/trailing whitespaces and collapses multiple spaces into one.
         """
-        if series.dtype != "object":
+        if not pd.api.types.is_object_dtype(series.dtype) and not pd.api.types.is_string_dtype(series.dtype):
             return series, 0
             
         def clean_spaces(val):
@@ -22,7 +22,8 @@ class NormalizationEngine:
             return re.sub(r'\s+', ' ', val.strip())
 
         cleaned = series.apply(clean_spaces)
-        changes = int((series != cleaned).sum())
+        # Ensure exact equality checks work (avoid dtype/representation differences)
+        changes = int((series.astype(str) != cleaned.astype(str)).sum())
         return cleaned, changes
 
     @staticmethod
@@ -80,7 +81,7 @@ class NormalizationEngine:
         - 'upper': for codes (SKU, Currency, Status, Country ISO)
         - 'lower': for emails
         """
-        if series.dtype != "object":
+        if not pd.api.types.is_object_dtype(series.dtype) and not pd.api.types.is_string_dtype(series.dtype):
             return series, 0
             
         def apply_style(val):
@@ -103,14 +104,15 @@ class NormalizationEngine:
         """
         Strips currency signs ($, €, £), commas, and casts string monetary columns to numeric float.
         """
-        if series.dtype != "object":
+        if not pd.api.types.is_object_dtype(series.dtype) and not pd.api.types.is_string_dtype(series.dtype):
             return series, 0
             
-        cleaned = series.copy()
         changes = 0
         
+        numeric_series = pd.Series(index=series.index, dtype="float64")
         for i, val in enumerate(series):
             if pd.isna(val):
+                numeric_series.iloc[i] = np.nan
                 continue
             val_str = str(val).strip()
             # Replace common currency symbols and commas
@@ -120,13 +122,15 @@ class NormalizationEngine:
                 # Keep original sign if present
                 if "-" in val_str:
                     numeric_val = -numeric_val
-                cleaned.iloc[i] = numeric_val
+                numeric_series.iloc[i] = numeric_val
                 changes += 1
             except ValueError:
-                pass
+                numeric_series.iloc[i] = np.nan
                 
         # Cast to float series if successful
         try:
-            return pd.to_numeric(cleaned, errors='ignore'), changes
+            if numeric_series.notna().any():
+                return numeric_series, changes
+            return numeric_series, changes
         except Exception:
-            return cleaned, changes
+            return numeric_series, changes
