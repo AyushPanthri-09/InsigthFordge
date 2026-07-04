@@ -14,9 +14,8 @@ interface LoginResponse {
   role: string;
 }
 
-const API_BASE_URL =
-  (import.meta.env.VITE_INSIGHTFORGE_API_URL as string | undefined)?.trim() ||
-  "http://127.0.0.1:8000";
+const configuredApiUrl = (import.meta.env.VITE_INSIGHTFORGE_API_URL as string | undefined)?.trim();
+const API_BASE_URL = configuredApiUrl ?? (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
 
 class AuthService {
   private tokenKey = "insightforge_access_token";

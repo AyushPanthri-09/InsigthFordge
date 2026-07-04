@@ -3,7 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 from backend.core.config import settings
+from backend.core.database import Base, engine
 from backend.core.logger import logger
+from backend.models import db_models
 from backend.api import health, upload, analyze, auth
 from backend.utils.exceptions import InsightForgeException
 
@@ -16,6 +18,7 @@ async def lifespan(app: FastAPI):
         f"Booting InsightForge Backend. Host: {settings.host}, Port: {settings.port}, "
         f"Debug Mode: {settings.debug}"
     )
+    Base.metadata.create_all(bind=engine)
     yield
     logger.info("Shutting down InsightForge Backend server.")
 

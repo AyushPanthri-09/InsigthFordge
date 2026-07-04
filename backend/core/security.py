@@ -3,9 +3,9 @@ import uuid
 from typing import Any, Union
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from backend.core.config import settings
 
 # Security Configuration Constants
-SECRET_KEY = "insightforge_super_secure_secret_key_must_be_changed_in_prod"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -40,7 +40,7 @@ def create_access_token(subject: Union[str, Any], expires_delta: datetime.timede
         "sub": str(subject),
         "type": "access"
     }
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
 
 def create_refresh_token(subject: Union[str, Any], expires_delta: datetime.timedelta = None) -> str:
     """
@@ -58,10 +58,10 @@ def create_refresh_token(subject: Union[str, Any], expires_delta: datetime.timed
         "sub": str(subject),
         "type": "refresh"
     }
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
 
 def decode_token(token: str) -> dict:
     """
     Decodes and validates a JWT token. Raises JWTError if invalid.
     """
-    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])

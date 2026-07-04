@@ -7,12 +7,14 @@ import { createHttpAnalyticsService } from "./httpImplementation";
  *
  * Set `VITE_INSIGHTFORGE_API_URL` to point the frontend at a deployed
  * FastAPI backend (must implement the contracts in `./types.ts`).
- * Without it, the local TypeScript implementation is used.
+ * Without it, local dev uses the TypeScript implementation, while production
+ * uses same-origin API routes provided by the Railway reverse proxy.
  */
-const apiUrl = (import.meta.env.VITE_INSIGHTFORGE_API_URL as string | undefined)?.trim();
+const configuredApiUrl = (import.meta.env.VITE_INSIGHTFORGE_API_URL as string | undefined)?.trim();
 
-export const analyticsService: AnalyticsService = apiUrl
-  ? createHttpAnalyticsService(apiUrl)
-  : tsAnalyticsService;
+export const analyticsService: AnalyticsService =
+  configuredApiUrl || !import.meta.env.DEV
+    ? createHttpAnalyticsService(configuredApiUrl ?? "")
+    : tsAnalyticsService;
 
 export * from "./types";

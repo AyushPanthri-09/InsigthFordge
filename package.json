@@ -8,6 +8,8 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "start": "node railway-server.mjs",
+    "start:railway": "node railway-server.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
