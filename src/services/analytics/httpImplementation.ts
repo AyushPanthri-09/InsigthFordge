@@ -12,6 +12,16 @@ import type {
 } from "./types";
 import { authService } from "../auth";
 
+function asArray<T = any>(value: unknown): T[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function asRecord(value: unknown): Record<string, any> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, any>)
+    : {};
+}
+
 export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
   return {
     async parseFile(file: File): Promise<ParsedDataset> {
@@ -35,14 +45,15 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         throw new Error(`Upload & analysis failed: ${r.status} ${text}`);
       }
 
-      const data = await r.json();
+      const data = asRecord(await r.json());
+      const datasetData = asRecord(data.dataset);
       return {
-        datasetId: data.dataset.datasetId || "staged-id",
-        fileName: data.dataset.fileName || file.name,
-        rowCount: data.dataset.rowCount || 0,
-        columnCount: data.dataset.columnCount || 0,
-        columns: data.dataset.columns || [],
-        preview: data.dataset.preview || [],
+        datasetId: datasetData.datasetId || "staged-id",
+        fileName: datasetData.fileName || file.name,
+        rowCount: datasetData.rowCount || 0,
+        columnCount: datasetData.columnCount || 0,
+        columns: asArray<string>(datasetData.columns),
+        preview: asArray<Record<string, unknown>>(datasetData.preview),
       };
     },
 
@@ -95,7 +106,14 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         throw new Error(`Analysis failed: ${r.status} - ${text}`);
       }
 
-      const data = await r.json();
+      const data = asRecord(await r.json());
+      const datasetData = asRecord(data.dataset);
+      const profile = asRecord(data.profile);
+      const narrative = asRecord(data.narrative);
+      const quality = asRecord(data.quality);
+      const kpis = asArray<any>(data.kpis);
+      const correlations = asArray<any>(data.correlations);
+      const insightsPayload = asArray<any>(data.insights);
 
       options?.onProgress?.({
         timestamp: Date.now(),
@@ -105,16 +123,16 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
 
       // Map backend DatasetMetadata to ParsedDataset
       const dataset: ParsedDataset = {
-        datasetId: data.dataset.datasetId || "staged-id",
-        fileName: data.dataset.fileName || file.name,
-        rowCount: data.dataset.rowCount || 0,
-        columnCount: data.dataset.columnCount || 0,
-        columns: data.dataset.columns || [],
-        preview: data.dataset.preview || [],
+        datasetId: datasetData.datasetId || "staged-id",
+        fileName: datasetData.fileName || file.name,
+        rowCount: datasetData.rowCount || 0,
+        columnCount: datasetData.columnCount || 0,
+        columns: asArray<string>(datasetData.columns),
+        preview: asArray<Record<string, unknown>>(datasetData.preview),
       };
 
       // Map backend ProfileReport & Narrative to DatasetUnderstanding
-      const columnProfiles: ColumnProfile[] = (data.profile.columns || []).map((col: any) => ({
+      const columnProfiles: ColumnProfile[] = asArray<any>(profile.columns).map((col: any) => ({
         name: col.name,
         inferredType: col.type || "unknown",
         inferredRole: col.role || "metadata",
@@ -129,19 +147,19 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
 
       const understanding: DatasetUnderstanding = {
         datasetId: dataset.datasetId,
-        domain: data.profile.domain || "generic",
-        domainConfidence: data.profile.domainConfidence || 0.9,
-        summary: data.narrative.situation || "Dataset successfully profiled by backend parser.",
-        purpose: data.narrative.complication || "Analyze metrics and correlations for trends.",
+        domain: profile.domain || "generic",
+        domainConfidence: profile.domainConfidence || 0.9,
+        summary: narrative.situation || "Dataset successfully profiled by backend parser.",
+        purpose: narrative.complication || "Analyze metrics and correlations for trends.",
         primaryEntities:
-          data.profile.domain === "ecommerce" ? ["Customer", "Order", "Product"] : ["Record"],
-        suggestedKPIs: (data.kpis || []).map((k: any) => ({
+          profile.domain === "ecommerce" ? ["Customer", "Order", "Product"] : ["Record"],
+        suggestedKPIs: kpis.map((k: any) => ({
           name: k.label,
           rationale: k.rationale,
           columns: dataset.columns,
         })),
         columnProfiles,
-        relationships: (data.correlations || []).map((c: any) => ({
+        relationships: correlations.map((c: any) => ({
           from: c.a,
           to: c.b,
           type: c.strength,
@@ -157,7 +175,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       });
 
       // Map QualityReport to CleaningReport
-      const cleaningIssues: CleaningIssue[] = (data.quality.issues || []).map((issue: any) => ({
+      const cleaningIssues: CleaningIssue[] = asArray<any>(quality.issues).map((issue: any) => ({
         id: issue.id,
         severity: issue.severity || "warning",
         action: issue.action || "flag_only",
@@ -175,7 +193,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         issues: cleaningIssues,
         rowsBefore: dataset.rowCount,
         rowsAfter: dataset.rowCount,
-        qualityScore: data.quality?.qualityScore || 100,
+        qualityScore: quality.qualityScore || 100,
         notes: "Clean report generated. Inconsistencies detected and flagged.",
       };
 
@@ -211,8 +229,8 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
 
       const eda: EDAReport = {
         datasetId: dataset.datasetId,
-        kpis: data.kpis || [],
-        correlations: data.correlations || [],
+        kpis,
+        correlations,
         charts,
         distributions: [],
         topFindings: [],
@@ -225,7 +243,7 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
       });
 
       // Map backend insights to AnalyticsReport
-      const insights: AIInsight[] = (data.insights || []).map((ins: any) => ({
+      const insights: AIInsight[] = insightsPayload.map((ins: any) => ({
         id: ins.id,
         level: ins.level || "descriptive",
         title: ins.title,
@@ -255,8 +273,8 @@ export function createHttpAnalyticsService(baseUrl: string): AnalyticsService {
         diagnostic: insights.filter((i) => i.level === "diagnostic"),
         predictive: insights.filter((i) => i.level === "predictive"),
         prescriptive: insights.filter((i) => i.level === "prescriptive"),
-        businessHealthScore: data.quality.qualityScore || 90,
-        executiveSummary: data.narrative.insight || "Analysis completed successfully.",
+        businessHealthScore: quality.qualityScore || 90,
+        executiveSummary: narrative.insight || "Analysis completed successfully.",
       };
 
       options?.onProgress?.({
