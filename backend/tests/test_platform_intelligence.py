@@ -1,3 +1,4 @@
+import math
 import pytest
 import pandas as pd
 import numpy as np
@@ -106,7 +107,7 @@ def test_continuous_learning():
     
     learning = ContinuousLearningEngine.optimize_parameters("test_plat_ds", 0.95)
     assert learning.learning_iterations == 1
-    assert learning.optimized_thresholds["retry_delay_seconds"] == 0.75
+    assert math.isclose(learning.optimized_thresholds["retry_delay_seconds"], 0.75, rel_tol=1e-9, abs_tol=1e-12)
     assert learning.accuracy_improvement > 0.0
 
 def test_platform_validator(mock_orch_result):
@@ -134,7 +135,7 @@ def test_supervisor_orchestrator(mock_orch_result):
     result = AIPlatformSupervisor.supervise("test_plat_ds", orch_res)
     assert isinstance(result, PlatformIntelligenceResult)
     assert result.dataset_id == "test_plat_ds"
-    assert result.overall_governance_score == 100.0
+    assert math.isclose(result.overall_governance_score, 100.0, rel_tol=1e-9, abs_tol=1e-12)
     
     # Memory validation
     mem = SharedProjectMemory()

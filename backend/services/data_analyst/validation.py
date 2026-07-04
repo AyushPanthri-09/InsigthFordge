@@ -1,3 +1,4 @@
+import math
 import pandas as pd
 from typing import List, Dict, Any
 from backend.services.data_analyst.contracts import (
@@ -93,7 +94,7 @@ class DataAnalystValidator:
 
         # 5. Every trend includes direction and confidence
         for trend in validated.trends:
-            if trend.confidence_breakdown.overall_confidence == 0.0:
+            if math.isclose(trend.confidence_breakdown.overall_confidence, 0.0, rel_tol=1e-9, abs_tol=1e-12):
                 trend.validation_status = "warning"
                 trend.limitations.append("Zero computed statistical significance for this trend.")
 

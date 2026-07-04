@@ -1,3 +1,4 @@
+import math
 import pytest
 import pandas as pd
 import numpy as np
@@ -87,16 +88,16 @@ def test_normalization_engine():
     # Currency normalization
     s_curr = pd.Series(["$120.00", "€1,500.50", "-$50.00", "invalid"])
     clean_curr, changes = NormalizationEngine.normalize_currency_symbols(s_curr)
-    assert clean_curr.iloc[0] == 120.0
-    assert clean_curr.iloc[1] == 1500.5
-    assert clean_curr.iloc[2] == -50.0
+    assert math.isclose(clean_curr.iloc[0], 120.0, rel_tol=1e-9, abs_tol=1e-12)
+    assert math.isclose(clean_curr.iloc[1], 1500.5, rel_tol=1e-9, abs_tol=1e-12)
+    assert math.isclose(clean_curr.iloc[2], -50.0, rel_tol=1e-9, abs_tol=1e-12)
     assert changes == 3
 
 def test_unit_standardizer():
     s_weight = pd.Series(["10kg", "500g", "5 lbs", "invalid"])
     clean_weight, changes = UnitStandardizer.standardize_column_units(s_weight, "weight_col")
-    assert clean_weight.iloc[0] == 10.0
-    assert clean_weight.iloc[1] == 0.5
+    assert math.isclose(clean_weight.iloc[0], 10.0, rel_tol=1e-9, abs_tol=1e-12)
+    assert math.isclose(clean_weight.iloc[1], 0.5, rel_tol=1e-9, abs_tol=1e-12)
     assert abs(clean_weight.iloc[2] - 2.26796) < 0.01
     assert changes == 3
 
@@ -278,7 +279,7 @@ def test_audit_trail():
     entries = trail.get_trail()
     assert len(entries) == 1
     assert entries[0].action == "test_action"
-    assert entries[0].confidence == 0.9
+    assert math.isclose(entries[0].confidence, 0.9, rel_tol=1e-9, abs_tol=1e-12)
 
 def test_ai_data_engineer_pipeline(dirty_dataframe):
     # Execute full Data Engineer pipeline
@@ -290,9 +291,9 @@ def test_ai_data_engineer_pipeline(dirty_dataframe):
     # Check that deterministic transformations were applied
     df_clean = certified.dataframe
     assert df_clean["cust_name"].iloc[0] == "John Doe"  # whitespace trimmed
-    assert df_clean["revenue_val"].iloc[0] == 120.0     # currency parsed to float
+    assert math.isclose(df_clean["revenue_val"].iloc[0], 120.0, rel_tol=1e-9, abs_tol=1e-12)     # currency parsed to float
     assert df_clean["is_active"].iloc[0] == True        # boolean standardized
-    assert df_clean["weight_col"].iloc[1] == 0.5        # unit standardized (500g -> 0.5kg)
+    assert math.isclose(df_clean["weight_col"].iloc[1], 0.5, rel_tol=1e-9, abs_tol=1e-12)        # unit standardized (500g -> 0.5kg)
     
     # Check that quality scores and certifications are generated
     assert certified.metadata.quality_report.quality_score.score > 0

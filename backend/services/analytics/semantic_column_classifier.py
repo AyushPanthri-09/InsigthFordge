@@ -1,3 +1,4 @@
+import math
 import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
@@ -398,7 +399,7 @@ def _decide_column_type(df: pd.DataFrame, col: str) -> ColumnDecision:
         scores["CATEGORICAL"] += cat_score + 0.1
 
     # Fallbacks
-    if max(scores.values()) == 0.0:
+    if math.isclose(max(scores.values()), 0.0, rel_tol=1e-9, abs_tol=1e-12):
         # use dtype-based fallback
         if pd.api.types.is_datetime64_any_dtype(series):
             return ColumnDecision(

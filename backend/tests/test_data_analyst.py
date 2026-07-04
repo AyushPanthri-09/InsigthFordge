@@ -1,3 +1,4 @@
+import math
 import pytest
 import pandas as pd
 import numpy as np
@@ -77,7 +78,12 @@ def test_kpi_discovery(mock_retail_dataframe, mock_hr_dataframe):
     
     # Verify calculated values
     total_rev_res = [r for r in kpi_res if r.kpi_name == "Total Revenue"][0]
-    assert total_rev_res.current_value == float(mock_retail_dataframe["revenue_val"].sum())
+    assert math.isclose(
+        total_rev_res.current_value,
+        float(mock_retail_dataframe["revenue_val"].sum()),
+        rel_tol=1e-9,
+        abs_tol=1e-12
+    )
     assert total_rev_res.evidence_ids[0].startswith("ev_kpi_total_revenue")
     assert total_rev_res.confidence_breakdown.overall_confidence > 0.0
 
@@ -137,7 +143,7 @@ def test_statistical_engine():
         "b": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20] # perfect collinearity
     })
     vifs = StatisticalAnalysisEngine.calculate_vif(df_vif, ["a", "b"])
-    assert vifs["a"] > 10.0 or vifs["a"] == 999.0
+    assert vifs["a"] > 10.0 or math.isclose(vifs["a"], 999.0, rel_tol=1e-9, abs_tol=1e-12)
 
 def test_eda_engine(mock_retail_dataframe):
     eda = EDAEngine.run_eda(

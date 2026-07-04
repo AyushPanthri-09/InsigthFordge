@@ -1,3 +1,4 @@
+import math
 import pytest
 import pandas as pd
 import numpy as np
@@ -83,9 +84,9 @@ def test_evidence_factory():
     )
     assert isinstance(ev, Evidence)
     assert ev.source == "TestHeuristic"
-    assert ev.confidence == 0.85
+    assert math.isclose(ev.confidence, 0.85, rel_tol=1e-9, abs_tol=1e-12)
     assert "col_a" in ev.supporting_columns
-    assert ev.supporting_statistics["mean"] == 10.0
+    assert math.isclose(ev.supporting_statistics["mean"], 10.0, rel_tol=1e-9, abs_tol=1e-12)
     assert ev.validation_status == "valid"
     assert ev.timestamp.endswith("Z")
 
@@ -93,7 +94,7 @@ def test_confidence_engine():
     # High confidence classification
     c_high = ConfidenceEngine.compute_confidence(0.95, "Looks extremely solid")
     assert c_high.level == "HIGH"
-    assert c_high.score == 0.95
+    assert math.isclose(c_high.score, 0.95, rel_tol=1e-9, abs_tol=1e-12)
     
     # Medium confidence
     c_med = ConfidenceEngine.compute_confidence(0.65, "Looks decent")
@@ -105,9 +106,9 @@ def test_confidence_engine():
     
     # Boundaries
     c_edge1 = ConfidenceEngine.compute_confidence(1.5, "Out of bounds")
-    assert c_edge1.score == 1.0
+    assert math.isclose(c_edge1.score, 1.0, rel_tol=1e-9, abs_tol=1e-12)
     c_edge2 = ConfidenceEngine.compute_confidence(-0.5, "Negative score")
-    assert c_edge2.score == 0.0
+    assert math.isclose(c_edge2.score, 0.0, rel_tol=1e-9, abs_tol=1e-12)
 
 def test_schema_understanding_retail(retail_dataframe):
     schema = SchemaUnderstandingEngine.analyze_schema(retail_dataframe)

@@ -1,3 +1,4 @@
+import math
 import pytest
 import pandas as pd
 import numpy as np
@@ -93,12 +94,12 @@ def test_experiment_tracker():
     record = ExperimentTrackerEngine.log_experiment({"alpha": 0.1}, runtime=5.5, success_rate=0.95)
     assert record.experiment_id != ""
     assert record.benchmark_score > 0.0
-    assert record.success_rate == 0.95
+    assert math.isclose(record.success_rate, 0.95, rel_tol=1e-9, abs_tol=1e-12)
 
 def test_benchmark_engine():
     res = BenchmarkEngine.run_benchmark(latency=4.0, cpu_usage=20.0, ram_usage=30.0)
     assert res.score > 0.0
-    assert res.cache_hit_rate == 0.85
+    assert math.isclose(res.cache_hit_rate, 0.85, rel_tol=1e-9, abs_tol=1e-12)
 
 def test_security_and_rbac():
     policy = SecurityManager.verify_security()
@@ -111,7 +112,7 @@ def test_security_and_rbac():
 def test_configuration_manager():
     profile = ConfigurationManager.get_profile()
     assert profile.retry_policy["max_retries"] == 3
-    assert profile.resource_limits["max_cpu_percent"] == 90.0
+    assert math.isclose(profile.resource_limits["max_cpu_percent"], 90.0, rel_tol=1e-9, abs_tol=1e-12)
 
 def test_backup_and_recovery():
     mem = SharedProjectMemory()
@@ -130,7 +131,7 @@ def test_observability_and_metrics():
     assert obs.failed_runs >= 0
     
     metrics = PlatformMetricsEngine.get_metrics("test_ops_ds")
-    assert metrics.availability == 99.9
+    assert math.isclose(metrics.availability, 99.9, rel_tol=1e-9, abs_tol=1e-12)
     assert metrics.success_rate >= 0.0
 
 def test_operations_validator():

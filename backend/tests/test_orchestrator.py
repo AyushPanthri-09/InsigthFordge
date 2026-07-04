@@ -1,3 +1,4 @@
+import math
 import pytest
 import pandas as pd
 import numpy as np
@@ -85,7 +86,7 @@ def test_progress_tracker():
     
     prog = tracker.get_progress()
     assert prog.current_phase == "Semantic"
-    assert prog.overall_progress_pct == 16.6
+    assert math.isclose(prog.overall_progress_pct, 16.6, rel_tol=1e-9, abs_tol=1e-12)
     
     # Verify cached in memory
     mem = SharedProjectMemory()

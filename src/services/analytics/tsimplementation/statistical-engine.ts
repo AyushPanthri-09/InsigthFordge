@@ -474,14 +474,14 @@ function buildDistributionExplanation(
  * Uses a simplified lookup (z-distribution for n>30; t-approx for smaller).
  */
 function confidenceZ(n: number, level: number): number {
-  if (level === 0.95) {
+  if (Math.abs(level - 0.95) < 1e-9) {
     if (n >= 30) return 1.96;
     if (n >= 20) return 2.09;
     if (n >= 15) return 2.13;
     if (n >= 10) return 2.23;
     return 2.57; // conservative
   }
-  if (level === 0.99) return n >= 30 ? 2.576 : 3.25;
+  if (Math.abs(level - 0.99) < 1e-9) return n >= 30 ? 2.576 : 3.25;
   return 1.645; // 90%
 }
 
